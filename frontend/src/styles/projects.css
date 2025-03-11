@@ -1,0 +1,274 @@
+/* Project styles */
+.project-list-container {
+    padding: 2rem;
+    background-color: #f5f7fa;
+    min-height: calc(100vh - 80px);
+  }
+  
+  .project-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .project-list-header h2 {
+    margin: 0;
+    color: #1167be;
+  }
+  
+  .create-project-btn {
+    background-color: #1167be;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .create-project-btn:hover {
+    background-color: #0d5bab;
+  }
+  
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .no-projects {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    grid-column: 1 / -1;
+  }
+  
+  .no-projects a {
+    color: #1167be;
+    text-decoration: none;
+  }
+  
+  /* Project Card */
+  .project-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .project-card-header {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .project-card-header h3 {
+    margin: 0;
+    color: #1167be;
+  }
+  
+  .project-status {
+    background-color: #e7f3ff;
+    color: #1167be;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    text-transform: capitalize;
+  }
+  
+  .project-card-body {
+    padding: 1rem;
+    flex-grow: 1;
+  }
+  
+  .project-dates {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: #666;
+  }
+  
+  .project-card-footer {
+    padding: 1rem;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .view-btn, .edit-btn, .delete-btn {
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .view-btn {
+    background-color: #e7f3ff;
+    color: #1167be;
+  }
+  
+  .edit-btn {
+    background-color: #ffeba3;
+    color: #b45309;
+  }
+  
+  .delete-btn {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+  
+  /* Create/Edit Project Forms */
+  .create-project-container,
+  .edit-project-container {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+    background-color: #f5f7fa;
+    min-height: calc(100vh - 80px);
+  }
+  
+  .create-project-form,
+  .edit-project-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .form-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+  }
+  
+  .cancel-btn {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+  }
+  
+  .submit-btn {
+    background-color: #1167be;
+    color: white;
+  }
+  
+  /* Project Detail */
+  .project-detail-container {
+    padding: 2rem;
+    background-color: #f5f7fa;
+    min-height: calc(100vh - 80px);
+  }
+  
+  .project-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .project-metadata {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .metadata-item {
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  .project-description {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+  }
+  
+  .project-description h3 {
+    margin-top: 0;
+    color: #1167be;
+  }
+  
+  .project-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .back-btn {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .project-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+  
+  .section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .section h3 {
+    margin-top: 0;
+    color: #1167be;
+  }
+  
+  .add-btn {
+    background-color: #e7f3ff;
+    color: #1167be;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 1rem;
+  }
+  
+  /* Loading and Error states */
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    font-size: 1.2rem;
+    color: #6b7280;
+  }
+  
+  .error-message {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+
+  .board-btn {
+    background-color: #1167be;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .board-btn:hover {
+    background-color: #0d5bab;
+  }

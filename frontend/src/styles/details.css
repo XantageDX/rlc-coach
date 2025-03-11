@@ -1,0 +1,260 @@
+/* Common detail view styles */
+.kd-detail-container,
+.kg-detail-container {
+  padding: 2rem;
+  background-color: #f5f7fa;
+  min-height: calc(100vh - 120px);
+}
+
+.kd-detail-header,
+.kg-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.header-left h2 {
+  margin: 0;
+  color: #1167be;
+}
+
+.title-input {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1167be;
+  padding: 0.3rem;
+  width: 100%;
+  min-width: 300px;
+}
+
+.status-badge {
+  background-color: #e7f3ff;
+  color: #1167be;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.save-btn,
+.cancel-btn,
+.edit-btn,
+.delete-btn,
+.back-btn,
+.board-btn,
+.project-btn,
+.add-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin: 0;
+  width: auto;
+}
+
+.save-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.cancel-btn {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.edit-btn {
+  background-color: #ffeba3;
+  color: #b45309;
+}
+
+.delete-btn {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.back-btn {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.board-btn,
+.project-btn {
+  background-color: #1167be;
+  color: white;
+}
+
+.add-btn {
+  background-color: #e7f3ff;
+  color: #1167be;
+}
+
+/* Metadata sections */
+.kd-detail-metadata,
+.kg-detail-metadata {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.metadata-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.metadata-row:last-child {
+  margin-bottom: 0;
+}
+
+.metadata-item {
+  min-width: 200px;
+  flex: 1;
+}
+
+.metadata-item input,
+.metadata-item select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.3rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Description and content sections */
+.kd-detail-description,
+.kg-detail-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.kd-detail-description h3,
+.kg-detail-section h3,
+.kd-detail-section h3 {
+  margin-top: 0;
+  color: #1167be;
+  margin-bottom: 1rem;
+}
+
+.kd-detail-description p,
+.kg-detail-section p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.kd-detail-description textarea,
+.kg-detail-section textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+/* Action buttons at the bottom */
+.kd-detail-actions,
+.kg-detail-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Knowledge gaps section */
+.kd-detail-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-header h3 {
+  margin: 0;
+  color: #1167be;
+}
+
+.no-items {
+  color: #6b7280;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.knowledge-gaps-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.knowledge-gap-card {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.gap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.gap-header h4 {
+  margin: 0;
+  color: #1167be;
+}
+
+.gap-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.view-btn {
+  background-color: #e7f3ff;
+  color: #1167be;
+  border: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.decision-link {
+  color: #1167be;
+  text-decoration: none;
+}
+
+.decision-link:hover {
+  text-decoration: underline;
+}

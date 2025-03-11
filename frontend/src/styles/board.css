@@ -1,0 +1,263 @@
+/* Board Layout */
+.project-board-container {
+    padding: 1rem;
+    overflow-x: auto;
+  }
+  
+  .project-board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .project-status {
+    background-color: #e7f3ff;
+    color: #1167be;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+  
+  .board-controls {
+    margin-bottom: 1rem;
+  }
+  
+  .add-ie-btn {
+    background-color: #1167be;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .add-ie-btn:hover {
+    background-color: #0d5bab;
+  }
+  
+  .board-container {
+    display: flex;
+    gap: 1.5rem;
+    padding-bottom: 1rem;
+    min-height: 400px;
+  }
+  
+  /* Integration Event Columns */
+  .ie-column {
+    background: #f5f7fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    width: 300px;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 200px);
+  }
+  
+  .ie-column-header {
+    background-color: #1167be;
+    color: white;
+    padding: 1rem;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .ie-column-header h3 {
+    margin: 0;
+    color: white;
+    font-size: 1.1rem;
+  }
+  
+  .ie-column-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .icon-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.25rem;
+    margin: 0;
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .icon-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+  
+  .ie-column-content {
+    padding: 1rem;
+    flex-grow: 1;
+    overflow-y: auto;
+    min-height: 200px;
+  }
+  
+  .dragging-over {
+    background-color: #e7f3ff;
+  }
+  
+  .no-items-text {
+    color: #888;
+    text-align: center;
+    margin: 2rem 0;
+    font-style: italic;
+  }
+  
+  .add-kd-btn {
+    margin: 0.75rem;
+    padding: 0.5rem;
+    background-color: #ff9a04;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .add-kd-btn:hover {
+    background-color: #e68c00;
+  }
+  
+  /* Key Decision Cards */
+  .kd-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    cursor: grab;
+    touch-action: none;
+  }
+  
+  .kd-card:active {
+    cursor: grabbing;
+  }
+  
+  .kd-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+  }
+  
+  .kd-card-header h4 {
+    margin: 0;
+    color: #1167be;
+    font-size: 1rem;
+  }
+  
+  .kd-status {
+    background-color: #e7f3ff;
+    color: #1167be;
+    padding: 0.1rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    text-transform: capitalize;
+  }
+  
+  .kd-card-body {
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 0.75rem;
+  }
+  
+  .kd-card-body p {
+    margin: 0.5rem 0;
+  }
+  
+  .kd-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+  
+  .small-btn {
+    padding: 0.25rem 0.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin: 0;
+    width: auto;
+  }
+  
+  .view-btn {
+    background-color: #e7f3ff;
+    color: #1167be;
+  }
+  
+  .edit-btn {
+    background-color: #ffeba3;
+    color: #b45309;
+  }
+  
+  .delete-btn {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+  
+  /* No Events Message */
+  .no-events-message {
+    background: white;
+    padding: 2rem;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+  }
+  
+  .no-events-message p {
+    margin-bottom: 1.5rem;
+    color: #666;
+  }
+
+  /* Knowledge Gaps in Key Decision cards */
+  .kd-card-knowledge-gaps {
+    margin-top: 0.75rem;
+    border-top: 1px dashed #ddd;
+    padding-top: 0.5rem;
+  }
+
+  .kg-list {
+    margin: 0.5rem 0 0 0;
+    padding-left: 1.25rem;
+    font-size: 0.85rem;
+  }
+
+  .kg-item {
+    margin-bottom: 0.25rem;
+    color: #666;
+  }
+
+  .kg-title {
+    cursor: pointer;
+    color: #1167be;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    max-width: 150px;
+  }
+  
+  .kg-title:hover {
+    text-decoration-style: solid;
+  }

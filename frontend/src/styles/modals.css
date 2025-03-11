@@ -1,0 +1,134 @@
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .modal-header h3 {
+    margin: 0;
+    color: #1167be;
+  }
+  
+  .modal-header .close-btn {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    width: auto;
+  }
+  
+  /* Note text in modals */
+  .note {
+    color: #666;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+  }
+  
+  /* Section styling */
+  .project-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .section-header h3 {
+    margin: 0;
+  }
+  
+  /* Card styles for entities */
+  .events-list,
+  .decision-list,
+  .gap-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .event-card,
+  .decision-card,
+  .gap-card {
+    background: #f9f9f9;
+    padding: 1rem;
+    border-radius: 6px;
+    border: 1px solid #eee;
+  }
+  
+  .decision-header,
+  .gap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+  }
+  
+  .decision-header h4,
+  .gap-header h4 {
+    margin: 0;
+    color: #1167be;
+  }
+  
+  .status-badge {
+    background-color: #e7f3ff;
+    color: #1167be;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    text-transform: capitalize;
+  }
+  
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .small-btn {
+    padding: 0.3rem 0.6rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    width: auto;
+    margin: 0;
+  }
