@@ -1,22 +1,64 @@
-import React, { useState, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
+import projectService from '../../services/projectService';
 
 const Sidebar = () => {
+  // eslint-disable-next-line no-unused-vars
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedProject, setSelectedProject] = useState('');
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
   
-  // This would be populated from API in the future
-  const projects = [
-    { id: "1", name: "Project A" },
-    { id: "2", name: "Project B" },
-    { id: "3", name: "Project C" }
-  ];
+  // Fetch projects when component mounts
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await projectService.getAllProjects();
+        setProjects(data);
+        
+        // If there are projects but none selected, select the first one
+        if (data.length > 0 && !selectedProject) {
+          // Check localStorage first
+          const savedProjectId = localStorage.getItem('selectedProjectId');
+          if (savedProjectId && data.some(p => p.id === savedProjectId)) {
+            setSelectedProject(savedProjectId);
+          } else {
+            setSelectedProject(data[0].id);
+            localStorage.setItem('selectedProjectId', data[0].id);
+          }
+        }
+        
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching projects:', err);
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, [selectedProject]);
   
   const handleProjectSelect = (e) => {
-    setSelectedProject(e.target.value);
-    // In the future, this would update the context or trigger data loading
+    const projectId = e.target.value;
+    setSelectedProject(projectId);
+    localStorage.setItem('selectedProjectId', projectId);
+    
+    // If user is on a project-specific page, redirect to the same page but for the newly selected project
+    if (location.pathname.includes('/core-hypothesis') ||
+        location.pathname.includes('/projects/') ||
+        location.pathname.includes('/report-writer')) {
+      // Navigate to the same section but for the new project
+      if (location.pathname.includes('/core-hypothesis')) {
+        navigate(`/core-hypothesis/${projectId}`);
+      } else if (location.pathname.includes('/report-writer')) {
+        navigate(`/report-writer/${projectId}`);
+      } else {
+        navigate(`/projects/${projectId}`);
+      }
+    }
   };
 
   return (
@@ -24,9 +66,6 @@ const Sidebar = () => {
       <h2>RLC Coach</h2>
       <ul>
         {/* Project-agnostic sections */}
-        <li>
-          <Link to="/dashboard">Dashboard</Link>
-        </li>
         <li>
           <Link to="/ai-coach">AI Coach</Link>
         </li>
@@ -39,25 +78,52 @@ const Sidebar = () => {
             id="project-selector" 
             value={selectedProject}
             onChange={handleProjectSelect}
+            disabled={loading || projects.length === 0}
           >
-            <option value="">--Choose a Project--</option>
-            {projects.map(project => (
-              <option key={project.id} value={project.id}>
-                {project.name}
-              </option>
-            ))}
+            {loading ? (
+              <option value="">Loading projects...</option>
+            ) : projects.length === 0 ? (
+              <option value="">No projects available</option>
+            ) : (
+              <>
+                <option value="">--Choose a Project--</option>
+                {projects.map(project => (
+                  <option key={project.id} value={project.id}>
+                    {project.title}
+                  </option>
+                ))}
+              </>
+            )}
           </select>
         </li>
         
         {/* Project-specific sections */}
         <li>
-          <Link to="/core-hypothesis">Core Hypothesis Guide</Link>
+          <Link 
+            to={selectedProject ? `/core-hypothesis/${selectedProject}` : "/projects"}
+            className={!selectedProject ? "disabled-link" : ""}
+            onClick={e => !selectedProject && e.preventDefault()}
+          >
+            Core Hypothesis Guide
+          </Link>
         </li>
         <li>
-          <Link to="/projects">Project Schedule</Link>
+          <Link 
+            to={selectedProject ? `/projects/${selectedProject}/board` : "/projects"}
+            className={!selectedProject ? "disabled-link" : ""}
+            onClick={e => !selectedProject && e.preventDefault()}
+          >
+            Project Schedule
+          </Link>
         </li>
         <li>
-          <Link to="/report-writer">Report Writer</Link>
+          <Link 
+            to={selectedProject ? `/report-writer/${selectedProject}` : "/projects"}
+            className={!selectedProject ? "disabled-link" : ""}
+            onClick={e => !selectedProject && e.preventDefault()}
+          >
+            Report Writer
+          </Link>
         </li>
         <li>
           <Link to="/archive">Archive</Link>

@@ -196,6 +196,20 @@ const KeyDecisionDetail = () => {
       <div className="kd-detail-metadata">
         <div className="metadata-row">
           <div className="metadata-item">
+            <strong>Sequence Number:</strong> {isEditing ? (
+              <input
+                type="text"
+                name="sequence"
+                value={editData.sequence || ''}
+                onChange={handleChange}
+                placeholder="##"
+                style={{ width: '60px' }}
+              />
+            ) : (
+              `KD${decision.sequence || '??'}`
+            )}
+          </div>
+          <div className="metadata-item">
             <strong>Integration Event:</strong> {isEditing ? (
               <select
                 name="integration_event_id"
@@ -268,18 +282,100 @@ const KeyDecisionDetail = () => {
         </div>
       </div>
       
-      <div className="kd-detail-description">
-        <h3>Description</h3>
+      {/* The Key Decision (formerly just Description) */}
+      <div className="kd-detail-section">
+        <h3>The Key Decision</h3>
         {isEditing ? (
           <textarea
             name="description"
             value={editData.description || ''}
             onChange={handleChange}
             rows="4"
-            placeholder="Description"
+            placeholder="Describe the key decision to be made..."
           />
         ) : (
           <p>{decision.description || 'No description provided.'}</p>
+        )}
+      </div>
+      
+      {/* Purpose section - new */}
+      <div className="kd-detail-section">
+        <h3>The Purpose</h3>
+        <p className="section-hint">(link back to the project's Objectives)</p>
+        {isEditing ? (
+          <textarea
+            name="purpose"
+            value={editData.purpose || ''}
+            onChange={handleChange}
+            rows="3"
+            placeholder="Explain the purpose of this decision..."
+          />
+        ) : (
+          <p>{decision.purpose || 'No purpose provided.'}</p>
+        )}
+      </div>
+      
+      {/* What We Have Done section - new */}
+      <div className="kd-detail-section">
+        <h3>What We Have Done</h3>
+        <p className="section-hint">Summary of work to close knowledge gaps and build stakeholder alignment</p>
+        
+        {knowledgeGaps.length > 0 && (
+          <div className="related-knowledge-gaps">
+            <strong>Related Knowledge Gaps:</strong>
+            <ul>
+              {knowledgeGaps.map(gap => (
+                <li key={gap.id}>
+                  KG {decision.sequence || '??'}-{gap.sequence || '??'}: {gap.title}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        
+        {isEditing ? (
+          <textarea
+            name="what_we_have_done"
+            value={editData.what_we_have_done || ''}
+            onChange={handleChange}
+            rows="4"
+            placeholder="Describe what has been done so far..."
+          />
+        ) : (
+          <p>{decision.what_we_have_done || 'No work documented yet.'}</p>
+        )}
+      </div>
+      
+      {/* What We Have Learned section - new */}
+      <div className="kd-detail-section">
+        <h3>What We Have Learned</h3>
+        <p className="section-hint">Summary of all Knowledge Gaps</p>
+        {isEditing ? (
+          <textarea
+            name="what_we_have_learned"
+            value={editData.what_we_have_learned || ''}
+            onChange={handleChange}
+            rows="4"
+            placeholder="Summarize what has been learned..."
+          />
+        ) : (
+          <p>{decision.what_we_have_learned || 'No learning documented yet.'}</p>
+        )}
+      </div>
+      
+      {/* Recommendations section - new */}
+      <div className="kd-detail-section">
+        <h3>What We Recommend / What We Have Decided</h3>
+        {isEditing ? (
+          <textarea
+            name="recommendations"
+            value={editData.recommendations || ''}
+            onChange={handleChange}
+            rows="4"
+            placeholder="Provide recommendations or document the decision..."
+          />
+        ) : (
+          <p>{decision.recommendations || 'No recommendations or decisions documented yet.'}</p>
         )}
       </div>
       
@@ -317,7 +413,7 @@ const KeyDecisionDetail = () => {
             {knowledgeGaps.map(gap => (
               <div key={gap.id} className="knowledge-gap-card">
                 <div className="gap-header">
-                  <h4>{gap.title}</h4>
+                  <h4>KG {decision.sequence || '??'}-{gap.sequence || '??'}: {gap.title}</h4>
                   <span className="status-badge">{gap.status}</span>
                 </div>
                 <p>{gap.description || 'No description'}</p>
@@ -349,6 +445,8 @@ const KeyDecisionDetail = () => {
         onClose={() => setIsKGModalOpen(false)}
         onSave={handleKGSave}
         projectId={projectId}
+        keyDecisionId={decisionId}
+        keyDecisionSequence={decision.sequence}
       />
     </div>
   );

@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import keyDecisionService from '../../services/keyDecisionService';
 
-const KnowledgeGapModal = ({ isOpen, onClose, onSave, projectId }) => {
+const KnowledgeGapModal = ({ isOpen, onClose, onSave, projectId, keyDecisionId, keyDecisionSequence }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    key_decision_id: '',
+    key_decision_id: keyDecisionId || '', // Use provided key decision if available
     owner: '',
     contributors: '',
-    learning_cycle: ''
+    learning_cycle: '',
+    sequence: '',
+    kd_sequence: keyDecisionSequence || ''
   });
   const [decisions, setDecisions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -47,7 +49,8 @@ const KnowledgeGapModal = ({ isOpen, onClose, onSave, projectId }) => {
     // Convert contributors from comma-separated string to array
     const formattedData = {
       ...formData,
-      contributors: formData.contributors ? formData.contributors.split(',').map(c => c.trim()) : []
+      contributors: formData.contributors ? formData.contributors.split(',').map(c => c.trim()) : [],
+      kd_sequence: keyDecisionSequence || '' // Ensure KD sequence is included
     };
     
     onSave(formattedData);
@@ -56,10 +59,12 @@ const KnowledgeGapModal = ({ isOpen, onClose, onSave, projectId }) => {
     setFormData({
       title: '',
       description: '',
-      key_decision_id: '',
+      key_decision_id: keyDecisionId || '',
       owner: '',
       contributors: '',
-      learning_cycle: ''
+      learning_cycle: '',
+      sequence: '',
+      kd_sequence: keyDecisionSequence || ''
     });
   };
 
@@ -157,6 +162,23 @@ const KnowledgeGapModal = ({ isOpen, onClose, onSave, projectId }) => {
               onChange={handleChange}
               placeholder="e.g. Sprint 1, Q1 2024"
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="sequence">Sequence Number*</label>
+            <div className="sequence-input-group">
+              <span>KG{keyDecisionSequence ? `${keyDecisionSequence}-` : ''}</span>
+              <input
+                type="text"
+                id="sequence"
+                name="sequence"
+                value={formData.sequence}
+                onChange={handleChange}
+                placeholder="##"
+                required
+                style={{ width: '60px' }}
+              />
+            </div>
           </div>
           
           <div className="form-buttons">

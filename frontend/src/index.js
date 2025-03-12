@@ -8,6 +8,8 @@ import './styles/projects.css';
 import './styles/modals.css';
 import './styles/board.css';
 import './styles/details.css';
+import './styles/core-hypothesis.css';
+import './styles/report-writer.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

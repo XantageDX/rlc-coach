@@ -1,3 +1,5 @@
+// frontend/src/components/projects/board/Column.js
+
 import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -17,6 +19,9 @@ const Column = ({
   const { setNodeRef, isOver } = useDroppable({
     id: event.id
   });
+
+  // Log decisions being passed to cards
+  console.log(`Decisions for column ${event.name}:`, decisions);
 
   return (
     <div className="ie-column">
@@ -52,14 +57,19 @@ const Column = ({
             <p className="no-items-text">No key decisions yet</p>
           ) : (
             decisions.map((decision) => (
-              <Card
-                key={decision.id}
-                decision={decision}
-                projectId={projectId}
-                onEdit={onEditDecision}
-                onDelete={onDeleteDecision}
-                onView={onViewDecision}
-              />
+              <div key={decision.id} className="kd-card-wrapper">
+                {/* Display KD number above the card */}
+                {decision.sequence && (
+                  <div className="kd-sequence-badge">KD{decision.sequence}</div>
+                )}
+                <Card
+                  decision={decision}
+                  projectId={projectId}
+                  onEdit={onEditDecision}
+                  onDelete={onDeleteDecision}
+                  onView={onViewDecision}
+                />
+              </div>
             ))
           )}
         </SortableContext>

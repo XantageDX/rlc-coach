@@ -131,7 +131,7 @@ const KnowledgeGapDetail = () => {
               className="title-input"
             />
           ) : (
-            <h2>{knowledgeGap.title}</h2>
+            <h2>KG {keyDecision?.sequence || '??'}-{knowledgeGap.sequence || '??'}: {knowledgeGap.title}</h2>
           )}
           <span className="status-badge">{knowledgeGap.status}</span>
         </div>
@@ -154,6 +154,20 @@ const KnowledgeGapDetail = () => {
       
       <div className="kg-detail-metadata">
         <div className="metadata-row">
+          <div className="metadata-item">
+            <strong>Sequence Number:</strong> {isEditing ? (
+              <input
+                type="text"
+                name="sequence"
+                value={editData.sequence || ''}
+                onChange={handleChange}
+                placeholder="##"
+                style={{ width: '60px' }}
+              />
+            ) : (
+              `KG${keyDecision?.sequence || '??'}-${knowledgeGap.sequence || '??'}`
+            )}
+          </div>
           <div className="metadata-item">
             <strong>Key Decision:</strong> {isEditing ? (
               <select
@@ -246,44 +260,80 @@ const KnowledgeGapDetail = () => {
         </div>
       </div>
       
+      {/* The Question to Answer (formerly Description) */}
       <div className="kg-detail-section">
-        <h3>Description</h3>
+        <h3>The Question to Answer</h3>
         {isEditing ? (
           <textarea
             name="description"
             value={editData.description || ''}
             onChange={handleChange}
             rows="4"
-            placeholder="Description"
+            placeholder="What question needs to be answered?"
           />
         ) : (
-          <p>{knowledgeGap.description || 'No description provided.'}</p>
+          <p>{knowledgeGap.description || 'No question provided.'}</p>
         )}
       </div>
       
+      {/* Purpose section - new */}
+      <div className="kg-detail-section">
+        <h3>The Purpose</h3>
+        <p className="section-hint">(link back to the Knowledge Gap's Key Decision)</p>
+        {isEditing ? (
+          <textarea
+            name="purpose"
+            value={editData.purpose || ''}
+            onChange={handleChange}
+            rows="3"
+            placeholder="Explain the purpose of this knowledge gap..."
+          />
+        ) : (
+          <p>{knowledgeGap.purpose || 'No purpose provided.'}</p>
+        )}
+      </div>
+      
+      {/* What We Have Done section - new */}
+      <div className="kg-detail-section">
+        <h3>What We Will Do / What We Have Done</h3>
+        {isEditing ? (
+          <textarea
+            name="what_we_have_done"
+            value={editData.what_we_have_done || ''}
+            onChange={handleChange}
+            rows="4"
+            placeholder="Describe what will be done or has been done..."
+          />
+        ) : (
+          <p>{knowledgeGap.what_we_have_done || 'No plan documented yet.'}</p>
+        )}
+      </div>
+      
+      {/* What We Have Learned section (replaces old learned field) */}
       <div className="kg-detail-section">
         <h3>What We Have Learned</h3>
         {isEditing ? (
           <textarea
-            name="learned"
-            value={editData.learned || ''}
+            name="what_we_have_learned"
+            value={editData.what_we_have_learned || editData.learned || ''}
             onChange={handleChange}
-            rows="6"
+            rows="4"
             placeholder="Document what has been learned..."
           />
         ) : (
-          <p>{knowledgeGap.learned || 'No learning documented yet.'}</p>
+          <p>{knowledgeGap.what_we_have_learned || knowledgeGap.learned || 'No learning documented yet.'}</p>
         )}
       </div>
       
+      {/* Recommendations section (updates old recommendations field) */}
       <div className="kg-detail-section">
-        <h3>Recommendations</h3>
+        <h3>Recommendations and Next Steps</h3>
         {isEditing ? (
           <textarea
             name="recommendations"
             value={editData.recommendations || ''}
             onChange={handleChange}
-            rows="6"
+            rows="4"
             placeholder="Provide recommendations based on learnings..."
           />
         ) : (

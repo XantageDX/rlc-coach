@@ -1,0 +1,70 @@
+/* Core Hypothesis styles */
+.core-hypothesis-container {
+    padding: 2rem;
+    background-color: #f5f7fa;
+    min-height: calc(100vh - 120px);
+  }
+  
+  .core-hypothesis-content {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 1.5rem;
+  }
+  
+  .hypothesis-form {
+    margin-top: 1.5rem;
+  }
+  
+  .hypothesis-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 120px;
+    margin-bottom: 1rem;
+    font-family: inherit;
+  }
+  
+  .save-hypothesis-btn {
+    background-color: #1167be;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  .save-hypothesis-btn:hover {
+    background-color: #0d5bab;
+  }
+  
+  .hypothesis-image {
+    max-width: 100%;
+    margin-top: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.5rem;
+  }
+  
+  .upload-section {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 2px dashed #ddd;
+    border-radius: 4px;
+    text-align: center;
+  }
+  
+  .upload-btn {
+    display: inline-block;
+    background-color: #f0f4f8;
+    color: #1167be;
+    border: 1px solid #ddd;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+  }

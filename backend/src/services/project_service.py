@@ -125,7 +125,7 @@ async def update_project(project_id: str, project_data: ProjectUpdate, current_u
 
 
 async def delete_project(project_id: str, current_user) -> dict:
-    """Delete a project"""
+    """Delete a project and all its related entities"""
     
     # Find project by ID and check manager access
     project = projects_collection.find_one({
@@ -139,16 +139,23 @@ async def delete_project(project_id: str, current_user) -> dict:
             detail="Project not found or you don't have permission to delete it",
         )
     
-    # Delete project from DB (or set status to deleted)
-    result = projects_collection.update_one(
-        {"id": project_id},
-        {"$set": {"status": "deleted", "updated_at": datetime.utcnow()}}
-    )
+    # Delete all related entities
+    # 1. Delete integration events
+    db["integration_events"].delete_many({"project_id": project_id})
     
-    if not result.modified_count:
+    # 2. Delete key decisions
+    db["key_decisions"].delete_many({"project_id": project_id})
+    
+    # 3. Delete knowledge gaps
+    db["knowledge_gaps"].delete_many({"project_id": project_id})
+    
+    # 4. Delete the project itself
+    result = projects_collection.delete_one({"id": project_id})
+    
+    if not result.deleted_count:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to delete project",
         )
     
-    return {"message": "Project successfully deleted"}
+    return {"message": "Project and all related entities successfully deleted"}

@@ -42,6 +42,10 @@ const KeyDecisionModal = ({ isOpen, onClose, onSave, projectId }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Log the form data being submitted
+    console.log("Submitting KD form data:", formData);
+    
     onSave(formData);
     
     // Reset form
@@ -50,7 +54,8 @@ const KeyDecisionModal = ({ isOpen, onClose, onSave, projectId }) => {
       description: '',
       integration_event_id: '',
       owner: '',
-      decision_maker: ''
+      decision_maker: '',
+      sequence: '' // Make sure sequence is included here
     });
   };
 

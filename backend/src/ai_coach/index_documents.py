@@ -1,7 +1,7 @@
 # index_documents.py
 import os
 import argparse
-from embeddings import load_and_split_documents, initialize_vector_db
+from src.ai_coach.embeddings import load_and_split_documents, initialize_vector_db
 
 def main():
     parser = argparse.ArgumentParser(description='Index RLC methodology documents')

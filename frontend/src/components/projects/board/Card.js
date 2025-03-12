@@ -1,3 +1,5 @@
+// frontend/src/components/projects/board/Card.js
+
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -5,6 +7,9 @@ import { useNavigate } from 'react-router-dom';
 
 const Card = ({ decision, onEdit, onDelete, onView, projectId }) => {
   const navigate = useNavigate();
+  
+  // Log the entire decision object to inspect it
+  console.log("Rendering card with decision:", JSON.stringify(decision, null, 2));
   
   const {
     attributes,
@@ -27,6 +32,19 @@ const Card = ({ decision, onEdit, onDelete, onView, projectId }) => {
       {...listeners}
       className="kd-card"
     >
+      {/* DIRECT HARDCODED TEST FOR KD NUMBER */}
+      <div style={{
+        backgroundColor: '#1167be', 
+        color: 'white', 
+        padding: '3px 8px', 
+        borderRadius: '4px',
+        marginBottom: '8px',
+        display: 'inline-block',
+        fontWeight: 'bold'
+      }}>
+        {decision.sequence ? `KD${decision.sequence}` : 'KD##'}
+      </div>
+      
       <div className="kd-card-header">
         <h4>{decision.title}</h4>
         <span className="kd-status">{decision.status}</span>

@@ -5,14 +5,29 @@ from langchain_aws import BedrockEmbeddings
 from langchain_community.vectorstores import Chroma
 import chromadb
 
+from langchain_community.document_loaders import DirectoryLoader, TextLoader, Docx2txtLoader
+
 def load_and_split_documents(docs_directory):
     """Load documents from a directory and split them into chunks."""
-    loader = DirectoryLoader(
+    # Create loaders for different file types
+    txt_loader = DirectoryLoader(
         docs_directory,
         glob="**/*.txt",
         loader_cls=TextLoader
     )
-    documents = loader.load()
+    
+    docx_loader = DirectoryLoader(
+        docs_directory,
+        glob="**/*.docx",
+        loader_cls=Docx2txtLoader
+    )
+    
+    # Load all documents
+    txt_documents = txt_loader.load()
+    docx_documents = docx_loader.load()
+    documents = txt_documents + docx_documents
+    
+    print(f"Loaded {len(documents)} files: {len(txt_documents)} .txt and {len(docx_documents)} .docx")
     
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
@@ -27,7 +42,7 @@ def initialize_vector_db(chunks, persist_directory="./chroma_db"):
     """Initialize the vector database with document chunks."""
     # Initialize Bedrock embeddings
     embeddings = BedrockEmbeddings(
-        model_id="amazon.titan-embed-text-v1",
+        model_id="amazon.titan-embed-text-v2:0",
         region_name=os.getenv("AWS_REGION", "us-west-2"),
     )
     
@@ -44,7 +59,7 @@ def get_retriever(persist_directory="./chroma_db"):
     """Get a retriever from an existing vector database."""
     # Initialize Bedrock embeddings
     embeddings = BedrockEmbeddings(
-        model_id="amazon.titan-embed-text-v1",
+        model_id="amazon.titan-embed-text-v2:0",
         region_name=os.getenv("AWS_REGION", "us-west-2"),
     )
     

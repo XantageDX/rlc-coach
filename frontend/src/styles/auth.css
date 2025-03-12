@@ -375,4 +375,10 @@ a:hover {
       padding: 5px 10px;
       cursor: pointer;
     }
+
+    /* Add this to your sidebar styles */
+    .disabled-link {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   }
