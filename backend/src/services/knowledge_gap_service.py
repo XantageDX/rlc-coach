@@ -39,6 +39,12 @@ async def create_knowledge_gap(
         owner=kg_data.owner,
         contributors=kg_data.contributors,
         learning_cycle=kg_data.learning_cycle,
+        sequence=kg_data.sequence,  # Make sure this is included
+        kd_sequence=kg_data.kd_sequence,  # Make sure this is included
+        purpose=kg_data.purpose,
+        what_we_have_done=kg_data.what_we_have_done,
+        what_we_have_learned=kg_data.what_we_have_learned,
+        recommendations=kg_data.recommendations,
         created_by=current_user.username
     )
 

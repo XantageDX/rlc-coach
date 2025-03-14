@@ -463,3 +463,12 @@
   z-index: 10;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
+
+.add-kg-btn {
+  background-color: #e7f3ff;
+  color: #1167be;
+}
+
+.add-kg-btn:hover {
+  background-color: #d0e8ff;
+}

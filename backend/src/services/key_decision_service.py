@@ -38,6 +38,11 @@ async def create_key_decision(
         integration_event_id=decision_data.integration_event_id,
         owner=decision_data.owner,
         decision_maker=decision_data.decision_maker,
+        sequence=decision_data.sequence,
+        purpose=decision_data.purpose,
+        what_we_have_done=decision_data.what_we_have_done,
+        what_we_have_learned=decision_data.what_we_have_learned,
+        recommendations=decision_data.recommendations,
         created_by=current_user.username
     )
 

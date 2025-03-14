@@ -5,7 +5,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useNavigate } from 'react-router-dom';
 
-const Card = ({ decision, onEdit, onDelete, onView, projectId }) => {
+const Card = ({ decision, onEdit, onDelete, onView, onAddKG, projectId }) => {
   const navigate = useNavigate();
   
   // Log the entire decision object to inspect it
@@ -71,7 +71,8 @@ const Card = ({ decision, onEdit, onDelete, onView, projectId }) => {
                       navigate(`/projects/${projectId}/knowledge-gaps/${kg.id}`);
                     }}
                   >
-                    {kg.title}
+                    {/* Display KG sequence and title */}
+                    KG{decision.sequence ? `${decision.sequence}-${kg.sequence || '??'}` : `??-${kg.sequence || '??'}`}: {kg.title}
                   </span>
                 </li>
               ))}
@@ -106,6 +107,16 @@ const Card = ({ decision, onEdit, onDelete, onView, projectId }) => {
           }}
         >
           Delete
+        </button>
+        {/* Add the new 'Add KG' button */}
+        <button
+          className="small-btn add-kg-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddKG(decision);
+          }}
+        >
+          Add KG
         </button>
       </div>
     </div>

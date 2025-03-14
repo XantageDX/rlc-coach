@@ -11,6 +11,7 @@ from src.controllers.integration_event_controller import router as integration_e
 from src.controllers.key_decision_controller import router as key_decision_router
 from src.controllers.knowledge_gap_controller import router as knowledge_gap_router
 from src.controllers.ai_coach_controller import router as ai_coach_router
+from src.controllers.kg_report_ai_controller import router as kg_report_ai_router
 
 # Load environment variables
 load_dotenv()
@@ -46,6 +47,7 @@ app.include_router(
     tags=["knowledge-gaps"]
 )
 app.include_router(ai_coach_router, prefix="/ai-coach", tags=["ai-coach"])
+app.include_router(kg_report_ai_router, prefix="/kg-report-ai", tags=["kg-report-ai"])
 
 # Root endpoint
 @app.get("/")

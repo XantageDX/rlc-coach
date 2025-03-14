@@ -2,15 +2,21 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import projectService from '../../services/projectService';
+import logo from '../../assets/powered_by_xantage.png';
 
 const Sidebar = () => {
-  // eslint-disable-next-line no-unused-vars
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedProject, setSelectedProject] = useState('');
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Toggle sidebar function
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
   
   // Fetch projects when component mounts
   useEffect(() => {
@@ -62,7 +68,16 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+      {/* Sidebar toggle button */}
+      <button 
+        className="sidebar-toggle" 
+        onClick={toggleSidebar}
+        aria-label={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+      >
+        {isCollapsed ? '»' : '«'}
+      </button>
+
       <h2>RLC Coach</h2>
       <ul>
         {/* Project-agnostic sections */}
@@ -140,6 +155,10 @@ const Sidebar = () => {
           <Link to="/account-admin">Account Admin</Link>
         </li>
       </ul>
+      {/* Logo at the bottom of sidebar */}
+      <div className="sidebar-logo">
+        <img src={logo} alt="Xantage logo" />
+      </div>
     </div>
   );
 };

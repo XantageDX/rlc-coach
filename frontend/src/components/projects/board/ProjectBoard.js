@@ -366,10 +366,16 @@ const ProjectBoard = () => {
   const [activeDecision, setActiveDecision] = useState(null);
   const [viewMode, setViewMode] = useState('board');
   
-  // Side drawer state
+  // Side drawer state for KD
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerTitle, setDrawerTitle] = useState('');
   const [editingKD, setEditingKD] = useState(null);
+
+  // Side drawer state for KG
+  const [isKGDrawerOpen, setIsKGDrawerOpen] = useState(false);
+  const [drawerKGTitle, setDrawerKGTitle] = useState('');
+  const [editingKG, setEditingKG] = useState(null);
+  const [selectedKDForKG, setSelectedKDForKG] = useState(null);
   
   const { id } = useParams();
   const navigate = useNavigate();
@@ -621,8 +627,94 @@ const ProjectBoard = () => {
 
   // Group decisions by integration event ID
   const getDecisionsForEvent = (eventId) => {
-    return decisions.filter(decision => decision.integration_event_id === eventId);
+    const eventDecisions = decisions.filter(decision => decision.integration_event_id === eventId);
+    
+    // Enhance each decision with its knowledge gaps
+    return eventDecisions.map(decision => {
+      const decisionKGs = knowledgeGaps.filter(kg => kg.key_decision_id === decision.id);
+      return {
+        ...decision,
+        knowledge_gaps: decisionKGs.map(kg => ({
+          id: kg.id,
+          title: kg.title,
+          sequence: kg.sequence || ''  // Make sure we include the sequence
+        }))
+      };
+    });
   };
+
+  // Open drawer to create a new Knowledge Gap
+  const handleAddKG = (decision) => {
+    setDrawerKGTitle('Create Knowledge Gap');
+    setSelectedKDForKG(decision);
+    setEditingKG({
+      sequence: '',
+      title: '',
+      description: '',
+      owner: '',
+      contributors: [],
+      learning_cycle: '',
+      key_decision_id: decision.id,  // Ensure this is set correctly
+      kd_sequence: decision.sequence || ''
+    });
+    setIsKGDrawerOpen(true);
+  };
+  
+  // Close the KG side drawer
+  const handleCloseKGDrawer = () => {
+    setIsKGDrawerOpen(false);
+    setEditingKG(null);
+    setSelectedKDForKG(null);
+  };
+  
+  // Handle changes to the KG form in the drawer
+  const handleKGChange = (e) => {
+    const { name, value } = e.target;
+    setEditingKG(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+// Save Knowledge Gap from drawer
+const handleSaveKG = async () => {
+  try {
+    // Format the data correctly
+    const contributorsArray = typeof editingKG.contributors === 'string' 
+      ? editingKG.contributors.split(',').map(c => c.trim()).filter(Boolean)
+      : editingKG.contributors || [];
+    
+    // Create the data object with all required fields
+    const kgData = {
+      title: editingKG.title,
+      description: editingKG.description || '',
+      key_decision_id: selectedKDForKG.id, // Make sure this is set correctly
+      owner: editingKG.owner || '',
+      contributors: contributorsArray,
+      learning_cycle: editingKG.learning_cycle || '',
+      sequence: editingKG.sequence || '',
+      kd_sequence: selectedKDForKG.sequence || ''
+    };
+    
+    console.log("Saving KG with data:", kgData);
+    
+    // Create new KG
+    await knowledgeGapService.createKnowledgeGap(id, kgData);
+    
+    // Refresh knowledge gaps
+    const updatedKGs = await knowledgeGapService.getProjectKnowledgeGaps(id);
+    setKnowledgeGaps(updatedKGs);
+    
+    // Close drawer
+    handleCloseKGDrawer();
+    
+    // Show success message (optional)
+    setError(null); // Clear any previous errors
+  } catch (err) {
+    console.error("Error saving knowledge gap:", err);
+    setError("Failed to save knowledge gap: " + (err.response?.data?.detail || err.message));
+  }
+};
 
   return (
     <div className="project-board-container">
@@ -706,6 +798,7 @@ const ProjectBoard = () => {
                   onEditDecision={handleEditDecision}
                   onDeleteDecision={handleDeleteDecision}
                   onViewDecision={handleViewDecision}
+                  onAddKG={handleAddKG}
                 />
               ))
             )}
@@ -825,6 +918,94 @@ const ProjectBoard = () => {
             </div>
           </div>
         )}
+
+        {/* Side Drawer for creating/editing KGs */}
+        <div className={`side-drawer ${isKGDrawerOpen ? 'open' : ''}`}>
+          <div className="side-drawer-header">
+            <h3>{drawerKGTitle}</h3>
+            <button className="close-btn" onClick={handleCloseKGDrawer}>✕</button>
+          </div>
+          
+          {editingKG && selectedKDForKG && (
+            <div className="drawer-content">
+              <div className="drawer-field">
+                <label htmlFor="kg-sequence">Sequence Number (##)</label>
+                <div className="sequence-input-container">
+                  <span>KG{selectedKDForKG.sequence ? `${selectedKDForKG.sequence}-` : ''}</span>
+                  <input 
+                    type="text" 
+                    id="kg-sequence" 
+                    name="sequence"
+                    value={editingKG.sequence || ''}
+                    onChange={handleKGChange}
+                    placeholder="##"
+                  />
+                </div>
+              </div>
+              
+              <div className="drawer-field">
+                <label htmlFor="kg-title">Title</label>
+                <input 
+                  type="text" 
+                  id="kg-title" 
+                  name="title"
+                  value={editingKG.title || ''}
+                  onChange={handleKGChange}
+                  required
+                />
+              </div>
+              
+              <div className="drawer-field">
+                <label htmlFor="kg-owner">Owner</label>
+                <input 
+                  type="text" 
+                  id="kg-owner" 
+                  name="owner"
+                  value={editingKG.owner || ''}
+                  onChange={handleKGChange}
+                />
+              </div>
+              
+              <div className="drawer-field">
+                <label htmlFor="kg-contributors">Contributors (comma-separated)</label>
+                <input 
+                  type="text" 
+                  id="kg-contributors" 
+                  name="contributors"
+                  value={Array.isArray(editingKG.contributors) ? editingKG.contributors.join(', ') : editingKG.contributors || ''}
+                  onChange={handleKGChange}
+                />
+              </div>
+              
+              <div className="drawer-field">
+                <label htmlFor="kg-learning-cycle">Learning Cycle</label>
+                <input 
+                  type="text" 
+                  id="kg-learning-cycle" 
+                  name="learning_cycle"
+                  value={editingKG.learning_cycle || ''}
+                  onChange={handleKGChange}
+                />
+              </div>
+              
+              <div className="drawer-field">
+                <label htmlFor="kg-description">Description</label>
+                <textarea 
+                  id="kg-description" 
+                  name="description"
+                  value={editingKG.description || ''}
+                  onChange={handleKGChange}
+                  rows="3"
+                ></textarea>
+              </div>
+              
+              <div className="drawer-actions">
+                <button className="cancel-btn" onClick={handleCloseKGDrawer}>Cancel</button>
+                <button className="save-btn" onClick={handleSaveKG}>Save</button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

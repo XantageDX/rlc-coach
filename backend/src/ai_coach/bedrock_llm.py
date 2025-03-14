@@ -11,8 +11,8 @@ def get_bedrock_llm():
         model_id="us.meta.llama3-3-70b-instruct-v1:0",
         region_name=os.getenv("AWS_REGION", "us-west-2"),
         model_kwargs={
-            "temperature": 0.2,
-            "max_gen_len": 2000,
+            "temperature": 0,
+            "max_gen_len": 1000,
             "top_p": 0.9,
         }
     )

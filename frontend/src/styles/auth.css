@@ -134,22 +134,27 @@ a:hover {
 .app-header {
     background-color: #1167be;
     color: white;
-    padding: 1rem 0;
+    padding: 0.5rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
   
   .header-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1rem;
+    padding-left: 3rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 40px;
   }
   
   .logo a {
     color: white;
     text-decoration: none;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: bold;
   }
   
@@ -243,10 +248,10 @@ a:hover {
   }
   
   .main-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
+    margin-left: 250px; /* Match sidebar width */
+    transition: margin-left 0.3s ease; /* Smooth transition when sidebar collapses */
+    width: calc(100% - 250px);
+  }  
   
   .main-content {
     flex: 1;
@@ -261,9 +266,12 @@ a:hover {
     color: #FFFFFF;
     height: 100vh;
     padding: 20px;
-    position: sticky;
+    position: fixed;
     top: 0;
-    overflow-y: auto;
+    left: 0;
+    overflow-y: hidden;
+    transition: transform 0.3s ease;
+    z-index: 50;
   }
   
   .sidebar h2 {
@@ -277,6 +285,7 @@ a:hover {
     list-style: none;
     padding: 0;
     margin: 0;
+    padding-bottom: 80px;
   }
   
   .sidebar ul li {
@@ -294,6 +303,65 @@ a:hover {
     color: #FFFFFF;
     text-decoration: none;
     display: block;
+  }
+
+  .sidebar-logo {
+    position: absolute;
+    bottom: 80px;
+    left: 0;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .sidebar-logo img {
+    max-width: 80%;
+    height: auto;
+    opacity: 0.9;
+  }
+
+  /* Collapsed sidebar state */
+  .sidebar.collapsed {
+    transform: translateX(-230px); /* Hide most of the sidebar, leaving just a bit visible */
+  }
+
+  .sidebar.collapsed + .main-container {
+    margin-left: 20px; /* Small margin when sidebar is collapsed */
+    width: calc(100% - 20px);
+  }
+
+  .hamburger-icon {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 60; /* Higher than sidebar */
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 24px;
+    display: none; /* Hide by default, show in collapsed state */
+  }
+
+  .sidebar.collapsed .hamburger-icon {
+    display: block;
+    left: 25px; /* Position when sidebar is collapsed */
+  }
+
+  .sidebar-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    width: auto;
   }
   
   /* Divider line in the sidebar menu */

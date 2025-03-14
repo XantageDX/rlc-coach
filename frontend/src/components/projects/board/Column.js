@@ -14,7 +14,8 @@ const Column = ({
   onDeleteEvent,
   onEditDecision,
   onDeleteDecision,
-  onViewDecision
+  onViewDecision,
+  onAddKG
 }) => {
   const { setNodeRef, isOver } = useDroppable({
     id: event.id
@@ -59,15 +60,16 @@ const Column = ({
             decisions.map((decision) => (
               <div key={decision.id} className="kd-card-wrapper">
                 {/* Display KD number above the card */}
-                {decision.sequence && (
+                {/* {decision.sequence && (
                   <div className="kd-sequence-badge">KD{decision.sequence}</div>
-                )}
+                )} */}
                 <Card
                   decision={decision}
                   projectId={projectId}
                   onEdit={onEditDecision}
                   onDelete={onDeleteDecision}
                   onView={onViewDecision}
+                  onAddKG={onAddKG}
                 />
               </div>
             ))
