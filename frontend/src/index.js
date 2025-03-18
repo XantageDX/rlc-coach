@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import './styles/auth.css';
-import './styles/projects.css';
+// import './styles/projects.css';
 import './styles/modals.css';
 import './styles/board.css';
 import './styles/details.css';

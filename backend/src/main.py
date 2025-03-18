@@ -6,12 +6,12 @@ from dotenv import load_dotenv
 
 # Import controllers
 from src.controllers.auth_controller import router as auth_router
-from src.controllers.project_controller import router as project_router
-from src.controllers.integration_event_controller import router as integration_event_router
-from src.controllers.key_decision_controller import router as key_decision_router
-from src.controllers.knowledge_gap_controller import router as knowledge_gap_router
+# from src.controllers.project_controller import router as project_router
+# from src.controllers.integration_event_controller import router as integration_event_router
+# from src.controllers.key_decision_controller import router as key_decision_router
+# from src.controllers.knowledge_gap_controller import router as knowledge_gap_router
 from src.controllers.ai_coach_controller import router as ai_coach_router
-from src.controllers.kg_report_ai_controller import router as kg_report_ai_router
+from src.controllers.report_ai_controller import router as report_ai_router
 
 # Load environment variables
 load_dotenv()
@@ -30,24 +30,24 @@ app.add_middleware(
 
 # Include routers
 app.include_router(auth_router, prefix="/auth", tags=["authentication"])
-app.include_router(project_router, prefix="/projects", tags=["projects"])
-app.include_router(
-    integration_event_router, 
-    prefix="/projects/{project_id}/integration-events", 
-    tags=["integration-events"]
-)
-app.include_router(
-    key_decision_router, 
-    prefix="/projects/{project_id}/key-decisions", 
-    tags=["key-decisions"]
-)
-app.include_router(
-    knowledge_gap_router, 
-    prefix="/projects/{project_id}/knowledge-gaps", 
-    tags=["knowledge-gaps"]
-)
+# app.include_router(project_router, prefix="/projects", tags=["projects"])
+# app.include_router(
+#     integration_event_router, 
+#     prefix="/projects/{project_id}/integration-events", 
+#     tags=["integration-events"]
+# )
+# app.include_router(
+#     key_decision_router, 
+#     prefix="/projects/{project_id}/key-decisions", 
+#     tags=["key-decisions"]
+# )
+# app.include_router(
+#     knowledge_gap_router, 
+#     prefix="/projects/{project_id}/knowledge-gaps", 
+#     tags=["knowledge-gaps"]
+# )
 app.include_router(ai_coach_router, prefix="/ai-coach", tags=["ai-coach"])
-app.include_router(kg_report_ai_router, prefix="/kg-report-ai", tags=["kg-report-ai"])
+app.include_router(report_ai_router, prefix="/report-ai", tags=["report-ai"])
 
 # Root endpoint
 @app.get("/")
