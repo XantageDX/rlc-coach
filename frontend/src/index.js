@@ -10,6 +10,7 @@ import './styles/board.css';
 import './styles/details.css';
 import './styles/core-hypothesis.css';
 import './styles/report-writer.css';
+import './styles/archive.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

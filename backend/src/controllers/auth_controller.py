@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 
@@ -7,7 +7,6 @@ from src.services.auth_service import create_user, login_user, get_current_activ
 from src.utils.auth import get_current_user
 
 router = APIRouter()
-
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(user_data: UserCreate):
@@ -38,3 +37,12 @@ async def read_users_me(current_user = Depends(get_current_user)):
         role=user_data["role"],
         tenant_id=user_data.get("tenant_id")
     )
+
+
+# Add this OPTIONS handler for CORS preflight requests
+@router.options("/{path:path}")
+async def options_route(path: str):
+    """
+    Handle OPTIONS requests for CORS preflight.
+    """
+    return Response(status_code=200)

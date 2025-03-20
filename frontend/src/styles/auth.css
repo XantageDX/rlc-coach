@@ -322,6 +322,14 @@ a:hover {
     opacity: 0.9;
   }
 
+  .sidebar ul li.active {
+    background: #FF9A04; /* Orange background for active page */
+  }
+  
+  .sidebar ul li.active a {
+    color: #FFFFFF; /* Ensure text is white on orange background */
+  }
+
   /* Collapsed sidebar state */
   .sidebar.collapsed {
     transform: translateX(-230px); /* Hide most of the sidebar, leaving just a bit visible */

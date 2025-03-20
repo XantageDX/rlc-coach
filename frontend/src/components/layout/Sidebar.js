@@ -14,6 +14,11 @@ const Sidebar = () => {
     setIsCollapsed(!isCollapsed);
   };
 
+  // Function to check if a path is active
+  const isActivePath = (path) => {
+    return location.pathname.includes(path);
+  };
+
   return (
     <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       {/* Sidebar toggle button */}
@@ -27,20 +32,20 @@ const Sidebar = () => {
 
       <h2>RLC Coach</h2>
       <ul>
-        {/* Main navigation items - only the required four */}
-        <li>
+        {/* Main navigation items - highlight active page with orange background */}
+        <li className={isActivePath('/ai-coach') ? 'active' : ''}>
           <Link to="/ai-coach">AI Coach</Link>
         </li>
         
-        <li>
+        <li className={isActivePath('/report-writer') ? 'active' : ''}>
           <Link to="/report-writer">Report Writer</Link>
         </li>
         
-        <li>
+        <li className={isActivePath('/archive') ? 'active' : ''}>
           <Link to="/archive">Archive</Link>
         </li>
         
-        <li>
+        <li className={isActivePath('/user-admin') ? 'active' : ''}>
           <Link to="/user-admin">User Admin</Link>
         </li>
       </ul>

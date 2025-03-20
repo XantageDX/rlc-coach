@@ -342,8 +342,8 @@ Regularly monitor **progress** and **relevance**:
 Your only task is to distribute information into:
 - The Key Decision
 - The Purpose
-- What We Have Learned
 - What We Have Done
+- What We Have Learned
 - What We Recommend / What We Have Decided
 
 Don't give much context: go to the point.
@@ -469,8 +469,8 @@ Regularly monitor **progress** and **relevance**:
 2. Based on this, provide a feedback on each of these sections, in this form:
 - The Key Decision: ...
 - The Purpose: ...
-- What We Have Learned: ...
 - What We Have Done: ...
+- What We Have Learned: ...
 - What We Recommend / What We Have Decided: ...
 
 Don't give much context: go to the point.

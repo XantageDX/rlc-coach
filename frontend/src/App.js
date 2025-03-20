@@ -95,6 +95,7 @@ import UserAdmin from './components/admin/UserAdmin';
 // Styles
 import './styles/auth.css';
 import './styles/ai-coach.css';
+import './styles/archive.css';
 
 // Layout wrapper for protected routes with header and sidebar
 const ProtectedLayout = () => {
