@@ -46,3 +46,4 @@ async def options_route(path: str):
     Handle OPTIONS requests for CORS preflight.
     """
     return Response(status_code=200)
+

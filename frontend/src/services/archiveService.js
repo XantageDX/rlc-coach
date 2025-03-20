@@ -85,7 +85,6 @@ const API_URL = 'http://localhost:8000/archive';
 
 // Get auth header for requests
 const getAuthHeader = () => {
-  // Check for token in localStorage
   const user = localStorage.getItem('user');
   
   try {
@@ -105,7 +104,7 @@ const getAuthHeader = () => {
 };
 
 const archiveService = {
-  // Fetch all projects
+  // Existing functions...
   getAllProjects: async () => {
     try {
       const response = await axios.get(`${API_URL}/projects`, {
@@ -121,7 +120,6 @@ const archiveService = {
     }
   },
   
-  // Create a new project
   createProject: async (projectData) => {
     try {
       const response = await axios.post(`${API_URL}/projects`, projectData, {
@@ -137,7 +135,6 @@ const archiveService = {
     }
   },
   
-  // Upload document to a project
   uploadDocument: async (type, projectId, file) => {
     const formData = new FormData();
     formData.append('document', file);
@@ -160,7 +157,7 @@ const archiveService = {
     }
   },
 
-  // Delete a project
+  // Add new delete functions
   deleteProject: async (projectId) => {
     try {
       await axios.delete(`${API_URL}/projects/${projectId}`, {
@@ -169,6 +166,18 @@ const archiveService = {
       return true;
     } catch (error) {
       console.error('Error deleting project:', error);
+      throw error;
+    }
+  },
+
+  deleteDocument: async (projectId, documentId) => {
+    try {
+      await axios.delete(`${API_URL}/projects/${projectId}/documents/${documentId}`, {
+        headers: getAuthHeader()
+      });
+      return true;
+    } catch (error) {
+      console.error('Error deleting document:', error);
       throw error;
     }
   }

@@ -10,6 +10,10 @@ from src.models.archive_models import (
 )
 from src.utils.db import db
 
+from src.utils.document_processor import extract_text_from_file, split_text
+from src.ai_archive.embeddings import add_document_to_vectordb
+import shutil
+
 # Collection references
 projects_collection = db["archive_projects"]
 
@@ -49,7 +53,7 @@ async def create_project(project_data: ProjectCreate) -> ProjectResponse:
 
 async def upload_project_document(project_id: str, file) -> Dict:
     """
-    Upload a document to a project.
+    Upload a document to a project and process it for embedding.
     
     :param project_id: ID of the project to upload document to
     :param file: File object to upload
@@ -63,22 +67,58 @@ async def upload_project_document(project_id: str, file) -> Dict:
         # Generate unique document ID
         doc_id = str(ObjectId())
         
+        # Get original filename and extension
+        original_filename = file.filename
+        file_extension = os.path.splitext(original_filename)[1].lower()
+        
+        # Check if file type is supported (PDF, DOCX, PPT/PPTX)
+        allowed_extensions = ['.pdf', '.docx', '.ppt', '.pptx']
+        if file_extension not in allowed_extensions:
+            raise ValueError(f"Unsupported file type. Allowed types: {', '.join(allowed_extensions)}")
+        
         # Generate unique filename
-        filename = f"{datetime.utcnow().isoformat().replace(':', '-')}_{file.filename}"
+        filename = f"{datetime.utcnow().isoformat().replace(':', '-')}_{original_filename}"
         filepath = os.path.join(upload_dir, filename)
         
         # Save file
         with open(filepath, 'wb') as buffer:
             buffer.write(await file.read())
         
-        # Create document metadata
-        document = {
-            "_id": doc_id,
-            "filename": file.filename,
-            "stored_filename": filename,
-            "path": filepath,
-            "uploaded_at": datetime.utcnow().isoformat()
-        }
+        # Process the document for embedding
+        # Extract text from the document
+        document_text = extract_text_from_file(filepath)
+        
+        # If text was successfully extracted
+        if document_text:
+            # Split text into chunks with metadata
+            document_chunks = split_text(document_text, original_filename)
+            
+            # Add document chunks to vector database
+            embedding_success = add_document_to_vectordb(document_chunks)
+            
+            # Create document metadata
+            document = {
+                "_id": doc_id,
+                "filename": original_filename,
+                "stored_filename": filename,
+                "path": filepath,
+                "uploaded_at": datetime.utcnow().isoformat(),
+                "embedded": embedding_success,
+                "file_size": os.path.getsize(filepath),
+                "file_type": file_extension[1:]  # Remove the dot
+            }
+        else:
+            # If text extraction failed
+            document = {
+                "_id": doc_id,
+                "filename": original_filename,
+                "stored_filename": filename,
+                "path": filepath,
+                "uploaded_at": datetime.utcnow().isoformat(),
+                "embedded": False,
+                "file_size": os.path.getsize(filepath),
+                "file_type": file_extension[1:]  # Remove the dot
+            }
         
         # Update project with document metadata
         result = projects_collection.update_one(
@@ -92,6 +132,12 @@ async def upload_project_document(project_id: str, file) -> Dict:
         return document
     except Exception as e:
         print(f"Error uploading document: {e}")
+        # Clean up the file if it was saved but an error occurred
+        if 'filepath' in locals() and os.path.exists(filepath):
+            try:
+                os.remove(filepath)
+            except:
+                pass
         raise
 
 async def delete_project_document(project_id: str, document_id: str) -> bool:

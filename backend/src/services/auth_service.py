@@ -17,7 +17,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
 # Get users collection
 users_collection = db["users"]
 
-
 async def create_user(user_data: UserCreate) -> UserResponse:
     """Create a new user"""
     # Check if user already exists

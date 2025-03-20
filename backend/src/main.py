@@ -13,6 +13,7 @@ from src.controllers.auth_controller import router as auth_router
 from src.controllers.ai_coach_controller import router as ai_coach_router
 from src.controllers.report_ai_controller import router as report_ai_router
 from src.controllers.archive_controller import router as archive_router
+from src.controllers.user_admin_controller import router as user_admin_router
 
 # Load environment variables
 load_dotenv()
@@ -61,6 +62,7 @@ app.include_router(auth_router, prefix="/auth", tags=["authentication"])
 app.include_router(ai_coach_router, prefix="/ai-coach", tags=["ai-coach"])
 app.include_router(report_ai_router, prefix="/report-ai", tags=["report-ai"])
 app.include_router(archive_router, prefix="/archive", tags=["archive"])
+app.include_router(user_admin_router, prefix="/admin", tags=["user-admin"])
 
 # Root endpoint
 @app.get("/")
