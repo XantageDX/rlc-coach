@@ -21,9 +21,20 @@ load_dotenv()
 app = FastAPI(title="RLC Coach API")
 
 # Configure CORS
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],  # More permissive for development
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # More permissive for development
+    allow_origins=[
+        "http://localhost:3000",  # React development server
+        "http://127.0.0.1:3000",
+        "*"  # Be cautious with this in production
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -56,11 +67,11 @@ app.include_router(archive_router, prefix="/archive", tags=["archive"])
 def read_root():
     return {"message": "Welcome to RLC Coach API"}
 
-@app.middleware("http")
-async def options_middleware(request, call_next):
-    if request.method == "OPTIONS":
-        return Response(status_code=200)
-    return await call_next(request)
+# @app.middleware("http")
+# async def options_middleware(request, call_next):
+#     if request.method == "OPTIONS":
+#         return Response(status_code=200)
+#     return await call_next(request)
 
 # Run server (for development)
 if __name__ == "__main__":

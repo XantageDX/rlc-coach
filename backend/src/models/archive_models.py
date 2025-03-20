@@ -1,7 +1,7 @@
-# backend/src/models/archive_models.py
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Any
 from bson import ObjectId
+from datetime import datetime
 
 # Helper function to convert MongoDB ObjectId to string
 def convert_object_id(obj: dict) -> dict:
@@ -10,11 +10,18 @@ def convert_object_id(obj: dict) -> dict:
         obj["_id"] = str(obj["_id"])
     return obj
 
+# Document model for uploaded files
+class DocumentModel(BaseModel):
+    filename: str
+    stored_filename: str
+    path: str
+    uploaded_at: str  # ISO format datetime
+
 # Project models
 class ProjectBase(BaseModel):
     name: str
     description: Optional[str] = None
-    collaborators: List[str] = []  # List of user IDs who have access
+    documents: Optional[List[DocumentModel]] = []
 
 class ProjectCreate(ProjectBase):
     pass
@@ -26,7 +33,7 @@ class ProjectResponse(ProjectBase):
         populate_by_name=True
     )
 
-# Key Decision models
+# Key Decision models for future reference
 class KeyDecisionBase(BaseModel):
     title: str
     sequence: str  # Two digits string, e.g., "01", "02"
@@ -44,7 +51,7 @@ class KeyDecisionResponse(KeyDecisionBase):
         populate_by_name=True
     )
 
-# Knowledge Gap models
+# Knowledge Gap models for future reference
 class KnowledgeGapBase(BaseModel):
     title: str
     sequence: str  # Two digits string, e.g., "01", "02"
