@@ -176,7 +176,49 @@ const reportAiService = {
       console.error('Error evaluating KD report:', error);
       throw error;
     }
+  },
+
+  checkArchive: async (reportData, reportType) => {
+    try {
+      // Create a query string from the report data
+      let queryText = '';
+      
+      if (reportType === 'kg') {
+        queryText = `
+          Knowledge Gap: ${reportData.title || ''}
+          Question: ${reportData.description || ''}
+          Purpose: ${reportData.purpose || ''}
+          What We Have Done: ${reportData.what_we_have_done || ''}
+          What We Have Learned: ${reportData.what_we_have_learned || ''}
+          Recommendations: ${reportData.recommendations || ''}
+        `;
+      } else if (reportType === 'kd') {
+        queryText = `
+          Key Decision: ${reportData.title || ''}
+          Description: ${reportData.description || ''}
+          Purpose: ${reportData.purpose || ''}
+          What We Have Done: ${reportData.what_we_have_done || ''}
+          What We Have Learned: ${reportData.what_we_have_learned || ''}
+          Recommendations: ${reportData.recommendations || ''}
+        `;
+      }
+      
+      const response = await axios.post(
+        `${API_URL}/report-ai/check-archive`,
+        { 
+          query: queryText,
+          max_results: 5
+        },
+        { headers: getAuthHeader() }
+      );
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error checking archive:', error);
+      throw error;
+    }
   }
 };
+
 
 export default reportAiService;

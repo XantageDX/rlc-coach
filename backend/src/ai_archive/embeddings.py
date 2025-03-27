@@ -42,7 +42,7 @@ def get_archive_retriever(persist_directory="./archive_chroma_db"):
             embedding_function=embeddings,
             collection_name="archive_documents"
         )
-        return vectordb.as_retriever(search_kwargs={"k": 4})
+        return vectordb.as_retriever(search_kwargs={"k": 8})
     except Exception as e:
         print(f"Error loading archive vector database: {e}")
         return None
@@ -84,3 +84,59 @@ def add_document_to_vectordb(docs, persist_directory="./archive_chroma_db"):
     except Exception as e:
         print(f"Error adding document to vector database: {e}")
         return False
+    
+def delete_document_embeddings(document_filename, persist_directory="./archive_chroma_db"):
+    """
+    Delete all embeddings for a specific document from the vector database.
+    
+    Args:
+        document_filename: Filename of the document to remove
+        persist_directory: Directory for the vector database
+    """
+    try:
+        # Initialize Bedrock embeddings
+        embeddings = BedrockEmbeddings(
+            model_id="amazon.titan-embed-text-v2:0",
+            region_name=os.getenv("AWS_REGION", "us-west-2"),
+        )
+        
+        # Get the vector database
+        vectordb = Chroma(
+            persist_directory=persist_directory,
+            embedding_function=embeddings,
+            collection_name="archive_documents"
+        )
+        
+        # Query for all documents with matching source in metadata
+        results = vectordb.get(
+            where={"source": document_filename}
+        )
+        
+        # If we found matching documents, delete them by ID
+        if results and results.get('ids'):
+            vectordb.delete(ids=results['ids'])
+            vectordb.persist()
+            print(f"Deleted {len(results['ids'])} embeddings for {document_filename}")
+            return True
+        else:
+            print(f"No embeddings found for {document_filename}")
+            return False
+            
+    except Exception as e:
+        print(f"Error deleting document embeddings: {e}")
+        return False
+
+def delete_all_project_embeddings(document_filenames, persist_directory="./archive_chroma_db"):
+    """
+    Delete all embeddings for all documents in a project.
+    
+    Args:
+        document_filenames: List of filenames to remove
+        persist_directory: Directory for the vector database
+    """
+    results = []
+    for filename in document_filenames:
+        result = delete_document_embeddings(filename, persist_directory)
+        results.append(result)
+    
+    return all(results)  # Return True only if all deletions were successful

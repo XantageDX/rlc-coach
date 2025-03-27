@@ -550,6 +550,33 @@ const Archive = () => {
     }
   };
 
+  const handleFileDrop = (files) => {
+    const allowedTypes = [
+      'application/pdf',                     // PDF files
+      'application/vnd.ms-powerpoint',       // PPT files
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation', // PPTX files
+      'application/msword',                  // DOC files
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'   // DOCX files
+    ];
+    
+    // Check file extensions for files that might not have the correct MIME type
+    const allowedExtensions = ['.pdf', '.ppt', '.pptx', '.doc', '.docx'];
+    
+    // Filter invalid files
+    const invalidFiles = files.filter(file => {
+      const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+      return !allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension);
+    });
+    
+    if (invalidFiles.length > 0) {
+      setUploadError(`Invalid file type(s): ${invalidFiles.map(f => f.name).join(', ')}. Only PDF, PPT, and Word documents are allowed.`);
+      return;
+    }
+    
+    setUploadError('');
+    setFilesToUpload(files);
+  };
+
   return (
     <div className="archive-container">
       <h2>Archive</h2>
@@ -620,22 +647,62 @@ const Archive = () => {
               </div>
 
               <div className="file-upload-controls">
-                <div className="file-input-wrapper">
+                <div 
+                  className={`dropzone ${filesToUpload.length > 0 ? 'active' : ''}`}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onDragEnter={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.classList.add('active');
+                  }}
+                  onDragLeave={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.classList.remove('active');
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.classList.remove('active');
+                    
+                    const files = Array.from(e.dataTransfer.files);
+                    handleFileDrop(files);
+                  }}
+                  onClick={() => document.getElementById('file-input').click()}
+                >
                   <input 
+                    id="file-input"
                     type="file" 
                     onChange={handleFileSelect}
                     multiple
                     accept=".pdf,.doc,.docx,.ppt,.pptx"
+                    style={{ display: 'none' }}
                   />
-                  <small className="file-types-hint">Allowed file types: PDF, PPT, DOC</small>
-                  {uploadError && <div className="upload-error">{uploadError}</div>}
+                  {filesToUpload.length > 0 ? (
+                    <div>
+                      <p><strong>{filesToUpload.length} files selected</strong></p>
+                      <p>Click to select different files or drop them here</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p><strong>Drag & drop files here</strong> or click to select</p>
+                      <p className="file-types">Allowed file types: PDF, PPT, DOCX</p>
+                    </div>
+                  )}
                 </div>
-                <button 
-                  onClick={handleFileUpload}
-                  disabled={!filesToUpload.length}
-                >
-                  Upload {filesToUpload.length ? `(${filesToUpload.length} files)` : ''}
-                </button>
+                {uploadError && <div className="upload-error">{uploadError}</div>}
+                
+                {filesToUpload.length > 0 && (
+                  <button 
+                    className="upload-btn"
+                    onClick={handleFileUpload}
+                  >
+                    Upload {filesToUpload.length} {filesToUpload.length === 1 ? 'file' : 'files'}
+                  </button>
+                )}
               </div>
 
               {/* Show selected files preview */}
@@ -654,18 +721,47 @@ const Archive = () => {
               <div className="uploaded-files">
                 <h3>Uploaded Files:</h3>
                 {selectedProject.documents && selectedProject.documents.length > 0 ? (
-                  <ul>
-                    {selectedProject.documents.map((doc) => (
-                      <li key={doc._id}>
-                        <span title={doc.filename}>{doc.filename}</span>
-                        <button
-                          className="delete-file-btn"
-                          onClick={() => handleDeleteFile(doc._id, doc.filename)}
-                        >
-                          Delete
-                        </button>
-                      </li>
-                    ))}
+                  <ul className="files-list">
+                    {selectedProject.documents.map((doc) => {
+                      // Determine embedding status
+                      let embeddingStatus = 'processing';
+                      let embeddingLabel = 'Processing';
+                      
+                      if (doc.embedded === true) {
+                        embeddingStatus = 'success';
+                        embeddingLabel = 'Embedded';
+                      } else if (doc.embedded === false) {
+                        embeddingStatus = 'failed';
+                        embeddingLabel = 'Failed';
+                      }
+                      
+                      return (
+                        <li key={doc._id} className={`file-item ${embeddingStatus}`}>
+                          <div className="file-info">
+                            <span className="file-name" title={doc.filename}>{doc.filename}</span>
+                            <div className="file-meta">
+                              <span className="file-type">{doc.file_type?.toUpperCase() || ''}</span>
+                              {doc.file_size && (
+                                <span className="file-size">
+                                  {Math.round(doc.file_size / 1024)} KB
+                                </span>
+                              )}
+                              <span className={`embedding-badge ${embeddingStatus}`}>
+                                {embeddingLabel}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="file-actions">
+                            <button
+                              className="delete-file-btn"
+                              onClick={() => handleDeleteFile(doc._id, doc.filename)}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </li>
+                      );
+                    })}
                   </ul>
                 ) : (
                   <p>No files uploaded yet</p>

@@ -1,3 +1,4 @@
+# backend/src/services/archive_service.py
 from bson import ObjectId
 from typing import List, Dict
 from datetime import datetime
@@ -11,7 +12,8 @@ from src.models.archive_models import (
 from src.utils.db import db
 
 from src.utils.document_processor import extract_text_from_file, split_text
-from src.ai_archive.embeddings import add_document_to_vectordb
+from src.ai_archive.embeddings import get_archive_retriever
+from src.ai_archive.embeddings import add_document_to_vectordb, delete_document_embeddings, delete_all_project_embeddings
 import shutil
 
 # Collection references
@@ -162,6 +164,10 @@ async def delete_project_document(project_id: str, document_id: str) -> bool:
         
         if not document:
             return False
+            
+        # Delete embeddings from ChromaDB
+        if document.get('embedded', False):
+            delete_document_embeddings(document['filename'])
 
         # Delete the physical file if it exists
         if 'path' in document and os.path.exists(document['path']):
@@ -195,6 +201,16 @@ async def delete_project(project_id: str) -> bool:
         if not project:
             return False
 
+        # Get the filenames of all embedded documents
+        embedded_filenames = [
+            doc['filename'] for doc in project.get('documents', [])
+            if doc.get('embedded', False)
+        ]
+        
+        # Delete all embeddings for this project
+        if embedded_filenames:
+            delete_all_project_embeddings(embedded_filenames)
+
         # Delete all physical files associated with the project
         for document in project.get('documents', []):
             if 'path' in document and os.path.exists(document['path']):
@@ -219,3 +235,33 @@ async def delete_project(project_id: str) -> bool:
     except Exception as e:
         print(f"Error deleting project: {e}")
         raise
+
+async def search_archive(query: str, num_results: int = 5) -> List[Dict]:
+    """
+    Search the archive for documents similar to the query.
+    
+    :param query: The text query to search for
+    :param num_results: Number of results to return
+    :return: List of document matches with metadata
+    """
+    try:
+        # Get the retriever
+        retriever = get_archive_retriever()
+        if not retriever:
+            return []
+        
+        # Search for similar documents
+        docs = retriever.get_relevant_documents(query)
+        
+        # Format results
+        results = []
+        for doc in docs[:num_results]:
+            results.append({
+                "text": doc.page_content,
+                "metadata": doc.metadata
+            })
+        
+        return results
+    except Exception as e:
+        print(f"Error searching archive: {e}")
+        return []

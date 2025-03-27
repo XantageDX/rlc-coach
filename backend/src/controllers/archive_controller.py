@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+from pydantic import BaseModel
 from typing import List, Dict
 from src.models.archive_models import ProjectCreate, ProjectResponse
 from src.services.archive_service import (
@@ -6,11 +7,33 @@ from src.services.archive_service import (
     get_all_projects, 
     upload_project_document,
     delete_project_document,
-    delete_project
+    delete_project,
+    search_archive
 )
 from src.utils.auth import get_current_user
 
 router = APIRouter()
+
+class SearchQuery(BaseModel):
+    query: str
+    num_results: int = 5
+
+@router.post("/search", response_model=List[Dict])
+async def search_documents(
+    search_data: SearchQuery,
+    current_user = Depends(get_current_user)
+):
+    """
+    Search the archive for documents similar to the query.
+    """
+    try:
+        results = await search_archive(search_data.query, search_data.num_results)
+        return results
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error searching archive: {str(e)}"
+        )
 
 @router.get("/projects", response_model=List[Dict])
 async def list_projects(current_user = Depends(get_current_user)):

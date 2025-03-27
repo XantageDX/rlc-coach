@@ -3,6 +3,7 @@ import './../../styles/report-writer.css';
 import reportAiService from '../../services/reportAiService';
 import pptxgen from 'pptxgenjs';
 import jsPDF from 'jspdf';
+// import archiveService from '../../services/archiveService';
 
 const ReportWriter = () => {
   const [selectedReport, setSelectedReport] = useState('');
@@ -991,7 +992,69 @@ const handleReportSelect = (e) => {
   };
 
 
-  const checkReportArchive = () => alert('Check archive feature would be implemented here');
+  const checkReportArchive = async () => {
+    if (!selectedReport) {
+      setChatMessages(prev => [...prev, {
+        role: 'ai',
+        content: "Please select a report type first."
+      }]);
+      return;
+    }
+    
+    // Add user message to chat
+    setChatMessages(prev => [...prev, {
+      role: 'user',
+      content: "Check Archive"
+    }]);
+    
+    // Add a loading message
+    setChatMessages(prev => [...prev, {
+      role: 'ai',
+      content: "Searching archive for relevant documents...",
+      isLoading: true
+    }]);
+    
+    setIsAiLoading(true);
+    
+    try {
+      // Get report context (all field values)
+      const reportData = getReportFieldValues();
+      
+      // Determine the report type
+      const reportType = selectedReport === 'knowledge_gap' ? 'kg' : 'kd';
+      
+      // Call the check archive service
+      const result = await reportAiService.checkArchive(reportData, reportType);
+      
+      // Remove the loading message and add the real response
+      setChatMessages(prev => {
+        const filteredMessages = prev.filter(msg => !msg.isLoading);
+        return [
+          ...filteredMessages,
+          {
+            role: 'ai',
+            content: result.ai_response || "I've searched the archive but couldn't find relevant documents."
+          }
+        ];
+      });
+    } catch (err) {
+      console.error('Error checking archive:', err);
+      
+      // Remove the loading message and add the error message
+      setChatMessages(prev => {
+        const filteredMessages = prev.filter(msg => !msg.isLoading);
+        return [
+          ...filteredMessages,
+          {
+            role: 'ai',
+            content: "Sorry, there was an error searching the archive. Please try again later."
+          }
+        ];
+      });
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
   
   // Function to evaluate the report using AI
   const evaluateReport = async () => {
@@ -1119,12 +1182,20 @@ const handleReportSelect = (e) => {
           <h3>Chat Assistant</h3>
           <div className="chat-messages" id="report-chat-response">
             {chatMessages.map((msg, index) => (
-              <div key={index} className={`chat-message ${msg.role}-message`}>
+              <div key={index} className={`chat-message ${msg.role}-message ${msg.isLoading ? 'loading' : ''}`}>
                 <strong>{msg.role === 'ai' ? 'AI:' : 'You:'}</strong>{' '}
-                <div 
-                  className="message-content"
-                  dangerouslySetInnerHTML={{ __html: formatMessage(msg.content) }}
-                />
+                {msg.isLoading ? (
+                  <div className="loading-indicator">
+                    <span className="dot"></span>
+                    <span className="dot"></span>
+                    <span className="dot"></span>
+                  </div>
+                ) : (
+                  <div 
+                    className="message-content"
+                    dangerouslySetInnerHTML={{ __html: formatMessage(msg.content) }}
+                  />
+                )}
               </div>
             ))}
             <div ref={messagesEndRef} />
@@ -1135,29 +1206,43 @@ const handleReportSelect = (e) => {
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
               placeholder="Type a message..."
+              disabled={isAiLoading} // Disable input while loading
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
+                  e.preventDefault(); // Prevent default to avoid newline
                   handleChatSubmit();
                 }
               }}
             ></textarea>
-            <button className="voice-btn" onClick={startVoiceInput} aria-label="Voice Input">
+            <button 
+              className="voice-btn" 
+              onClick={startVoiceInput} 
+              aria-label="Voice Input"
+              disabled={isAiLoading} // Disable voice input while loading
+            >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 15C13.66 15 15 13.66 15 12V6C15 4.34 13.66 3 12 3C10.34 3 9 4.34 9 6V12C9 13.66 10.34 15 12 15Z" fill="#8BB5E8"/>
-                <path d="M17 12C17 14.76 14.76 17 12 17C9.24 17 7 14.76 7 12H5C5 15.53 7.61 18.43 11 18.93V21H13V18.93C16.39 18.43 19 15.53 19 12H17Z" fill="#8BB5E8"/>
+                <path d="M12 15C13.66 15 15 13.66 15 12V6C15 4.34 13.66 3 12 3C10.34 3 9 4.34 9 6V12C9 13.66 10.34 15 12 15Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
+                <path d="M17 12C17 14.76 14.76 17 12 17C9.24 17 7 14.76 7 12H5C5 15.53 7.61 18.43 11 18.93V21H13V18.93C16.39 18.43 19 15.53 19 12H17Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
               </svg>
             </button>
           </div>
           <div className="chat-actions">
-            <button className="action-btn archive-btn" onClick={checkReportArchive}>
+            <button 
+              className="action-btn archive-btn" 
+              onClick={checkReportArchive}
+              disabled={isAiLoading}
+            >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M21 8V21H3V8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M3 4H21V8H3V4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               <span className="btn-text">Check Archive</span>
             </button>
-            <button className="action-btn evaluate-btn" onClick={evaluateReport}>
+            <button 
+              className="action-btn evaluate-btn" 
+              onClick={evaluateReport}
+              disabled={isAiLoading}
+            >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
