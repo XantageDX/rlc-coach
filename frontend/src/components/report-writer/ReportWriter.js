@@ -3,12 +3,14 @@ import './../../styles/report-writer.css';
 import reportAiService from '../../services/reportAiService';
 import pptxgen from 'pptxgenjs';
 import jsPDF from 'jspdf';
+import axios from 'axios';
 // import archiveService from '../../services/archiveService';
 
 const ReportWriter = () => {
   const [selectedReport, setSelectedReport] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  // const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState(null);
+  const [sources, setSources] = useState([]);
   const [chatInput, setChatInput] = useState('');
   const [isAiLoading, setIsAiLoading] = useState(false);
   const messagesEndRef = useRef(null);
@@ -357,33 +359,68 @@ const handleReportSelect = (e) => {
   };
   
   // Helper function to format message text with basic markdown-like styling
-  const formatMessage = (text) => {
-    if (!text) return '';
+  // const formatMessage = (text) => {
+  //   if (!text) return '';
     
-    // First, clean up any unexpected characters or encoding issues
-    text = text.replace(/\$2/g, ''); // Remove any $2 placeholders
-    text = text.replace(/\n\s*\n/g, '\n'); // Normalize multiple newlines
+  //   // First, clean up any unexpected characters or encoding issues
+  //   text = text.replace(/\$2/g, ''); // Remove any $2 placeholders
+  //   text = text.replace(/\n\s*\n/g, '\n'); // Normalize multiple newlines
     
-    // Replace headers
-    text = text.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-    text = text.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-    text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  //   // Replace headers
+  //   text = text.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  //   text = text.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  //   text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
   
-    // Bold text
-    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  //   // Bold text
+  //   text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   
-    // Lists (handle both bullet and numbered)
-    text = text.replace(/^([-•]\s+)(.+)$/gm, '<li>$2</li>');
-    text = text.replace(/^(\d+\.\s+)(.+)$/gm, '<li>$2</li>');
+  //   // Lists (handle both bullet and numbered)
+  //   text = text.replace(/^([-•]\s+)(.+)$/gm, '<li>$2</li>');
+  //   text = text.replace(/^(\d+\.\s+)(.+)$/gm, '<li>$2</li>');
     
-    // Wrap consecutive list items
-    text = text.replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
+  //   // Wrap consecutive list items
+  //   text = text.replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
   
-    // Additional cleanup
-    text = text.replace(/\s+/g, ' ').trim();
+  //   // Additional cleanup
+  //   text = text.replace(/\s+/g, ' ').trim();
   
+  //   return text;
+  // };
+  // Update the formatMessage function
+const formatMessage = (text) => {
+  if (!text) return '';
+  
+  // Check if the text already contains HTML (like our buttons)
+  if (text.includes('<button')) {
+    // If it has HTML, we'll return it with minimal formatting
+    // to avoid disrupting the button functionality
     return text;
-  };
+  }
+  
+  // First, clean up any unexpected characters or encoding issues
+  text = text.replace(/\$2/g, ''); // Remove any $2 placeholders
+  text = text.replace(/\n\s*\n/g, '\n'); // Normalize multiple newlines
+  
+  // Replace headers
+  text = text.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  text = text.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+
+  // Bold text
+  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+  // Lists (handle both bullet and numbered)
+  text = text.replace(/^([-•]\s+)(.+)$/gm, '<li>$2</li>');
+  text = text.replace(/^(\d+\.\s+)(.+)$/gm, '<li>$2</li>');
+  
+  // Wrap consecutive list items
+  text = text.replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
+
+  // Additional cleanup
+  text = text.replace(/\s+/g, ' ').trim();
+
+  return text;
+};
 
   // Report action functions
   const exportPowerPoint = () => {
@@ -992,6 +1029,69 @@ const handleReportSelect = (e) => {
   };
 
 
+  // const checkReportArchive = async () => {
+  //   if (!selectedReport) {
+  //     setChatMessages(prev => [...prev, {
+  //       role: 'ai',
+  //       content: "Please select a report type first."
+  //     }]);
+  //     return;
+  //   }
+    
+  //   // Add user message to chat
+  //   setChatMessages(prev => [...prev, {
+  //     role: 'user',
+  //     content: "Check Archive"
+  //   }]);
+    
+  //   // Add a loading message
+  //   setChatMessages(prev => [...prev, {
+  //     role: 'ai',
+  //     content: "Searching archive for relevant documents...",
+  //     isLoading: true
+  //   }]);
+    
+  //   setIsAiLoading(true);
+    
+  //   try {
+  //     // Get report context (all field values)
+  //     const reportData = getReportFieldValues();
+      
+  //     // Determine the report type
+  //     const reportType = selectedReport === 'knowledge_gap' ? 'kg' : 'kd';
+      
+  //     // Call the check archive service
+  //     const result = await reportAiService.checkArchive(reportData, reportType);
+      
+  //     // Remove the loading message and add the real response
+  //     setChatMessages(prev => {
+  //       const filteredMessages = prev.filter(msg => !msg.isLoading);
+  //       return [
+  //         ...filteredMessages,
+  //         {
+  //           role: 'ai',
+  //           content: result.ai_response || "I've searched the archive but couldn't find relevant documents."
+  //         }
+  //       ];
+  //     });
+  //   } catch (err) {
+  //     console.error('Error checking archive:', err);
+      
+  //     // Remove the loading message and add the error message
+  //     setChatMessages(prev => {
+  //       const filteredMessages = prev.filter(msg => !msg.isLoading);
+  //       return [
+  //         ...filteredMessages,
+  //         {
+  //           role: 'ai',
+  //           content: "Sorry, there was an error searching the archive. Please try again later."
+  //         }
+  //       ];
+  //     });
+  //   } finally {
+  //     setIsAiLoading(false);
+  //   }
+  // };
   const checkReportArchive = async () => {
     if (!selectedReport) {
       setChatMessages(prev => [...prev, {
@@ -1014,6 +1114,9 @@ const handleReportSelect = (e) => {
       isLoading: true
     }]);
     
+    // Clear the sources list
+    setSources([]);
+    
     setIsAiLoading(true);
     
     try {
@@ -1033,10 +1136,15 @@ const handleReportSelect = (e) => {
           ...filteredMessages,
           {
             role: 'ai',
-            content: result.ai_response || "I've searched the archive but couldn't find relevant documents."
+            content: result.ai_response || "I couldn't find any relevant documents in our archive."
           }
         ];
       });
+      
+      // Update the sources state if we found any documents
+      if (result.document_metadata && result.document_metadata.length > 0) {
+        setSources(result.document_metadata);
+      }
     } catch (err) {
       console.error('Error checking archive:', err);
       
@@ -1160,6 +1268,103 @@ const handleReportSelect = (e) => {
     return fields;
   };
   
+  // Add this function to the ReportWriter component
+  const extractDocumentIds = (aiResponse) => {
+    if (!aiResponse) return [];
+    
+    const documents = [];
+    // Look for document references in the AI response
+    // Format: [Filename] (project_id: {project_id}, document_id: {document_id})
+    const regex = /\[([^\]]+)\]\s*\(project_id:\s*([^,]+),\s*document_id:\s*([^)]+)\)/g;
+    let match;
+    
+    while ((match = regex.exec(aiResponse)) !== null) {
+      documents.push({
+        filename: match[1],
+        project_id: match[2].trim(),
+        document_id: match[3].trim()
+      });
+    }
+    
+    return documents;
+  };
+
+  // Add this function to the ReportWriter component
+  const handleOpenDocument = async (projectId, documentId, filename) => {
+    try {
+      // Get the auth token
+      const user = JSON.parse(localStorage.getItem('user'));
+      const token = user?.access_token;
+      
+      if (!token) {
+        alert('Authentication token not found. Please log in again.');
+        return;
+      }
+      
+      // Get file extension
+      const fileExtension = filename.split('.').pop().toLowerCase();
+      
+      if (fileExtension === 'pdf') {
+        // PDFs can be viewed in the browser
+        const response = await axios({
+          url: `http://localhost:8000/archive/projects/${projectId}/documents/${documentId}/view`,
+          method: 'GET',
+          responseType: 'blob',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      } else if (['pptx', 'ppt', 'docx', 'doc'].includes(fileExtension)) {
+        // For PowerPoint and Word files, show message and download
+        // eslint-disable-next-line no-restricted-globals
+        if (confirm(`Browser cannot display ${fileExtension.toUpperCase()} files directly. Do you want to download the file?`)) {
+          const response = await axios({
+            url: `http://localhost:8000/archive/projects/${projectId}/documents/${documentId}/view`,
+            method: 'GET',
+            responseType: 'blob',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          
+          const blob = new Blob([response.data]);
+          const url = window.URL.createObjectURL(blob);
+          
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', filename);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        }
+      } else {
+        // For all other file types, just download
+        const response = await axios({
+          url: `http://localhost:8000/archive/projects/${projectId}/documents/${documentId}/view`,
+          method: 'GET',
+          responseType: 'blob',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        const blob = new Blob([response.data]);
+        const url = window.URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error('Error opening document:', err);
+      alert('Failed to open file: ' + (err.response?.data?.detail || err.message));
+    }
+  };
+
+
   // Main component render
   return (
     <div className="report-writer-container">
@@ -1249,6 +1454,29 @@ const handleReportSelect = (e) => {
               <span className="btn-text">Evaluate Report</span>
             </button>
           </div>
+
+          {/* Sources section */}
+          {sources.length > 0 && (
+            <div className="sources-section">
+              <h4>Sources</h4>
+              <ul className="sources-list">
+                {sources.map((doc, index) => (
+                  <li key={index} className="source-item">
+                    <a 
+                      href="#" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleOpenDocument(doc.project_id, doc.document_id, doc.filename);
+                      }}
+                      className="source-link"
+                    >
+                      {doc.filename}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
         
         <div className="report-preview">

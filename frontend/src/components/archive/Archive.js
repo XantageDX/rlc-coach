@@ -352,6 +352,7 @@
 import React, { useState, useEffect } from 'react';
 import './../../styles/archive.css';
 import archiveService from '../../services/archiveService';
+import axios from 'axios';
 
 const Archive = () => {
   const [projects, setProjects] = useState([]);
@@ -577,6 +578,106 @@ const Archive = () => {
     setFilesToUpload(files);
   };
 
+  // const handleOpenFile = async (documentId, filename) => {
+  //   if (!selectedProject) return;
+    
+  //   try {
+  //     // Get the auth token
+  //     const user = JSON.parse(localStorage.getItem('user'));
+  //     const token = user?.access_token;
+      
+  //     if (!token) {
+  //       alert('Authentication token not found. Please log in again.');
+  //       return;
+  //     }
+      
+  //     // Use axios to get the file with authorization header
+  //     const response = await axios({
+  //       url: `http://localhost:8000/archive/projects/${selectedProject._id}/documents/${documentId}/view`,
+  //       method: 'GET',
+  //       responseType: 'blob', // Important for handling file downloads
+  //       headers: {
+  //         'Authorization': `Bearer ${token}`
+  //       }
+  //     });
+      
+  //     // Create a blob URL and open it
+  //     const blob = new Blob([response.data]);
+  //     const url = window.URL.createObjectURL(blob);
+      
+  //     // Create a temporary link and click it
+  //     const link = document.createElement('a');
+  //     link.href = url;
+  //     link.setAttribute('download', filename); // Set the filename
+  //     link.setAttribute('target', '_blank');
+  //     document.body.appendChild(link);
+  //     link.click();
+      
+  //     // Clean up
+  //     document.body.removeChild(link);
+  //     window.URL.revokeObjectURL(url);
+  //   } catch (err) {
+  //     console.error('Error opening file:', err);
+  //     alert('Failed to open file: ' + (err.response?.data?.detail || err.message));
+  //   }
+  // };
+  const handleOpenFile = async (documentId, filename) => {
+    if (!selectedProject) return;
+    
+    try {
+      // Create a URL with the token in the query string
+      const user = JSON.parse(localStorage.getItem('user'));
+      const token = user?.access_token;
+      
+      // Set up a global axios request interceptor to add the token to every request
+      axios.interceptors.request.use(
+        config => {
+          config.headers.Authorization = `Bearer ${token}`;
+          return config;
+        },
+        error => Promise.reject(error)
+      );
+      
+      // For PDF, DOC, DOCX, PPT, PPTX files
+      const fileExtension = filename.split('.').pop().toLowerCase();
+      
+      // For files that browsers can display
+      if (['pdf'].includes(fileExtension)) {
+        // For PDFs, we can display them directly in a new tab
+        const response = await axios({
+          url: `http://localhost:8000/archive/projects/${selectedProject._id}/documents/${documentId}/view`,
+          method: 'GET',
+          responseType: 'blob',
+        });
+        
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      } else {
+        // For other file types, download them
+        const response = await axios({
+          url: `http://localhost:8000/archive/projects/${selectedProject._id}/documents/${documentId}/view`,
+          method: 'GET',
+          responseType: 'blob',
+        });
+        
+        const blob = new Blob([response.data]);
+        const url = window.URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error('Error opening file:', err);
+      alert('Failed to open file: ' + (err.response?.data?.detail || err.message));
+    }
+  };
+
   return (
     <div className="archive-container">
       <h2>Archive</h2>
@@ -752,6 +853,12 @@ const Archive = () => {
                             </div>
                           </div>
                           <div className="file-actions">
+                            <button
+                              className="open-file-btn"
+                              onClick={() => handleOpenFile(doc._id, doc.filename)}
+                            >
+                              Open
+                            </button>
                             <button
                               className="delete-file-btn"
                               onClick={() => handleDeleteFile(doc._id, doc.filename)}
