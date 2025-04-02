@@ -26,9 +26,21 @@ const ReportWriter = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
   
+  // Keep your existing scrollToBottom useEffect
   useEffect(() => {
     scrollToBottom();
   }, [chatMessages]);
+
+  // Add this new useEffect for voice recognition cleanup
+  useEffect(() => {
+    return () => {
+      // Reset any microphone button styling when component unmounts
+      const voiceBtn = document.querySelector('.voice-btn svg');
+      if (voiceBtn) {
+        voiceBtn.style.fill = '#8BB5E8';
+      }
+    };
+  }, []);
   
   // Handle report type selection
 // Update the handleReportSelect function
@@ -122,11 +134,186 @@ const handleReportSelect = (e) => {
     }
   };
   
-  // Voice input handler (placeholder)
-  const startVoiceInput = () => {
-    // This would implement speech recognition in a real app
-    alert('Voice input feature would be implemented here');
+// Voice input handler with updated UX flow
+const startVoiceInput = () => {
+  // Feature detection for Web Speech API
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  
+  if (!SpeechRecognition) {
+    // Alert user if browser doesn't support the feature
+    alert("Sorry, voice recognition isn't supported in your browser. For best results, use Chrome or Edge.");
+    return;
+  }
+
+  // Store reference to paths in microphone SVG
+  const micTopPath = document.querySelector('.voice-btn svg path#mic-top');
+  const micBottomPath = document.querySelector('.voice-btn svg path#mic-bottom');
+  const voiceBtn = document.querySelector('.voice-btn');
+  
+  // Check if we're already recording
+  const isRecording = voiceBtn.getAttribute('data-recording') === 'true';
+  
+  if (isRecording) {
+    // If we're already recording, stop it
+    console.log('Stopping recording');
+    window.speechRecognitionInstance?.stop();
+    return;
+  }
+  
+  // Create a new speech recognition instance
+  const recognition = new SpeechRecognition();
+  
+  // Store the recognition instance globally so we can stop it later
+  window.speechRecognitionInstance = recognition;
+  
+  // Configure the recognition
+  recognition.lang = 'en-US';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  
+  // Mark button as recording
+  voiceBtn.setAttribute('data-recording', 'true');
+  
+  // Change microphone color to red
+  if (micTopPath && micBottomPath) {
+    micTopPath.setAttribute('fill', '#ff4c4c');
+    micBottomPath.setAttribute('fill', '#ff4c4c');
+    console.log('Microphone color changed to red');
+  }
+  
+  // Add message showing recording has started
+  setChatMessages(prev => [...prev, {
+    role: 'ai',
+    content: "🎤 I'm listening... Speak clearly and I'll transcribe your message. Click the microphone button again to stop recording."
+  }]);
+  
+  // Variable to store transcript
+  let finalTranscript = '';
+  
+  // Event handler for results
+  recognition.onresult = (event) => {
+    console.log('Speech recognition result received', event);
+    let interimTranscript = '';
+    
+    // Process the results
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+      
+      if (event.results[i].isFinal) {
+        finalTranscript += transcript + ' ';
+      } else {
+        interimTranscript += transcript;
+      }
+    }
+    
+    // Update the chat input with the current transcript
+    setChatInput(finalTranscript + interimTranscript);
   };
+  
+  // Handle errors
+  recognition.onerror = (event) => {
+    console.error('Speech recognition error', event.error);
+    
+    // Reset the voice button color and state
+    resetRecordingState();
+    
+    if (event.error === 'not-allowed') {
+      setChatMessages(prev => [...prev, {
+        role: 'ai',
+        content: "Microphone access was denied. Please allow microphone access and try again."
+      }]);
+    } else {
+      setChatMessages(prev => [...prev, {
+        role: 'ai',
+        content: `Speech recognition error: ${event.error}. Please try again.`
+      }]);
+    }
+  };
+  
+  // Handle the end of speech recognition
+  recognition.onend = () => {
+    console.log('Speech recognition ended');
+    
+    // Reset the voice button color and state
+    resetRecordingState();
+    
+    // Only submit if we have a transcript
+    if (finalTranscript.trim()) {
+      setChatInput(finalTranscript.trim());
+      
+      // Small delay to ensure the UI updates before submitting
+      setTimeout(() => {
+        handleChatSubmit();
+      }, 300);
+    }
+  };
+  
+  // Function to reset recording state
+  const resetRecordingState = () => {
+    // Reset the voice button color
+    if (micTopPath && micBottomPath) {
+      micTopPath.setAttribute('fill', '#8BB5E8');
+      micBottomPath.setAttribute('fill', '#8BB5E8');
+    }
+    
+    // Reset the recording state
+    voiceBtn.setAttribute('data-recording', 'false');
+    
+    // Clear the global instance
+    window.speechRecognitionInstance = null;
+  };
+  
+  // Start recognition
+  try {
+    recognition.start();
+    console.log('Speech recognition started');
+  } catch (err) {
+    console.error('Error starting speech recognition:', err);
+    resetRecordingState();
+  }
+};
+  
+//   // Handle the end of speech recognition
+//   recognition.onend = () => {
+//     console.log("Recognition ended with transcript:", finalTranscript);
+    
+//     // Only submit if we have a transcript
+//     if (finalTranscript.trim()) {
+//       setChatInput(finalTranscript.trim());
+      
+//       // Small delay to ensure the UI updates before submitting
+//       setTimeout(() => {
+//         handleChatSubmit();
+//       }, 500);
+//     }
+    
+//     // Reset button color
+//     if (voiceBtn) {
+//       voiceBtn.setAttribute('fill', isAiLoading ? "#cccccc" : "#8BB5E8");
+//     }
+//   };
+  
+//   // Start recognition
+//   recognition.start();
+//   console.log("Speech recognition started");
+  
+//   // Setup stop mechanism
+//   const stopBtn = document.querySelector('.voice-btn');
+//   const originalOnClick = stopBtn.onclick;
+  
+//   // Use a one-time handler to stop recording on next click
+//   stopBtn.onclick = (e) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+    
+//     // Stop recognition
+//     recognition.stop();
+//     console.log("Speech recognition stopped by button");
+    
+//     // Reset the onclick handler
+//     stopBtn.onclick = originalOnClick;
+//   };
+// };
   
   // Render Key Decision report template
   const renderKeyDecisionReport = () => {
@@ -1423,11 +1610,11 @@ const formatMessage = (text) => {
               className="voice-btn" 
               onClick={startVoiceInput} 
               aria-label="Voice Input"
-              disabled={isAiLoading} // Disable voice input while loading
+              disabled={isAiLoading}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 15C13.66 15 15 13.66 15 12V6C15 4.34 13.66 3 12 3C10.34 3 9 4.34 9 6V12C9 13.66 10.34 15 12 15Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
-                <path d="M17 12C17 14.76 14.76 17 12 17C9.24 17 7 14.76 7 12H5C5 15.53 7.61 18.43 11 18.93V21H13V18.93C16.39 18.43 19 15.53 19 12H17Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
+                <path id="mic-top" d="M12 15C13.66 15 15 13.66 15 12V6C15 4.34 13.66 3 12 3C10.34 3 9 4.34 9 6V12C9 13.66 10.34 15 12 15Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
+                <path id="mic-bottom" d="M17 12C17 14.76 14.76 17 12 17C9.24 17 7 14.76 7 12H5C5 15.53 7.61 18.43 11 18.93V21H13V18.93C16.39 18.43 19 15.53 19 12H17Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
               </svg>
             </button>
           </div>

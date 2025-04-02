@@ -1,6 +1,124 @@
-// AICoach.js
+// // AICoach.js
+// import React, { useState, useRef, useEffect } from 'react';
+// import aiCoachService from '../../services/aiCoachService';
+
+// const AICoach = () => {
+//   const [messages, setMessages] = useState([]);
+//   const [inputText, setInputText] = useState('');
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [error, setError] = useState(null);
+//   const [conversationId, setConversationId] = useState(null);
+  
+//   const messagesEndRef = useRef(null);
+  
+//   // Scroll to bottom of messages
+//   const scrollToBottom = () => {
+//     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+//   };
+  
+//   useEffect(() => {
+//     scrollToBottom();
+//   }, [messages]);
+  
+//   // Add initial welcome message
+//   useEffect(() => {
+//     setMessages([{
+//       role: 'assistant',
+//       content: 'Hello! I\'m your AI Coach for Rapid Learning Cycles. Ask me anything about the RLC methodology, and I\'ll do my best to help you understand and apply it effectively.'
+//     }]);
+    
+//     // Generate a random conversation ID
+//     setConversationId(`conversation-${Date.now()}`);
+//   }, []);
+  
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+    
+//     if (!inputText.trim()) return;
+    
+//     // Add user message
+//     const userMessage = {
+//       role: 'user',
+//       content: inputText
+//     };
+    
+//     setMessages(prev => [...prev, userMessage]);
+//     setInputText('');
+//     setIsLoading(true);
+//     setError(null);
+    
+//     try {
+//       // Send to API
+//       const response = await aiCoachService.askQuestion(inputText, conversationId);
+      
+//       // Add assistant response
+//       setMessages(prev => [...prev, {
+//         role: 'assistant',
+//         content: response.answer
+//       }]);
+      
+//     } catch (err) {
+//       console.error('Error from AI Coach:', err);
+//       setError('Sorry, there was an error processing your question. Please try again.');
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+  
+//   return (
+//     <div className="ai-coach-container">
+//       <div className="ai-coach-header">
+//         <h2>AI Coach - RLC Methodology Guide</h2>
+//         <p>Ask questions about Rapid Learning Cycles methodology and implementation</p>
+//       </div>
+      
+//       {error && <div className="error-message">{error}</div>}
+      
+//       <div className="messages-container">
+//         {messages.map((message, index) => (
+//           <div 
+//             key={index}
+//             className={`message ${message.role === 'user' ? 'user-message' : 'assistant-message'}`}
+//           >
+//             <div className="message-content">
+//               {message.content}
+//             </div>
+//           </div>
+//         ))}
+//         {isLoading && (
+//           <div className="message assistant-message">
+//             <div className="message-content loading">
+//               <div className="typing-indicator">
+//                 <span></span>
+//                 <span></span>
+//                 <span></span>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+//         <div ref={messagesEndRef} />
+//       </div>
+      
+//       <form onSubmit={handleSubmit} className="input-form">
+//         <input
+//           type="text"
+//           value={inputText}
+//           onChange={(e) => setInputText(e.target.value)}
+//           placeholder="Ask about RLC methodology..."
+//           disabled={isLoading}
+//         />
+//         <button type="submit" disabled={isLoading || !inputText.trim()}>
+//           {isLoading ? 'Thinking...' : 'Send'}
+//         </button>
+//       </form>
+//     </div>
+//   );
+// };
+
+// export default AICoach;
 import React, { useState, useRef, useEffect } from 'react';
 import aiCoachService from '../../services/aiCoachService';
+import './../../styles/ai-coach.css'; // Make sure styles are imported
 
 const AICoach = () => {
   const [messages, setMessages] = useState([]);
@@ -8,6 +126,7 @@ const AICoach = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [conversationId, setConversationId] = useState(null);
+  const [showSuggestions, setShowSuggestions] = useState(true); // State to control displaying suggestions
   
   const messagesEndRef = useRef(null);
   
@@ -31,6 +150,30 @@ const AICoach = () => {
     setConversationId(`conversation-${Date.now()}`);
   }, []);
   
+  // Define suggested prompts with their associated questions
+  const suggestedPrompts = [
+    {
+      buttonText: "Introduce me to the foundations of Rapid Learning Cycles", 
+      prompt: "Can you introduce me to the foundations of Rapid Learning Cycles methodology?"
+    },
+    {
+      buttonText: "What are the main concepts of RLC methodology?", 
+      prompt: "Please introduce me to the main concepts of RLC methodology"
+    },
+    {
+      buttonText: "Explain Key Decisions and Knowledge Gaps", 
+      prompt: "Can you explain what Key Decisions and Knowledge Gaps are in the RLC methodology and how they relate to each other?"
+    },
+    {
+      buttonText: "How to run an effective Learning Cycle?", 
+      prompt: "What are the best practices for running an effective Learning Cycle?"
+    },
+    {
+      buttonText: "Tips for successful Integration Events", 
+      prompt: "What are some tips for making Integration Events successful?"
+    }
+  ];
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -47,9 +190,45 @@ const AICoach = () => {
     setIsLoading(true);
     setError(null);
     
+    // Hide suggestions after first user input
+    setShowSuggestions(false);
+    
     try {
       // Send to API
       const response = await aiCoachService.askQuestion(inputText, conversationId);
+      
+      // Add assistant response
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: response.answer
+      }]);
+      
+    } catch (err) {
+      console.error('Error from AI Coach:', err);
+      setError('Sorry, there was an error processing your question. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Function to handle clicking a suggested prompt
+  const handleSuggestedPrompt = async (promptText) => {
+    // Add user message with the prompt text
+    const userMessage = {
+      role: 'user',
+      content: promptText
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
+    setIsLoading(true);
+    setError(null);
+    
+    // Hide suggestions after selection
+    setShowSuggestions(false);
+    
+    try {
+      // Send to API
+      const response = await aiCoachService.askQuestion(promptText, conversationId);
       
       // Add assistant response
       setMessages(prev => [...prev, {
@@ -85,6 +264,27 @@ const AICoach = () => {
             </div>
           </div>
         ))}
+        
+        {/* Suggested prompts */}
+        {showSuggestions && messages.length === 1 && (
+          <div className="suggested-prompts">
+            <div className="suggested-prompts-header">
+              What would you like to know about RLC?
+            </div>
+            <div className="prompt-buttons">
+              {suggestedPrompts.map((promptData, index) => (
+                <button 
+                  key={index} 
+                  className="prompt-button"
+                  onClick={() => handleSuggestedPrompt(promptData.prompt)}
+                >
+                  {promptData.buttonText}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        
         {isLoading && (
           <div className="message assistant-message">
             <div className="message-content loading">
@@ -100,12 +300,18 @@ const AICoach = () => {
       </div>
       
       <form onSubmit={handleSubmit} className="input-form">
-        <input
-          type="text"
+        <textarea
+          rows="3"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           placeholder="Ask about RLC methodology..."
           disabled={isLoading}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault(); // Prevent default to avoid newline
+              handleSubmit(e);
+            }
+          }}
         />
         <button type="submit" disabled={isLoading || !inputText.trim()}>
           {isLoading ? 'Thinking...' : 'Send'}
