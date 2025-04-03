@@ -12,11 +12,11 @@ const getAuthHeader = () => {
 // AI Coach service
 const aiCoachService = {
   // Ask a question to the AI Coach
-  askQuestion: async (question, conversationId = null) => {
+  askQuestion: async (question, conversationId = null, modelId = null) => {
     try {
       const response = await axios.post(
         `${API_URL}/ai-coach/ask`,
-        { question, conversation_id: conversationId },
+        { question, conversation_id: conversationId, model_id: modelId },
         { headers: getAuthHeader() }
       );
       return response.data;

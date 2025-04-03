@@ -10,6 +10,7 @@ router = APIRouter()
 class AICoachQuestion(BaseModel):
     question: str
     conversation_id: Optional[str] = None
+    model_id: Optional[str] = None
 
 class AICoachResponse(BaseModel):
     answer: str
@@ -23,7 +24,7 @@ async def ask_question(
     """
     Ask a question to the AI Coach about RLC methodology.
     """
-    response = await ask_ai_coach(data.question, data.conversation_id)
+    response = await ask_ai_coach(data.question, data.conversation_id, data.model_id)
     
     if "error" in response:
         raise HTTPException(status_code=500, detail=response["error"])

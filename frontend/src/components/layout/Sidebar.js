@@ -1,11 +1,13 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
+import { useModel } from '../../context/ModelContext';
 import logo from '../../assets/powered_by_xantage.png';
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { currentUser } = useContext(AuthContext);
+  const { selectedModel, setSelectedModel, models } = useModel();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -49,6 +51,23 @@ const Sidebar = () => {
           <Link to="/user-admin">User Admin</Link>
         </li>
       </ul>
+
+      {/* Model selector dropdown - Add this section */}
+      <div className="model-selector">
+        <label htmlFor="model-select">LLM Model:</label>
+        <select 
+          id="model-select"
+          value={selectedModel}
+          onChange={(e) => setSelectedModel(e.target.value)}
+          className="model-dropdown"
+        >
+          {models.map(model => (
+            <option key={model.id} value={model.id}>
+              {model.name}
+            </option>
+          ))}
+        </select>
+      </div>
       
       {/* Logo at the bottom of sidebar */}
       <div className="sidebar-logo">

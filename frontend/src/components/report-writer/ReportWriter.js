@@ -5,8 +5,10 @@ import pptxgen from 'pptxgenjs';
 import jsPDF from 'jspdf';
 import axios from 'axios';
 // import archiveService from '../../services/archiveService';
+import { useModel } from '../../context/ModelContext';
 
 const ReportWriter = () => {
+  const { selectedModel } = useModel();
   const [selectedReport, setSelectedReport] = useState('');
   // const [loading, setLoading] = useState(false);
   // const [error, setError] = useState(null);
@@ -106,13 +108,15 @@ const handleReportSelect = (e) => {
         response = await reportAiService.processKGMessage(
           userMessage.content,
           null, // No report ID since we're not using the database
-          reportContext
+          reportContext,
+          selectedModel
         );
       } else if (selectedReport === 'key_decision') {
         response = await reportAiService.processKDMessage(
           userMessage.content,
           null, // No report ID
-          reportContext
+          reportContext,
+          selectedModel
         );
       } else {
         throw new Error("Please select a report type first.");
@@ -1314,7 +1318,7 @@ const formatMessage = (text) => {
       const reportType = selectedReport === 'knowledge_gap' ? 'kg' : 'kd';
       
       // Call the check archive service
-      const result = await reportAiService.checkArchive(reportData, reportType);
+      const result = await reportAiService.checkArchive(reportData, reportType, selectedModel);
       
       // Remove the loading message and add the real response
       setChatMessages(prev => {
@@ -1380,9 +1384,9 @@ const formatMessage = (text) => {
       
       // Use the appropriate service based on report type
       if (selectedReport === 'knowledge_gap') {
-        response = await reportAiService.evaluateKGReport(reportData);
+        response = await reportAiService.evaluateKGReport(reportData, selectedModel);
       } else if (selectedReport === 'key_decision') {
-        response = await reportAiService.evaluateKDReport(reportData);
+        response = await reportAiService.evaluateKDReport(reportData, selectedModel);
       }
       
       // Add AI response

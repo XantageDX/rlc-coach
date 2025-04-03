@@ -479,10 +479,10 @@ Don't give much context: go to the point.
 - In Conclusion: ...
 """
 
-async def process_kg_message(user_message, report_context=None):
+async def process_kg_message(user_message, report_context=None, model_id=None):
     """Process a user message for Knowledge Gap report assistance"""
     try:
-        llm = get_bedrock_llm()
+        llm = get_bedrock_llm(model_id)
         
         messages = [
             {"role": "system", "content": KG_SYSTEM_PROMPT},
@@ -512,10 +512,10 @@ async def process_kg_message(user_message, report_context=None):
             "success": False
         }
 
-async def evaluate_kg_report(report_data):
+async def evaluate_kg_report(report_data, model_id=None):
     """Evaluate a Knowledge Gap report and provide feedback"""
     try:
-        llm = get_bedrock_llm()
+        llm = get_bedrock_llm(model_id)
         
         # Format report data as a structured prompt
         report_text = f"""
@@ -546,10 +546,10 @@ async def evaluate_kg_report(report_data):
         }
     
 # Add KD functions
-async def process_kd_message(user_message, report_context=None):
+async def process_kd_message(user_message, report_context=None, model_id=None):
     """Process a user message for Key Decision report assistance"""
     try:
-        llm = get_bedrock_llm()
+        llm = get_bedrock_llm(model_id)
         
         messages = [
             {"role": "system", "content": KD_SYSTEM_PROMPT},
@@ -579,10 +579,10 @@ async def process_kd_message(user_message, report_context=None):
             "success": False
         }
 
-async def evaluate_kd_report(report_data):
+async def evaluate_kd_report(report_data, model_id=None):
     """Evaluate a Key Decision report and provide feedback"""
     try:
-        llm = get_bedrock_llm()
+        llm = get_bedrock_llm(model_id)
         
         # Format report data as a structured prompt
         report_text = f"""

@@ -13,14 +13,17 @@ class ReportMessageRequest(BaseModel):
     report_id: Optional[str] = None
     report_context: Optional[Dict[str, Any]] = None
     report_type: str = "kg"  # Default to 'kg' for backward compatibility
+    model_id: Optional[str] = None
 
 class ReportEvaluationRequest(BaseModel):
     report_data: Dict[str, Any]
     report_type: str = "kg"  # Default to 'kg' for backward compatibility
+    model_id: Optional[str] = None
 
 class ArchiveSearchRequest(BaseModel): # Class for Archive Search
     query: str
     max_results: int = 5
+    model_id: Optional[str] = None
 
 @router.post("/message")
 async def process_report_message(
@@ -29,9 +32,9 @@ async def process_report_message(
 ):
     """Process a message related to report writing (KG or KD)"""
     if data.report_type == "kd":
-        return await process_kd_message(data.message, data.report_context)
+        return await process_kd_message(data.message, data.report_context, data.model_id)
     else:
-        return await process_kg_message(data.message, data.report_context)
+        return await process_kg_message(data.message, data.report_context, data.model_id)
 
 @router.post("/evaluate")
 async def evaluate_report_endpoint(
@@ -40,9 +43,9 @@ async def evaluate_report_endpoint(
 ):
     """Evaluate a report (KG or KD) and provide feedback"""
     if data.report_type == "kd":
-        return await evaluate_kd_report(data.report_data)
+        return await evaluate_kd_report(data.report_data, data.model_id)
     else:
-        return await evaluate_kg_report(data.report_data)
+        return await evaluate_kg_report(data.report_data, data.model_id)
     
 
 # @router.post("/check-archive")
@@ -137,7 +140,7 @@ async def check_archive_endpoint(
             results_text = "I didn't find any relevant documents in the archive."
         
         # Get AI to process the results
-        llm = get_bedrock_llm()
+        llm = get_bedrock_llm(data.model_id)
         
         prompt = f"""
         The user has clicked the "Check Archive" button to find similar documents for their current report.

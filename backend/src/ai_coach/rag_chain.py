@@ -32,7 +32,7 @@ Question: {question}
 Answer:
 """)
 
-def create_rag_chain(persist_directory="./chroma_db"):
+def create_rag_chain(persist_directory="./chroma_db", model_id=None):
     """Create a RAG chain for answering RLC methodology questions."""
     # Initialize retriever
     retriever = get_retriever(persist_directory=persist_directory)
@@ -47,7 +47,7 @@ def create_rag_chain(persist_directory="./chroma_db"):
     )
     
     # Initialize LLM
-    llm = get_bedrock_llm()
+    llm = get_bedrock_llm(model_id)
     
     # Create the conversational chain
     chain = ConversationalRetrievalChain.from_llm(
