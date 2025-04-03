@@ -1,7 +1,7 @@
 // aiCoachService.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000';
+const API_URL = 'http://98.81.245.4:8000';
 
 // Create axios instance with auth header
 const getAuthHeader = () => {

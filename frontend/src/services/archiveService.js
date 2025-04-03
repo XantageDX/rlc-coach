@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/archive';
+const API_URL = 'http://98.81.245.4:8000/archive';
 
 // Get auth header for requests
 const getAuthHeader = () => {

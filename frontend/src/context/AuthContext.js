@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('http://localhost:8000/auth/token', {
+      const response = await fetch('http://98.81.245.4:8000/auth/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('http://localhost:8000/auth/register', {
+      const response = await fetch('http://98.81.245.4:8000/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
