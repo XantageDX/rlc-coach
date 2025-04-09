@@ -30,7 +30,7 @@ yarn-error.log*
 # Database
 *.sqlite3
 backend/archive_chroma_db/
-backend/chroma_db
+#backend/chroma_db
 
 # Documents
 backend/uploads

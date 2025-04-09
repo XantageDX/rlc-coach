@@ -43,7 +43,7 @@ def initialize_vector_db(chunks, persist_directory="./chroma_db"):
     # Initialize Bedrock embeddings
     embeddings = BedrockEmbeddings(
         model_id="amazon.titan-embed-text-v2:0",
-        region_name=os.getenv("AWS_REGION", "us-west-2"),
+        region_name=os.getenv("AWS_REGION", "us-east-1"),
     )
     
     # Create and persist the vector store
@@ -60,7 +60,7 @@ def get_retriever(persist_directory="./chroma_db"):
     # Initialize Bedrock embeddings
     embeddings = BedrockEmbeddings(
         model_id="amazon.titan-embed-text-v2:0",
-        region_name=os.getenv("AWS_REGION", "us-west-2"),
+        region_name=os.getenv("AWS_REGION", "us-east-1"),
     )
     
     # Load the existing vector store
@@ -73,3 +73,34 @@ def get_retriever(persist_directory="./chroma_db"):
     except Exception as e:
         print(f"Error loading vector database: {e}")
         return None
+    
+def add_to_vector_db(chunks, persist_directory="./chroma_db"):
+    """Add document chunks to an existing vector database."""
+    try:
+        # Initialize Bedrock embeddings
+        embeddings = BedrockEmbeddings(
+            model_id="amazon.titan-embed-text-v2:0",
+            region_name=os.getenv("AWS_REGION", "us-east-1"),
+        )
+        
+        # Load the existing vector store
+        try:
+            vectordb = Chroma(
+                persist_directory=persist_directory,
+                embedding_function=embeddings
+            )
+            
+            # Add the new chunks to the vector database
+            vectordb.add_documents(chunks)
+            
+            # Persist the changes
+            vectordb.persist()
+            print(f"Successfully added {len(chunks)} chunks to the database")
+            return True
+            
+        except Exception as e:
+            print(f"Error accessing vector database: {e}")
+            return False
+    except Exception as e:
+        print(f"Error adding documents to vector database: {e}")
+        return False
