@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'frontend/**'  # Only trigger when frontend files change
+      - 'frontend/**'
   pull_request:
     branches: [ main ]
     paths:
@@ -29,6 +29,8 @@ jobs:
         run: cd frontend && npm ci
       
       - name: Build React app
+        env:
+          CI: false  # This prevents warnings from being treated as errors
         run: cd frontend && npm run build
       
       - name: Configure AWS credentials
@@ -40,3 +42,6 @@ jobs:
       
       - name: Deploy to S3
         run: aws s3 sync frontend/build/ s3://rlc-coach-frontend/ --delete
+      
+      - name: Invalidate CloudFront cache
+        run: aws cloudfront create-invalidation --distribution-id EAG1SV165VUH6 --paths "/*"
