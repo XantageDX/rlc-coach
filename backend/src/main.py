@@ -23,7 +23,8 @@ app.add_middleware(
         "http://localhost:3000",  # React development server
         "http://127.0.0.1:3000",
         "https://d22ybva4cupp8q.cloudfront.net",  # CloudFront distribution
-        "http://rlc-coach-frontend.s3-website-us-east-1.amazonaws.com"  # Be cautious with this in production
+        #"http://rlc-coach-frontend.s3-website-us-east-1.amazonaws.com"  # Be cautious with this in production
+        "https://rapidlearningcycles.xantage.co"  # Custom domain
     ],
     allow_credentials=True,
     allow_methods=["*"],
