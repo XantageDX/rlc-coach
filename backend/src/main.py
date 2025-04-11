@@ -4,6 +4,8 @@ import uvicorn
 import os
 from dotenv import load_dotenv
 
+import logging
+
 # Import controllers
 from src.controllers.auth_controller import router as auth_router
 from src.controllers.ai_coach_controller import router as ai_coach_router
@@ -24,7 +26,8 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "https://d22ybva4cupp8q.cloudfront.net",  # CloudFront distribution
         #"http://rlc-coach-frontend.s3-website-us-east-1.amazonaws.com"  # Be cautious with this in production
-        "https://rapidlearningcycles.xantage.co"  # Custom domain
+        "https://rapidlearningcycles.xantage.co",  # Custom domain
+        "https://api.rapidlearningcycles.xantage.co"  # Add this line
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -38,6 +41,24 @@ app.include_router(ai_coach_router, prefix="/ai-coach", tags=["ai-coach"])
 app.include_router(report_ai_router, prefix="/report-ai", tags=["report-ai"])
 app.include_router(archive_router, prefix="/archive", tags=["archive"])
 app.include_router(user_admin_router, prefix="/admin", tags=["user-admin"])
+
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("uvicorn.access")
+
+# Create a middleware for request logging
+@app.middleware("http")
+async def log_requests(request, call_next):
+    logger.info(f"Request received: {request.method} {request.url}")
+    logger.info(f"Request headers: {request.headers}")
+    try:
+        response = await call_next(request)
+        logger.info(f"Response status: {response.status_code}")
+        return response
+    except Exception as e:
+        logger.error(f"Error processing request: {e}")
+        raise
 
 # Root endpoint
 @app.get("/")

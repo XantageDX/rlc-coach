@@ -51,3 +51,6 @@ knowledge_base
 
 # .pem
 rlc-coach-key.pem
+
+# actions
+.github/workflows/ci-cd-frontend.yml
