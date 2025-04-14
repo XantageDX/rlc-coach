@@ -1,7 +1,5 @@
 import axios from 'axios';
 
-//const API_URL = 'http://98.81.245.4:8000';
-//const API_URL = 'https://rlc-coach-backend-alb-1332858542.us-east-1.elb.amazonaws.com';
 const API_URL = 'https://api.rapidlearningcycles.xantage.co';
 
 // Create axios instance with auth header

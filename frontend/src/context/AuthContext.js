@@ -22,8 +22,6 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      // const response = await fetch('http://98.81.245.4:8000/auth/token', {
-      //const response = await fetch('https://rlc-coach-backend-alb-1332858542.us-east-1.elb.amazonaws.com/auth/token', {
       const response = await fetch('https://api.rapidlearningcycles.xantage.co/auth/token', {
         method: 'POST',
         headers: {
@@ -58,9 +56,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      
-      // const response = await fetch('http://98.81.245.4:8000/auth/register', {
-      //const response = await fetch('https://rlc-coach-backend-alb-1332858542.us-east-1.elb.amazonaws.com/auth/register', {
+
       const response = await fetch('https://api.rapidlearningcycles.xantage.co/auth/register', {
         method: 'POST',
         headers: {

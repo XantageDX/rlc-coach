@@ -19,20 +19,34 @@ load_dotenv()
 # Create FastAPI app
 app = FastAPI(title="RLC Coach API")
 
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=[
+#         "http://localhost:3000",  # React development server
+#         "http://127.0.0.1:3000",
+#         "https://d22ybva4cupp8q.cloudfront.net",  # CloudFront distribution
+#         #"http://rlc-coach-frontend.s3-website-us-east-1.amazonaws.com"  # Be cautious with this in production
+#         "https://rapidlearningcycles.xantage.co",  # Custom domain
+#         "https://api.rapidlearningcycles.xantage.co"  # Add this line
+#     ],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+#     expose_headers=["Content-Disposition"],  # Important for file downloads
+# )
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",  # React development server
+        "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "https://d22ybva4cupp8q.cloudfront.net",  # CloudFront distribution
-        #"http://rlc-coach-frontend.s3-website-us-east-1.amazonaws.com"  # Be cautious with this in production
-        "https://rapidlearningcycles.xantage.co",  # Custom domain
-        "https://api.rapidlearningcycles.xantage.co"  # Add this line
+        "https://d22ybva4cupp8q.cloudfront.net",
+        "https://rapidlearningcycles.xantage.co"
     ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["Content-Disposition"],  # Important for file downloads
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
+    expose_headers=["Content-Disposition"],
+    max_age=3600,  # Add this to cache preflight requests
 )
 
 # Include routers
@@ -64,6 +78,13 @@ async def log_requests(request, call_next):
 @app.get("/")
 def read_root():
     return {"message": "Welcome to RLC Coach API"}
+
+@app.options("/{path:path}")
+async def options_route(path: str):
+    """
+    Handle OPTIONS requests for CORS preflight.
+    """
+    return Response(status_code=200)
 
 # Run server (for development)
 if __name__ == "__main__":
