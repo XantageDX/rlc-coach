@@ -1,7 +1,8 @@
 # add_documents.py
 import os
 import argparse
-from src.ai_coach.embeddings import load_and_split_documents, add_to_vector_db
+#from src.ai_coach.embeddings import load_and_split_documents, add_to_vector_db
+from backend.src.ai_coach.embeddings import load_and_split_documents, add_to_vector_db
 
 def main():
     parser = argparse.ArgumentParser(description='Add new documents to the RLC methodology vector database')
