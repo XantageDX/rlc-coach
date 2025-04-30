@@ -22,7 +22,8 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('https://api.rapidlearningcycles.xantage.co/auth/token', {
+      // const response = await fetch('https://api.rapidlearningcycles.xantage.co/auth/token', {
+      const response = await fetch('https://api.spark.rapidlearningcycles.com/auth/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -57,7 +58,8 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('https://api.rapidlearningcycles.xantage.co/auth/register', {
+      // const response = await fetch('https://api.rapidlearningcycles.xantage.co/auth/register', {
+      const response = await fetch('https://api.spark.rapidlearningcycles.com/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

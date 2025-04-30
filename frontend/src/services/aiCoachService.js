@@ -1,7 +1,8 @@
 // aiCoachService.js
 import axios from 'axios';
 
-const API_URL = 'https://api.rapidlearningcycles.xantage.co';
+// const API_URL = 'https://api.rapidlearningcycles.xantage.co';
+const API_URL = 'https://api.spark.rapidlearningcycles.com';
 
 // Create axios instance with auth header
 const getAuthHeader = () => {
