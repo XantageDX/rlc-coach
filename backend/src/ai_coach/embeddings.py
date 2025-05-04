@@ -1,5 +1,5 @@
 import os
-from langchain_community.document_loaders import DirectoryLoader, TextLoader
+from langchain_community.document_loaders import DirectoryLoader, TextLoader, PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_aws import BedrockEmbeddings
 from langchain_community.vectorstores import Chroma
@@ -22,12 +22,21 @@ def load_and_split_documents(docs_directory):
         loader_cls=Docx2txtLoader
     )
     
+    # Add PDF loader
+
+    pdf_loader = DirectoryLoader(
+        docs_directory,
+        glob="**/*.pdf",
+        loader_cls=PyPDFLoader
+    )
+    
     # Load all documents
     txt_documents = txt_loader.load()
     docx_documents = docx_loader.load()
-    documents = txt_documents + docx_documents
+    pdf_documents = pdf_loader.load()  # Load PDF documents
+    documents = txt_documents + docx_documents + pdf_documents  # Add PDFs to the document list
     
-    print(f"Loaded {len(documents)} files: {len(txt_documents)} .txt and {len(docx_documents)} .docx")
+    print(f"Loaded {len(documents)} files: {len(txt_documents)} .txt, {len(docx_documents)} .docx, and {len(pdf_documents)} .pdf")
     
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
