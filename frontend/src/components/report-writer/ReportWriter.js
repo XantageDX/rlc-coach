@@ -7,6 +7,8 @@ import axios from 'axios';
 // import archiveService from '../../services/archiveService';
 import { useModel } from '../../context/ModelContext';
 
+const API_URL = 'https://api.spark.rapidlearningcycles.com';
+
 const ReportWriter = () => {
   const { selectedModel } = useModel();
   const [selectedReport, setSelectedReport] = useState('');

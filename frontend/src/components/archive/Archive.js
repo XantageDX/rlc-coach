@@ -368,6 +368,9 @@ const Archive = () => {
     fetchProjects();
   }, []);
 
+  // Use API_URL constant instead of hardcoded localhost
+  const API_URL = 'https://api.spark.rapidlearningcycles.com';
+
   // Fetch all projects from the archive
   const fetchProjects = async () => {
     try {
@@ -685,8 +688,7 @@ const Archive = () => {
       const user = JSON.parse(localStorage.getItem('user'));
       const token = user?.access_token;
       
-      // Use API_URL constant instead of hardcoded localhost
-      const API_URL = 'https://api.spark.rapidlearningcycles.com';
+
       
       // For PDF, DOC, DOCX, PPT, PPTX files
       const fileExtension = filename.split('.').pop().toLowerCase();
