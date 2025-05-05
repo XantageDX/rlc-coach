@@ -31,3 +31,5 @@ jobs:
           push: true
           platforms: linux/arm64,linux/amd64
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/rlc-coach-backend:latest
+          build-args: |
+            S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}

@@ -5,6 +5,10 @@ FROM python:3.9-slim
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+# Accept build arguments for S3 bucket name
+ARG S3_BUCKET_NAME
+ENV S3_BUCKET_NAME=${S3_BUCKET_NAME}
+
 # Create and set the working directory in the container
 WORKDIR /app
 
