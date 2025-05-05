@@ -1481,6 +1481,79 @@ const formatMessage = (text) => {
   };
 
   // Add this function to the ReportWriter component
+  // const handleOpenDocument = async (projectId, documentId, filename) => {
+  //   try {
+  //     // Get the auth token
+  //     const user = JSON.parse(localStorage.getItem('user'));
+  //     const token = user?.access_token;
+      
+  //     if (!token) {
+  //       alert('Authentication token not found. Please log in again.');
+  //       return;
+  //     }
+      
+  //     // Get file extension
+  //     const fileExtension = filename.split('.').pop().toLowerCase();
+      
+  //     if (fileExtension === 'pdf') {
+  //       // PDFs can be viewed in the browser
+  //       const response = await axios({
+  //         url: `http://localhost:8000/archive/projects/${projectId}/documents/${documentId}/view`,
+  //         method: 'GET',
+  //         responseType: 'blob',
+  //         headers: { 'Authorization': `Bearer ${token}` }
+  //       });
+        
+  //       const blob = new Blob([response.data], { type: 'application/pdf' });
+  //       const url = window.URL.createObjectURL(blob);
+  //       window.open(url, '_blank');
+  //     } else if (['pptx', 'ppt', 'docx', 'doc'].includes(fileExtension)) {
+  //       // For PowerPoint and Word files, show message and download
+  //       // eslint-disable-next-line no-restricted-globals
+  //       if (confirm(`Browser cannot display ${fileExtension.toUpperCase()} files directly. Do you want to download the file?`)) {
+  //         const response = await axios({
+  //           url: `http://localhost:8000/archive/projects/${projectId}/documents/${documentId}/view`,
+  //           method: 'GET',
+  //           responseType: 'blob',
+  //           headers: { 'Authorization': `Bearer ${token}` }
+  //         });
+          
+  //         const blob = new Blob([response.data]);
+  //         const url = window.URL.createObjectURL(blob);
+          
+  //         const link = document.createElement('a');
+  //         link.href = url;
+  //         link.setAttribute('download', filename);
+  //         document.body.appendChild(link);
+  //         link.click();
+  //         document.body.removeChild(link);
+  //         window.URL.revokeObjectURL(url);
+  //       }
+  //     } else {
+  //       // For all other file types, just download
+  //       const response = await axios({
+  //         url: `http://localhost:8000/archive/projects/${projectId}/documents/${documentId}/view`,
+  //         method: 'GET',
+  //         responseType: 'blob',
+  //         headers: { 'Authorization': `Bearer ${token}` }
+  //       });
+        
+  //       const blob = new Blob([response.data]);
+  //       const url = window.URL.createObjectURL(blob);
+        
+  //       const link = document.createElement('a');
+  //       link.href = url;
+  //       link.setAttribute('download', filename);
+  //       document.body.appendChild(link);
+  //       link.click();
+  //       document.body.removeChild(link);
+  //       window.URL.revokeObjectURL(url);
+  //     }
+  //   } catch (err) {
+  //     console.error('Error opening document:', err);
+  //     alert('Failed to open file: ' + (err.response?.data?.detail || err.message));
+  //   }
+  // };
   const handleOpenDocument = async (projectId, documentId, filename) => {
     try {
       // Get the auth token
@@ -1498,7 +1571,7 @@ const formatMessage = (text) => {
       if (fileExtension === 'pdf') {
         // PDFs can be viewed in the browser
         const response = await axios({
-          url: `http://localhost:8000/archive/projects/${projectId}/documents/${documentId}/view`,
+          url: `${API_URL}/archive/projects/${projectId}/documents/${documentId}/view`,
           method: 'GET',
           responseType: 'blob',
           headers: { 'Authorization': `Bearer ${token}` }
@@ -1512,7 +1585,7 @@ const formatMessage = (text) => {
         // eslint-disable-next-line no-restricted-globals
         if (confirm(`Browser cannot display ${fileExtension.toUpperCase()} files directly. Do you want to download the file?`)) {
           const response = await axios({
-            url: `http://localhost:8000/archive/projects/${projectId}/documents/${documentId}/view`,
+            url: `${API_URL}/archive/projects/${projectId}/documents/${documentId}/view`,
             method: 'GET',
             responseType: 'blob',
             headers: { 'Authorization': `Bearer ${token}` }
@@ -1532,7 +1605,7 @@ const formatMessage = (text) => {
       } else {
         // For all other file types, just download
         const response = await axios({
-          url: `http://localhost:8000/archive/projects/${projectId}/documents/${documentId}/view`,
+          url: `${API_URL}/archive/projects/${projectId}/documents/${documentId}/view`,
           method: 'GET',
           responseType: 'blob',
           headers: { 'Authorization': `Bearer ${token}` }
