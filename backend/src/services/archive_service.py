@@ -10,7 +10,7 @@ from botocore.exceptions import ClientError
 import io
 import tempfile
 from fastapi.responses import FileResponse
-from fastapi.background import BackgroundTask
+from starlette.background import BackgroundTask
 
 # Initialize S3 client
 s3_client = boto3.client('s3',

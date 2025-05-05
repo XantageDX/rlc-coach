@@ -5,7 +5,7 @@ import boto3
 from botocore.exceptions import ClientError
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Response
 from fastapi.responses import FileResponse
-from fastapi.background import BackgroundTask
+from starlette.background import BackgroundTask
 from dotenv import load_dotenv
 
 # Load environment variables
