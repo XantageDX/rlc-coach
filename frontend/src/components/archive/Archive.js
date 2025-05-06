@@ -555,6 +555,7 @@ const Archive = () => {
                 </div>
                 {uploadError && <div className="upload-error">{uploadError}</div>}
                 
+                {/* Move upload button here, outside the dropzone, making it a block element */}
                 {filesToUpload.length > 0 && (
                   <button 
                     className="upload-btn"

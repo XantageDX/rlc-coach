@@ -125,13 +125,20 @@
 }
 
 /* File upload controls */
-.file-upload-controls {
+/* .file-upload-controls {
   display: flex;
   gap: 10px;
   align-items: flex-start;
   margin-bottom: 15px;
   width: 100%;
-  min-width: 0; /* Allow content to shrink */
+  min-width: 0;
+} */
+.file-upload-controls {
+  display: flex;
+  flex-direction: column; /* Change to column layout */
+  gap: 10px;
+  margin-bottom: 15px;
+  width: 92%;
 }
 
 .file-upload-controls input[type="file"] {
@@ -139,13 +146,23 @@
 }
 
 .file-upload-controls button {
-  flex: 0.20;
+  /* flex: 0.20;
   height: 32px;
   margin-top: 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 0 8px;
+} */
+padding: 10px 16px;
+background-color: var(--brand-darkblue);
+color: white;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+font-weight: 500;
+align-self: flex-start; /* Align to the start of the flex container */
+margin-top: 8px; /* Add some space above the button */
 }
 
 .file-upload-controls button:disabled {
@@ -153,7 +170,21 @@
   cursor: not-allowed;
 }
 
+.file-upload-controls button:hover {
+  background-color: var(--brand-blue);
+}
+
 /* Dropzone for drag & drop */
+/* .dropzone {
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  padding: 20px;
+  text-align: center;
+  background-color: #fafafa;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  width: 100%;
+} */
 .dropzone {
   border: 2px dashed #ccc;
   border-radius: 4px;
@@ -163,6 +194,10 @@
   cursor: pointer;
   transition: border-color 0.2s ease;
   width: 100%;
+  min-height: 120px; /* Ensure minimum height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .dropzone:hover,
@@ -336,23 +371,35 @@
 
 .open-file-btn:hover {
   /* background-color: #0d5bab; */
-  background-color: var(--brand-darkblue);
+  background-color: var(--brand-blue);
 }
 
 .delete-file-btn {
   min-width: fit-content;
   padding: 4px 8px;
   font-size: 0.8rem;
-  background-color: #dc3545;
-  color: white;
+  background-color: #fee2e2;
+  color: #b91c1c;
   border: none;
   border-radius: 3px;
   cursor: pointer;
 }
-
-.delete-file-btn:hover {
-  background-color: #c82333;
+/* .delete-btn {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
 }
+
+.delete-btn:hover {
+  background-color: #fecaca;
+} */
+.delete-file-btn:hover {
+  background-color: #fecaca;
+}
+
 
 /* Project actions */
 .project-actions {

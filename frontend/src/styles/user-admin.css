@@ -41,7 +41,7 @@
   
   .user-creation-form input,
   .user-creation-form select {
-    width: 100%;
+    width: 95%;
     padding: 0.5rem;
     border: 1px solid #ddd;
     border-radius: 4px;

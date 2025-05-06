@@ -28,7 +28,7 @@ const AICoach = () => {
   useEffect(() => {
     setMessages([{
       role: 'assistant',
-      content: 'Hello! I\'m your AI Coach for Rapid Learning Cycles. Ask me anything about the RLC methodology, and I\'ll do my best to help you understand and apply it effectively.'
+      content: 'Hello! I\'m your AI Coach for Rapid Learning Cycles. What would you like to know about RLC? Ask me a question in the box at the bottom of the screen or click on one of the following options to get started.'
     }]);
     
     // Generate a random conversation ID
@@ -131,10 +131,10 @@ const AICoach = () => {
   
   return (
     <div className="ai-coach-container">
-      <div className="ai-coach-header">
-        {/* <h2>AI Coach - RLC Methodology Guide</h2> */}
+      {/* <div className="ai-coach-header">
+        <h2>AI Coach - RLC Methodology Guide</h2>
         <p>Ask questions about Rapid Learning Cycles methodology and implementation</p>
-      </div>
+      </div> */}
       
       {error && <div className="error-message">{error}</div>}
       
@@ -153,9 +153,9 @@ const AICoach = () => {
         {/* Suggested prompts */}
         {showSuggestions && messages.length === 1 && (
           <div className="suggested-prompts">
-            <div className="suggested-prompts-header">
+            {/* <div className="suggested-prompts-header">
               What would you like to know about RLC?
-            </div>
+            </div> */}
             <div className="prompt-buttons">
               {suggestedPrompts.map((promptData, index) => (
                 <button 
