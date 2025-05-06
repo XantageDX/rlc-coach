@@ -1,7 +1,8 @@
 /* Core Hypothesis styles */
 .core-hypothesis-container {
     padding: 2rem;
-    background-color: #f5f7fa;
+    /* background-color: #f5f7fa; */
+    background-color: var(--brand-bg);
     min-height: calc(100vh - 120px);
   }
   
@@ -29,7 +30,8 @@
   }
   
   .save-hypothesis-btn {
-    background-color: #1167be;
+    /* background-color: #1167be; */
+    background-color: var(--brand-darkblue);
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -39,7 +41,8 @@
   }
   
   .save-hypothesis-btn:hover {
-    background-color: #0d5bab;
+    /* background-color: #0d5bab; */
+    background-color: var(--blue);
   }
   
   .hypothesis-image {
@@ -61,7 +64,8 @@
   .upload-btn {
     display: inline-block;
     background-color: #f0f4f8;
-    color: #1167be;
+    /* color: #1167be; */
+    color: var(--brand-darkblue);
     border: 1px solid #ddd;
     padding: 0.5rem 1rem;
     border-radius: 4px;

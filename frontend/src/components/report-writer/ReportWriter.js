@@ -1635,7 +1635,7 @@ const formatMessage = (text) => {
   return (
     <div className="report-writer-container">
       <div className="report-select-container">
-        <h2>Report Writer</h2>
+        {/* <h2>Report Writer</h2> */}
         <select 
           id="report-selection" 
           className="report-select"

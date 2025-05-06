@@ -11,6 +11,10 @@ import './styles/details.css';
 import './styles/core-hypothesis.css';
 import './styles/report-writer.css';
 import './styles/archive.css';
+import './styles/brandColors.css';
+import './styles/sidebar.css';
+import './styles/layout.css';
+import './styles/dashboard.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

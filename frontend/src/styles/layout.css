@@ -1,0 +1,119 @@
+/* App Layout Structure */
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+  }
+  
+  .main-container {
+    margin-left: 250px; /* Match sidebar width */
+    transition: margin-left 0.3s ease; /* Smooth transition when sidebar collapses */
+    width: calc(100% - 250px);
+  }  
+  
+  .main-content {
+    flex: 1;
+    padding: 20px;
+    background-color: var(--brand-bg);
+  }
+  
+  /* Header styles */
+  .app-header {
+    background-color: var(--brand-darkblue);
+    color: white;
+    padding: 0.5rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .app-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: white;
+    font-weight: 500;
+  }
+  
+  .header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    padding-left: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+  }
+  
+  .logo a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  .main-nav {
+    display: flex;
+    gap: 1.5rem;
+  }
+  
+  .main-nav a {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .main-nav a:hover {
+    text-decoration: underline;
+  }
+  
+  .user-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .user-greeting {
+    margin-right: 0.5rem;
+  }
+  
+  .logout-btn {
+    background-color: var(--brand-darkblue);
+    color: white;
+    border: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0;
+    width: auto;
+  }
+  
+  .logout-btn:hover {
+    background-color: var(--brand-blue);
+  }
+  
+  /* Dashboard header */
+  .dashboard-header {
+    background-color: var(--brand-darkblue);
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .dashboard-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .user-info button {
+    margin: 0;
+    width: auto;
+    padding: 0.5rem 1rem;
+    background-color: var(--brand-blue);
+  }

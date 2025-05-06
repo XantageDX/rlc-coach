@@ -82,7 +82,7 @@ const UserAdmin = () => {
 
   return (
     <div className="user-admin-container">
-      <h2>User Administration</h2>
+      {/* <h2>User Administration</h2> */}
       <div className="user-admin-layout">
         <div className="user-creation-section">
           <h3>Create User</h3>

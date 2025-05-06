@@ -2,7 +2,8 @@
 .archive-container {
   padding: 1rem;
   padding-left: 2rem;
-  background-color: #f5f7fa;
+  /* background-color: #f5f7fa; */
+  background-color: var(--brand-bg);
   min-height: calc(100vh - 120px);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -22,7 +23,8 @@
   vertical-align: middle;
   line-height: 10px;
   font-size: 1.5rem;
-  color: #1167be;
+  /* color: #1167be; */
+  color: var(--brand-darkblue);
 }
 
 /* Project creation section */
@@ -42,11 +44,16 @@
 .project-creation .add-project-btn {
   flex: 1;
   padding: 8px 15px;
-  background-color: #1167be;
+  /* background-color: #1167be; */
+  background-color: var(--brand-darkblue);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.project-creation .add-project-btn:hover {
+  background-color: var(--brand-blue);
 }
 
 /* Main layout */
@@ -77,7 +84,8 @@
 .archive-structure-column h3,
 .upload-projects-column h3 {
   margin-top: 0;
-  color: #1167be;
+  /* color: #1167be; */
+  color: var(--brand-darkblue);
 }
 
 /* Projects list */
@@ -89,7 +97,8 @@
 .projects-list h4 {
   margin-top: 0;
   margin-bottom: 10px;
-  color: #1167be;
+  /* color: #1167be; */
+  color: var(--brand-darkblue);
 }
 
 .projects-list ul {
@@ -111,7 +120,8 @@
 
 .projects-list li.selected {
   background-color: #e7f3ff;
-  color: #1167be;
+  /* color: #1167be; */
+  color: var(--brand-darkblue);
 }
 
 /* File upload controls */
@@ -157,7 +167,8 @@
 
 .dropzone:hover,
 .dropzone.active {
-  border-color: #1167be;
+  /* border-color: #1167be; */
+  border-color: var(--brand-darkblue);
 }
 
 .dropzone p {
@@ -183,7 +194,8 @@
 
 .selected-files h4 {
   margin: 0 0 0.5rem 0;
-  color: #1167be;
+  /* color: #1167be; */
+  color: var(--brand-darkblue);
 }
 
 .selected-files ul {
@@ -209,7 +221,8 @@
 
 .uploaded-files h3 {
   margin-top: 0;
-  color: #1167be;
+  /* color: #1167be; */
+  color: var(--brand-darkblue);
 }
 
 .files-list {
@@ -312,7 +325,8 @@
   min-width: fit-content;
   padding: 4px 8px;
   font-size: 0.8rem;
-  background-color: #1167be;
+  /* background-color: #1167be; */
+  background-color: var(--brand-darkblue);
   color: white;
   border: none;
   border-radius: 3px;
@@ -321,7 +335,8 @@
 }
 
 .open-file-btn:hover {
-  background-color: #0d5bab;
+  /* background-color: #0d5bab; */
+  background-color: var(--brand-darkblue);
 }
 
 .delete-file-btn {

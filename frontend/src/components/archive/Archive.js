@@ -439,7 +439,7 @@ const Archive = () => {
 
   return (
     <div className="archive-container">
-      <h2>Archive</h2>
+      {/* <h2>Archive</h2> */}
       <div className="archive-layout">
         {/* Archive Structure Column */}
         <div className="archive-structure-column">

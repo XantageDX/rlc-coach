@@ -132,7 +132,7 @@ const AICoach = () => {
   return (
     <div className="ai-coach-container">
       <div className="ai-coach-header">
-        <h2>AI Coach - RLC Methodology Guide</h2>
+        {/* <h2>AI Coach - RLC Methodology Guide</h2> */}
         <p>Ask questions about Rapid Learning Cycles methodology and implementation</p>
       </div>
       

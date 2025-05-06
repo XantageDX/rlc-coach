@@ -19,7 +19,8 @@
   
   .project-status {
     background-color: #e7f3ff;
-    color: #1167be;
+    /* color: #1167be; */
+    color: var(--brand-darkblue);
     padding: 0.25rem 0.75rem;
     border-radius: 4px;
     font-size: 0.9rem;
@@ -30,7 +31,8 @@
   }
   
   .add-ie-btn {
-    background-color: #1167be;
+    /* background-color: #1167be; */
+    background-color: var(--brand-darkblue);
     color: white;
     border: none;
     padding: 0.5rem 1rem;
@@ -39,7 +41,8 @@
   }
   
   .add-ie-btn:hover {
-    background-color: #0d5bab;
+    /* background-color: #0d5bab; */
+    background-color: var(--brand-darkblue);
   }
   
   .board-container {
@@ -51,7 +54,8 @@
   
   /* Integration Event Columns */
   .ie-column {
-    background: #f5f7fa;
+    /* background: #f5f7fa; */
+    background: var(--brand-bg);
     border: 1px solid #e0e0e0;
     border-radius: 6px;
     width: 300px;
@@ -62,7 +66,8 @@
   }
   
   .ie-column-header {
-    background-color: #1167be;
+    /* background-color: #1167be; */
+    background-color: var(--brand-darkblue);
     color: white;
     padding: 1rem;
     border-top-left-radius: 6px;
@@ -123,7 +128,8 @@
   .add-kd-btn {
     margin: 0.75rem;
     padding: 0.5rem;
-    background-color: #ff9a04;
+    /* background-color: #ff9a04; */
+    background-color: var(--brand-blue);
     color: white;
     border: none;
     border-radius: 4px;
@@ -159,13 +165,15 @@
   
   .kd-card-header h4 {
     margin: 0;
-    color: #1167be;
+    /* color: #1167be; */
+    color: var(--brand-darkblue);
     font-size: 1rem;
   }
   
   .kd-status {
     background-color: #e7f3ff;
-    color: #1167be;
+    /* color: #1167be; */
+    color: var(--brand-darkblue);
     padding: 0.1rem 0.5rem;
     border-radius: 4px;
     font-size: 0.7rem;
@@ -200,7 +208,8 @@
   
   .view-btn {
     background-color: #e7f3ff;
-    color: #1167be;
+    /* color: #1167be; */
+    color: var(--brand-darkblue);
   }
   
   .edit-btn {
@@ -248,7 +257,8 @@
 
   .kg-title {
     cursor: pointer;
-    color: #1167be;
+    /* color: #1167be; */
+    color: var(--brand-darkblue);
     text-decoration: underline;
     text-decoration-style: dotted;
     white-space: nowrap;
@@ -310,7 +320,8 @@
 
 .side-drawer-header h3 {
   margin: 0;
-  color: #1167be;
+  /* color: #1167be; */
+  color: var(--brand-darkblue);
 }
 
 .close-btn {
@@ -384,7 +395,8 @@
 }
 
 .drawer-actions .save-btn {
-  background-color: #1167be;
+  /* background-color: #1167be; */
+  background-color: var(--brand-darkblue);
   color: white;
 }
 
@@ -409,7 +421,8 @@
 
 .kd-number {
   font-weight: bold;
-  color: #1167be;
+  /* color: #1167be; */
+  color: var(--brand-darkblue);
   margin-bottom: 5px;
   font-size: 0.9rem;
   background-color: #e7f3ff;
@@ -428,13 +441,15 @@
 
 .kd-card-header h4 {
   margin: 0;
-  color: #1167be;
+  /* color: #1167be; */
+  color: var(--brand-darkblue);
   font-size: 1rem;
 }
 
 .kd-status {
   background-color: #e7f3ff;
-  color: #1167be;
+  /* color: #1167be; */
+  color: var(--brand-darkblue);
   padding: 0.1rem 0.5rem;
   border-radius: 4px;
   font-size: 0.7rem;
@@ -454,7 +469,8 @@
   position: absolute;
   top: -10px;
   left: 10px;
-  background-color: #1167be;
+  /* background-color: #1167be; */
+  background-color: var(--brand-darkblue);
   color: white;
   padding: 2px 8px;
   border-radius: 4px;
@@ -466,7 +482,8 @@
 
 .add-kg-btn {
   background-color: #e7f3ff;
-  color: #1167be;
+  /* color: #1167be; */
+  color: var(--brand-darkblue);
 }
 
 .add-kg-btn:hover {

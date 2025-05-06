@@ -1,6 +1,7 @@
 .user-admin-container {
     padding: 1rem;
-    background-color: #f5f7fa;
+    /* background-color: #f5f7fa; */
+    background-color: var(--brand-bg);
     min-height: calc(100vh - 140px);
   }
   
@@ -19,6 +20,13 @@
     padding: 15px;
   }
   
+  /* Add these CSS rules to your user-admin.css file */
+.user-creation-section h3,
+.users-list-section h3 {
+  color: var(--brand-darkblue);
+  margin-top: 0;
+}
+
   .user-creation-form .form-group {
     margin-bottom: 1rem;
   }
@@ -27,7 +35,8 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: bold;
-    color: #1167be;
+    /* color: #1167be; */
+    color: var(--brand-darkblue);
   }
   
   .user-creation-form input,
@@ -41,7 +50,8 @@
   .create-user-btn {
     width: 100%;
     padding: 0.75rem;
-    background-color: #1167be;
+    /* background-color: #1167be; */
+    background-color: var(--brand-darkblue);
     color: white;
     border: none;
     border-radius: 4px;
@@ -50,7 +60,8 @@
   }
   
   .create-user-btn:hover {
-    background-color: #0d5bab;
+    /* background-color: #0d5bab; */
+    background-color: var(--brand-blue);
   }
   
   .users-list {
@@ -75,7 +86,8 @@
   }
   
   .user-details strong {
-    color: #1167be;
+    /* color: #1167be; */
+    color: var(--brand-darkblue);
   }
   
   .user-details .user-role {
@@ -83,7 +95,8 @@
     font-size: 0.8rem;
     margin-top: 0.25rem;
     background-color: #e7f3ff;
-    color: #1167be;
+    /* color: #1167be; */
+    color: var(--brand-darkblue);
     padding: 0.2rem 0.5rem;
     border-radius: 4px;
     display: inline-block;

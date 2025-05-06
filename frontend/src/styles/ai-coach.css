@@ -4,7 +4,8 @@
     flex-direction: column;
     height: calc(100vh - 140px);
     padding: 1rem;
-    background-color: #f5f7fa;
+    /* background-color: #f5f7fa; */
+    background-color: var(--brand-bg);
   }
   
   .ai-coach-header {
@@ -13,11 +14,12 @@
   
   .ai-coach-header h2 {
     margin-bottom: 0.5rem;
-    color: #1167BE;
+    /* color: #1167BE; */
+    color: var(--brand-darkblue);
   }
   
   .ai-coach-header p {
-    color: #666;
+    color: var(--brand-darkblue);
     margin: 0;
   }
   
@@ -48,19 +50,21 @@
   
   .message-content {
     padding: 0.75rem 1rem;
+    color: var(--brand-text);
     border-radius: 1rem;
     position: relative;
   }
   
   .user-message .message-content {
-    background-color: #1167BE;
+    /* background-color: #1167BE; */
+    background-color: var(--brand-darkblue);
     color: white;
     border-bottom-right-radius: 0.25rem;
   }
   
   .assistant-message .message-content {
     background-color: #f0f0f0;
-    color: #333;
+    color: var(--brand-darkblue);
     border-bottom-left-radius: 0.25rem;
   }
   
@@ -87,7 +91,8 @@
   
   .input-form button {
     padding: 0.75rem 1.5rem;
-    background-color: #1167BE;
+    /* background-color: #1167BE; */
+    background-color: var(--brand-darkblue);
     color: white;
     border: none;
     border-radius: 8px;
@@ -100,7 +105,8 @@
   }
   
   .input-form button:hover {
-    background-color: #0D5BAB;
+    /* background-color: #0D5BAB; */
+    background-color: var(--brand-blue);
   }
   
   .input-form button:disabled {
@@ -149,7 +155,8 @@
   .suggested-prompts-header {
     font-weight: 500;
     margin-bottom: 12px;
-    color: #1167BE;
+    /* color: #1167BE; */
+    color: var(--brand-darkblue);
     font-size: 1.1rem;
   }
 
@@ -162,7 +169,8 @@
 
   .prompt-button {
     background-color: #e7f3ff;
-    color: #1167BE;
+    /* color: #1167BE; */
+    color: var(--brand-darkblue);
     border: 1px solid #d0e8ff;
     border-radius: 18px;
     padding: 10px 16px;
@@ -175,7 +183,7 @@
   }
 
   .prompt-button:hover {
-    background-color: #d0e8ff;
+    background-color: var(--brand-blue);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
   
