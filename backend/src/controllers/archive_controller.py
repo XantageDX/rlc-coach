@@ -140,6 +140,112 @@ class SearchQuery(BaseModel):
 #             detail=f"Error retrieving document: {str(e)}"
 #         )
 ### with S3 Bucket
+# @router.get("/projects/{project_id}/documents/{document_id}/view", status_code=status.HTTP_200_OK)
+# async def view_document(
+#     project_id: str,
+#     document_id: str,
+#     current_user = Depends(get_current_user)
+# ):
+#     """
+#     Get a document file for viewing.
+#     """
+#     temp_file_path = None
+#     try:
+#         # Find the project
+#         project = next((p for p in await get_all_projects() if p.get("_id") == project_id), None)
+#         if not project:
+#             raise HTTPException(
+#                 status_code=status.HTTP_404_NOT_FOUND,
+#                 detail="Project not found"
+#             )
+        
+#         # Find the document in the project
+#         document = next((doc for doc in project.get('documents', []) if doc.get('_id') == document_id), None)
+#         if not document:
+#             raise HTTPException(
+#                 status_code=status.HTTP_404_NOT_FOUND,
+#                 detail="Document not found"
+#             )
+            
+#         # Get the S3 info
+#         s3_key = document.get('path')
+#         s3_bucket = document.get('s3_bucket', S3_BUCKET)
+        
+#         # Check if this is an S3 path or local path
+#         if s3_bucket and not os.path.exists(s3_key):
+#             # This is an S3 path
+#             try:
+#                 # Get file from S3
+#                 response = s3_client.get_object(Bucket=s3_bucket, Key=s3_key)
+#                 content = response['Body'].read()
+                
+#                 # Create a temporary file to serve
+#                 with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+#                     temp_file_path = temp_file.name
+#                     temp_file.write(content)
+                
+#                 # Determine content type based on file extension
+#                 content_type = "application/octet-stream"  # Default
+#                 filename = document.get('filename', '')
+#                 file_ext = os.path.splitext(filename)[1].lower()
+                
+#                 if file_ext == '.pdf':
+#                     content_type = "application/pdf"
+#                 elif file_ext == '.docx':
+#                     content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+#                 elif file_ext == '.pptx':
+#                     content_type = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                
+#                 # Return file response
+#                 return FileResponse(
+#                     path=temp_file_path,
+#                     filename=document.get('filename'),
+#                     media_type=content_type,
+#                     background=BackgroundTask(lambda: os.unlink(temp_file_path) if os.path.exists(temp_file_path) else None)
+#                 )
+                
+#             except ClientError as e:
+#                 print(f"S3 error: {str(e)}")
+#                 raise HTTPException(
+#                     status_code=status.HTTP_404_NOT_FOUND,
+#                     detail=f"File not found in S3: {str(e)}"
+#                 )
+#         else:
+#             # This is a local path (legacy support)
+#             if not os.path.exists(s3_key):
+#                 raise HTTPException(
+#                     status_code=status.HTTP_404_NOT_FOUND,
+#                     detail=f"File not found on server: {s3_key}"
+#                 )
+            
+#             # Return the file
+#             return FileResponse(
+#                 path=s3_key, 
+#                 filename=document.get('filename'),
+#                 media_type="application/octet-stream"
+#             )
+        
+#     except HTTPException:
+#         # Clean up temp file if exists
+#         if temp_file_path and os.path.exists(temp_file_path):
+#             try:
+#                 os.unlink(temp_file_path)
+#             except:
+#                 pass
+#         raise
+#     except Exception as e:
+#         # Clean up temp file if exists
+#         if temp_file_path and os.path.exists(temp_file_path):
+#             try:
+#                 os.unlink(temp_file_path)
+#             except:
+#                 pass
+#         print(f"Error retrieving document: {str(e)}")
+#         raise HTTPException(
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             detail=f"Error retrieving document: {str(e)}"
+#         )
+#### BUCKET FIRST
 @router.get("/projects/{project_id}/documents/{document_id}/view", status_code=status.HTTP_200_OK)
 async def view_document(
     project_id: str,
@@ -171,10 +277,12 @@ async def view_document(
         s3_key = document.get('path')
         s3_bucket = document.get('s3_bucket', S3_BUCKET)
         
-        # Check if this is an S3 path or local path
-        if s3_bucket and not os.path.exists(s3_key):
-            # This is an S3 path
+        # Check if this is an S3 path
+        if s3_bucket:
             try:
+                # Log for debugging
+                print(f"Fetching from S3: Bucket={s3_bucket}, Key={s3_key}")
+                
                 # Get file from S3
                 response = s3_client.get_object(Bucket=s3_bucket, Key=s3_key)
                 content = response['Body'].read()
@@ -197,6 +305,7 @@ async def view_document(
                     content_type = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
                 
                 # Return file response
+                print(f"Returning file from S3: {filename}, type: {content_type}")
                 return FileResponse(
                     path=temp_file_path,
                     filename=document.get('filename'),
@@ -204,23 +313,24 @@ async def view_document(
                     background=BackgroundTask(lambda: os.unlink(temp_file_path) if os.path.exists(temp_file_path) else None)
                 )
                 
-            except ClientError as e:
-                print(f"S3 error: {str(e)}")
+            except Exception as s3_err:
+                print(f"S3 error: {str(s3_err)}")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"File not found in S3: {str(e)}"
+                    detail=f"File not found in S3: {str(s3_err)}"
                 )
         else:
-            # This is a local path (legacy support)
-            if not os.path.exists(s3_key):
+            # Local file path (legacy support)
+            local_path = s3_key
+            if not os.path.exists(local_path):
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"File not found on server: {s3_key}"
+                    detail=f"File not found on server: {local_path}"
                 )
             
             # Return the file
             return FileResponse(
-                path=s3_key, 
+                path=local_path, 
                 filename=document.get('filename'),
                 media_type="application/octet-stream"
             )

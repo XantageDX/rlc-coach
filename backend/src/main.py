@@ -16,8 +16,20 @@ from src.controllers.user_admin_controller import router as user_admin_router
 # Load environment variables
 load_dotenv()
 
+import logging
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("uvicorn.access")
+
 # Create FastAPI app
 app = FastAPI(title="RLC Coach API")
+
+@app.on_event("startup")
+async def startup_event():
+    logger.info("Starting RLC Coach application...")
+    logger.info(f"S3_BUCKET_NAME: {os.getenv('S3_BUCKET_NAME', 'NOT SET')}")
+    logger.info(f"AWS_REGION: {os.getenv('AWS_REGION', 'NOT SET')}")
+    logger.info(f"AWS credentials available: {'Yes' if os.getenv('AWS_ACCESS_KEY_ID') and os.getenv('AWS_SECRET_ACCESS_KEY') else 'No'}")
 
 # app.add_middleware(
 #     CORSMiddleware,
