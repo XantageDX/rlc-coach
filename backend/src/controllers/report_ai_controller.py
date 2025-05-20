@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, Depends, Body, HTTPException, status
 from src.utils.auth import get_current_user
 from src.services.report_ai_service import process_kg_message, evaluate_kg_report, process_kd_message, evaluate_kd_report
 from src.services.archive_service import search_archive, get_all_projects
@@ -8,12 +8,21 @@ from typing import Optional, Dict, Any
 
 router = APIRouter()
 
+# class ReportMessageRequest(BaseModel):
+#     message: str
+#     report_id: Optional[str] = None
+#     report_context: Optional[Dict[str, Any]] = None
+#     report_type: str = "kg"  # Default to 'kg' for backward compatibility
+#     model_id: Optional[str] = None
+### CLEAR CONVERSATION MEMORY
 class ReportMessageRequest(BaseModel):
     message: str
     report_id: Optional[str] = None
     report_context: Optional[Dict[str, Any]] = None
     report_type: str = "kg"  # Default to 'kg' for backward compatibility
     model_id: Optional[str] = None
+    session_id: Optional[str] = None  # Add this field
+### END
 
 class ReportEvaluationRequest(BaseModel):
     report_data: Dict[str, Any]
@@ -25,16 +34,82 @@ class ArchiveSearchRequest(BaseModel): # Class for Archive Search
     max_results: int = 5
     model_id: Optional[str] = None
 
+# @router.post("/message")
+# async def process_report_message(
+#     data: ReportMessageRequest, 
+#     current_user = Depends(get_current_user)
+# ):
+#     """Process a message related to report writing (KG or KD)"""
+#     if data.report_type == "kd":
+#         return await process_kd_message(data.message, data.report_context, data.model_id)
+#     else:
+#         return await process_kg_message(data.message, data.report_context, data.model_id)
+### CLEAR CONVERSATION MEMORY
 @router.post("/message")
 async def process_report_message(
     data: ReportMessageRequest, 
     current_user = Depends(get_current_user)
 ):
-    """Process a message related to report writing (KG or KD)"""
-    if data.report_type == "kd":
-        return await process_kd_message(data.message, data.report_context, data.model_id)
-    else:
-        return await process_kg_message(data.message, data.report_context, data.model_id)
+    """Process a message related to report writing (KG or KD) with session tracking"""
+    try:
+        # Import the session service
+        from src.services.report_session_service import get_report_session, update_report_session
+        
+        # Get or create the session for this report
+        session = get_report_session(
+            session_id=data.session_id,
+            report_id=data.report_id,
+            report_type=data.report_type
+        )
+        
+        # Add the user message to the session history
+        session["messages"].append({
+            "role": "user",
+            "content": data.message
+        })
+        
+        # Update the context if provided
+        if data.report_context:
+            session["context"] = data.report_context
+        
+        # Process with the appropriate service
+        if data.report_type == "kd":
+            result = await process_kd_message(
+                data.message,
+                data.report_id,
+                data.report_context,
+                data.model_id
+            )
+        else:
+            result = await process_kg_message(
+                data.message,
+                data.report_id, 
+                data.report_context,
+                data.model_id
+            )
+        
+        # If successful, add AI response to session history
+        if "answer" in result and result.get("success", False):
+            session["messages"].append({
+                "role": "assistant",
+                "content": result["answer"]
+            })
+            
+            # Update the session in our storage
+            update_report_session(
+                session_id=data.session_id or f"{data.report_type}_{data.report_id or 'default'}",
+                data=session
+            )
+        
+        return result
+    except Exception as e:
+        print(f"Error in report AI message processing: {e}")
+        return {
+            "error": "An error occurred while processing your message.",
+            "details": str(e),
+            "success": False
+        }
+### END
 
 @router.post("/evaluate")
 async def evaluate_report_endpoint(
@@ -175,3 +250,31 @@ async def check_archive_endpoint(
             "error": "An error occurred while searching the archive.",
             "details": str(e)
         }
+    
+### CLEAR CONVERSATION MEMORY
+@router.post("/clear-session")
+async def clear_report_session_endpoint(
+    data: dict = Body(...),
+    current_user = Depends(get_current_user)
+):
+    """
+    Clear the session for a specific report.
+    """
+    try:
+        from src.services.report_session_service import clear_report_session
+        
+        session_id = data.get("session_id")
+        report_id = data.get("report_id")
+        report_type = data.get("report_type", "kg")
+        
+        success = clear_report_session(session_id, report_id, report_type)
+        
+        if success:
+            return {"message": "Report session cleared successfully"}
+        else:
+            return {"message": "No session found to clear"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error clearing report session: {str(e)}"
+        )

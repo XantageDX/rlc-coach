@@ -6,11 +6,22 @@ import jsPDF from 'jspdf';
 import axios from 'axios';
 // import archiveService from '../../services/archiveService';
 import { useModel } from '../../context/ModelContext';
+import { useReportWriter } from '../../context/ReportWriterContext';
 
 const API_URL = 'https://api.spark.rapidlearningcycles.com';
 
 const ReportWriter = () => {
   const { selectedModel } = useModel();
+  // CLEAR CONVERSATION MEMORY
+  // Add this to connect to the ReportWriter context
+  const {
+    currentReport,
+    reportType,
+    formData,
+    sessionId,  // Add this
+    clearReport
+  } = useReportWriter();
+  //  
   const [selectedReport, setSelectedReport] = useState('');
   // const [loading, setLoading] = useState(false);
   // const [error, setError] = useState(null);
@@ -1653,6 +1664,58 @@ const formatMessage = (text) => {
     }
   };
 
+  // CLEAR CONVERSATION MEMORY
+  // Add the new handler function for creating a new report
+  const handleNewReport = async () => {
+    try {
+      // First clear the local state using the context method
+      clearReport();
+      
+      // Reset chat messages to just the welcome message
+      setChatMessages([
+        {
+          role: 'ai',
+          content: "Welcome to the RLC report writing assistant. I'm an AI designed to help you complete reports more quickly. I won't write anything for you, but I will help you quickly repackage your thoughts into well-structured reports. You have a few options to get started:\n\n1. You can fill in the report on screen.\n2. You can chat with me and give me instructions to fill it in.\n3. You can use the voice assistant and tell me everything you know about this report; then I will organize the information.\n\nAt the very end you can click \"Evaluate Report\" and I can help guide you on any missing information. You can also check your report against older reports from other projects by clicking \"Check Archive\"."
+        },
+        {
+          role: 'ai',
+          content: `I've started a new report. Please select a report type and begin filling in the details.`
+        }
+      ]);
+      
+      // Clear any search results
+      setSources([]);
+      
+      // Reset selected report type
+      setSelectedReport('');
+      
+      // Then clear the backend session if needed
+      if (currentReport?.id) {
+        await reportAiService.clearReportSession(currentReport.id, reportType, sessionId);
+      }
+      
+      // Clear all form fields
+      const formContainer = document.getElementById('report-form-container');
+      if (formContainer) {
+        const inputs = formContainer.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+          input.value = '';
+        });
+        
+        // For selects, reset to first option
+        const selects = formContainer.querySelectorAll('select');
+        selects.forEach(select => {
+          if (select.options.length > 0) {
+            select.selectedIndex = 0;
+          }
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to clear report session:', error);
+      // Don't block UI on backend errors
+    }
+  };
+
 
   // Main component render
 //   return (
@@ -1902,7 +1965,12 @@ return (
             </select>
           </div>
 
+          {/* <div className="report-buttons">
+            <button onClick={exportPowerPoint}>Export PPT</button>
+            <button onClick={exportPDF}>Export PDF</button>
+          </div> */}
           <div className="report-buttons">
+            <button className="new-report-btn" onClick={handleNewReport}>New Report</button>
             <button onClick={exportPowerPoint}>Export PPT</button>
             <button onClick={exportPDF}>Export PDF</button>
           </div>

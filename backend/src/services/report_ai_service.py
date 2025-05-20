@@ -479,7 +479,40 @@ Don't give much context: go to the point.
 - In Conclusion: ...
 """
 
-async def process_kg_message(user_message, report_context=None, model_id=None):
+# async def process_kg_message(user_message, report_context=None, model_id=None):
+#     """Process a user message for Knowledge Gap report assistance"""
+#     try:
+#         llm = get_bedrock_llm(model_id)
+        
+#         messages = [
+#             {"role": "system", "content": KG_SYSTEM_PROMPT},
+#         ]
+        
+#         # Add report context if available
+#         if report_context:
+#             messages.append({
+#                 "role": "system", 
+#                 "content": f"Current report context: {report_context}"
+#             })
+            
+#         # Add user message
+#         messages.append({"role": "user", "content": user_message})
+        
+#         response = llm.invoke(messages)
+        
+#         return {
+#             "answer": response.content,
+#             "success": True
+#         }
+#     except Exception as e:
+#         print(f"Error in KG report assistant: {e}")
+#         return {
+#             "error": "An error occurred while processing your question.",
+#             "details": str(e),
+#             "success": False
+#         }
+### CLEAR CONVERSATION MEMORY
+async def process_kg_message(user_message, report_id=None, report_context=None, model_id=None, session_id=None):
     """Process a user message for Knowledge Gap report assistance"""
     try:
         llm = get_bedrock_llm(model_id)
@@ -487,6 +520,20 @@ async def process_kg_message(user_message, report_context=None, model_id=None):
         messages = [
             {"role": "system", "content": KG_SYSTEM_PROMPT},
         ]
+        
+        # Get previous conversation history from session if available
+        if session_id:
+            from src.services.report_session_service import get_report_session
+            session = get_report_session(session_id, report_id, 'kg')
+            
+            # Add previous messages to the conversation context
+            prev_messages = session.get("messages", [])
+            if prev_messages:
+                # Only include the last few messages to keep context manageable
+                recent_messages = prev_messages[-6:]  # Last 6 messages
+                for msg in recent_messages:
+                    if msg["role"] in ["user", "assistant"]:
+                        messages.append({"role": msg["role"], "content": msg["content"]})
         
         # Add report context if available
         if report_context:
@@ -511,6 +558,7 @@ async def process_kg_message(user_message, report_context=None, model_id=None):
             "details": str(e),
             "success": False
         }
+### END
 
 async def evaluate_kg_report(report_data, model_id=None):
     """Evaluate a Knowledge Gap report and provide feedback"""
@@ -546,7 +594,40 @@ async def evaluate_kg_report(report_data, model_id=None):
         }
     
 # Add KD functions
-async def process_kd_message(user_message, report_context=None, model_id=None):
+# async def process_kd_message(user_message, report_context=None, model_id=None):
+#     """Process a user message for Key Decision report assistance"""
+#     try:
+#         llm = get_bedrock_llm(model_id)
+        
+#         messages = [
+#             {"role": "system", "content": KD_SYSTEM_PROMPT},
+#         ]
+        
+#         # Add report context if available
+#         if report_context:
+#             messages.append({
+#                 "role": "system", 
+#                 "content": f"Current report context: {report_context}"
+#             })
+            
+#         # Add user message
+#         messages.append({"role": "user", "content": user_message})
+        
+#         response = llm.invoke(messages)
+        
+#         return {
+#             "answer": response.content,
+#             "success": True
+#         }
+#     except Exception as e:
+#         print(f"Error in KD report assistant: {e}")
+#         return {
+#             "error": "An error occurred while processing your question.",
+#             "details": str(e),
+#             "success": False
+#         }
+### CLEAR CONVERSATION MEMORY
+async def process_kd_message(user_message, report_id=None, report_context=None, model_id=None, session_id=None):
     """Process a user message for Key Decision report assistance"""
     try:
         llm = get_bedrock_llm(model_id)
@@ -554,6 +635,20 @@ async def process_kd_message(user_message, report_context=None, model_id=None):
         messages = [
             {"role": "system", "content": KD_SYSTEM_PROMPT},
         ]
+        
+        # Get previous conversation history from session if available
+        if session_id:
+            from src.services.report_session_service import get_report_session
+            session = get_report_session(session_id, report_id, 'kd')
+            
+            # Add previous messages to the conversation context
+            prev_messages = session.get("messages", [])
+            if prev_messages:
+                # Only include the last few messages to keep context manageable
+                recent_messages = prev_messages[-6:]  # Last 6 messages
+                for msg in recent_messages:
+                    if msg["role"] in ["user", "assistant"]:
+                        messages.append({"role": msg["role"], "content": msg["content"]})
         
         # Add report context if available
         if report_context:
@@ -578,6 +673,7 @@ async def process_kd_message(user_message, report_context=None, model_id=None):
             "details": str(e),
             "success": False
         }
+### END
 
 async def evaluate_kd_report(report_data, model_id=None):
     """Evaluate a Key Decision report and provide feedback"""

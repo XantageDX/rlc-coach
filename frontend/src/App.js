@@ -82,6 +82,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate, Outlet } from 'react-
 import { AuthProvider } from './context/AuthContext';
 import { ModelProvider } from './context/ModelContext';
 import { AICoachProvider } from './context/AICoachContext';
+import { ReportWriterProvider } from './context/ReportWriterContext'; // Import the provider
 
 // Auth Components
 import Login from './components/auth/Login';
@@ -124,32 +125,66 @@ const ProtectedLayout = () => {
   );
 };
 
+// function App() {
+//   return (
+//     <AuthProvider>
+//       <ModelProvider>
+//         <AICoachProvider> {/* Add this wrapper */}
+//           <Router>
+//             <Routes>
+//               {/* Public routes */}
+//               <Route path="/login" element={<Login />} />
+//               <Route path="/register" element={<Register />} />
+              
+//               {/* Protected routes with layout */}
+//               <Route element={<ProtectedRoute />}>
+//                 <Route element={<ProtectedLayout />}>
+//                   <Route path="/ai-coach" element={<AICoach />} />
+//                   <Route path="/report-writer" element={<ReportWriter />} />
+//                   <Route path="/archive" element={<Archive />} />
+//                   <Route path="/user-admin" element={<UserAdmin />} />
+//                 </Route>
+//               </Route>
+              
+//               {/* Redirect to AI Coach by default for authenticated users */}
+//               <Route path="*" element={<Navigate to="/ai-coach" replace />} />
+//             </Routes>
+//           </Router>
+//         </AICoachProvider> {/* Close the wrapper */}
+//       </ModelProvider>
+//     </AuthProvider>
+//   );
+// }
+
+// CLEAR CONVERSATION MEMORY
 function App() {
   return (
     <AuthProvider>
       <ModelProvider>
-        <AICoachProvider> {/* Add this wrapper */}
-          <Router>
-            <Routes>
-              {/* Public routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              
-              {/* Protected routes with layout */}
-              <Route element={<ProtectedRoute />}>
-                <Route element={<ProtectedLayout />}>
-                  <Route path="/ai-coach" element={<AICoach />} />
-                  <Route path="/report-writer" element={<ReportWriter />} />
-                  <Route path="/archive" element={<Archive />} />
-                  <Route path="/user-admin" element={<UserAdmin />} />
+        <AICoachProvider>
+          <ReportWriterProvider> {/* Add this wrapper */}
+            <Router>
+              <Routes>
+                {/* Public routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                
+                {/* Protected routes with layout */}
+                <Route element={<ProtectedRoute />}>
+                  <Route element={<ProtectedLayout />}>
+                    <Route path="/ai-coach" element={<AICoach />} />
+                    <Route path="/report-writer" element={<ReportWriter />} />
+                    <Route path="/archive" element={<Archive />} />
+                    <Route path="/user-admin" element={<UserAdmin />} />
+                  </Route>
                 </Route>
-              </Route>
-              
-              {/* Redirect to AI Coach by default for authenticated users */}
-              <Route path="*" element={<Navigate to="/ai-coach" replace />} />
-            </Routes>
-          </Router>
-        </AICoachProvider> {/* Close the wrapper */}
+                
+                {/* Redirect to AI Coach by default for authenticated users */}
+                <Route path="*" element={<Navigate to="/ai-coach" replace />} />
+              </Routes>
+            </Router>
+          </ReportWriterProvider>
+        </AICoachProvider>
       </ModelProvider>
     </AuthProvider>
   );

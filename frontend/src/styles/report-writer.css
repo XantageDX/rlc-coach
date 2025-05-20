@@ -375,6 +375,28 @@ margin: 0;
   background-color: var(--brand-blue);
 }
 
+
+/* New Report button */
+.new-report-btn {
+  background-color: var(--brand-blue);
+  color: white;
+  border: none;
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin-right: 10px;
+}
+
+.new-report-btn:hover {
+  background-color: var(--brand-darkblue);
+}
+
+.new-report-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 /* .select-report-prompt {
   text-align: center;
   color: #666;
