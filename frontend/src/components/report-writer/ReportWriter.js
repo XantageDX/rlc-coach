@@ -13,6 +13,8 @@ const API_URL = 'https://api.spark.rapidlearningcycles.com';
 const ReportWriter = () => {
   const { selectedModel } = useModel();
   // CLEAR CONVERSATION MEMORY
+  // Add this for the actions dropdown
+  const [showActionsMenu, setShowActionsMenu] = useState(false);
   // Add this to connect to the ReportWriter context
   const {
     currentReport,
@@ -45,6 +47,20 @@ const ReportWriter = () => {
   useEffect(() => {
     scrollToBottom();
   }, [chatMessages]);
+
+  // Add click outside listener to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showActionsMenu && !event.target.closest('.actions-dropdown')) {
+        setShowActionsMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showActionsMenu]);
 
   // Add this new useEffect for voice recognition cleanup
   useEffect(() => {
@@ -1900,7 +1916,7 @@ return (
             </svg>
           </button>
         </div>
-        <div className="chat-actions">
+        {/* <div className="chat-actions">
           <button 
             className="action-btn archive-btn" 
             onClick={checkReportArchive}
@@ -1922,8 +1938,8 @@ return (
             </svg>
             <span className="btn-text">Evaluate Report</span>
           </button>
-        </div>
-
+        </div> */}
+        <div className="chat-placeholder"></div>
         {/* Sources section */}
         {sources.length > 0 && (
           <div className="sources-section">
@@ -1951,7 +1967,6 @@ return (
       <div className="report-preview">
         <div className="report-preview-header">
           <h3>Report Preview</h3>
-          {/* Add the report selection dropdown here */}
           <div className="report-select-container">
             <select 
               id="report-selection" 
@@ -1965,14 +1980,59 @@ return (
             </select>
           </div>
 
-          {/* <div className="report-buttons">
-            <button onClick={exportPowerPoint}>Export PPT</button>
-            <button onClick={exportPDF}>Export PDF</button>
-          </div> */}
-          <div className="report-buttons">
-            <button className="new-report-btn" onClick={handleNewReport}>New Report</button>
-            <button onClick={exportPowerPoint}>Export PPT</button>
-            <button onClick={exportPDF}>Export PDF</button>
+          <div className="actions-dropdown">
+            <button className="actions-btn" onClick={() => setShowActionsMenu(!showActionsMenu)}>
+              Actions
+              <span className="dropdown-caret">▼</span>
+            </button>
+            {/* {showActionsMenu && (
+              <div className="actions-menu">
+                <button onClick={() => {
+                  exportPowerPoint();
+                  setShowActionsMenu(false);
+                }}>Export as PPT</button>
+                <button onClick={() => {
+                  exportPDF();
+                  setShowActionsMenu(false);
+                }}>Export as PDF</button>
+                <div className="menu-divider"></div>
+                <button 
+                  className="clear-session-btn" 
+                  onClick={() => {
+                    handleNewReport();
+                    setShowActionsMenu(false);
+                  }}
+                >Clear & Start New Session</button>
+              </div>
+            )} */}
+            {showActionsMenu && (
+              <div className="actions-menu">
+                <button onClick={() => {
+                  checkReportArchive();
+                  setShowActionsMenu(false);
+                }}>Check Archive</button>
+                <button onClick={() => {
+                  evaluateReport();
+                  setShowActionsMenu(false);
+                }}>Evaluate Report</button>
+                <button onClick={() => {
+                  exportPowerPoint();
+                  setShowActionsMenu(false);
+                }}>Export as PPT</button>
+                <button onClick={() => {
+                  exportPDF();
+                  setShowActionsMenu(false);
+                }}>Export as PDF</button>
+                <div className="menu-divider"></div>
+                <button 
+                  className="clear-session-btn" 
+                  onClick={() => {
+                    handleNewReport();
+                    setShowActionsMenu(false);
+                  }}
+                >Clear & Start New Session</button>
+              </div>
+            )}
           </div>
         </div>
         <div id="report-form-container">

@@ -349,15 +349,6 @@ const AICoach = () => {
       {error && <div className="error-message">{error}</div>}
       
       <div className="messages-container">
-        {/* Add New Chat button at the top-right of messages container */}
-        <button 
-          className="new-chat-btn"
-          onClick={handleNewChat}
-          disabled={isLoading}
-        >
-          New Chat
-        </button>
-
         {messages.map((message, index) => (
           <div 
             key={index}
@@ -401,24 +392,53 @@ const AICoach = () => {
         <div ref={messagesEndRef} />
       </div>
       
-      <form onSubmit={handleSubmit} className="input-form">
-        <textarea
-          rows="3"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          placeholder="Ask about RLC methodology..."
+      <div className="input-section">
+        <form onSubmit={handleSubmit} className="input-form">
+          <div className="input-container">
+            <textarea
+              rows="3"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="Ask about RLC methodology..."
+              disabled={isLoading}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
+            />
+            <button 
+              type="submit" 
+              className="send-btn" 
+              disabled={isLoading || !inputText.trim()}
+              aria-label="Send message"
+            >
+              {isLoading ? (
+                <div className="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 20L12 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M5 11L12 4L19 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+            </button>
+          </div>
+        </form>
+        
+        {/* New Session button repositioned */}
+        <button 
+          className="new-session-btn"
+          onClick={handleNewChat}
           disabled={isLoading}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSubmit(e);
-            }
-          }}
-        />
-        <button type="submit" disabled={isLoading || !inputText.trim()}>
-          {isLoading ? 'Thinking...' : 'Send'}
+        >
+          New Session
         </button>
-      </form>
+      </div>
     </div>
   );
 };

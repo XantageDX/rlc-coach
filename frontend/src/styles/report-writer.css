@@ -1,4 +1,89 @@
 /* frontend/src/styles/report-writer.css */
+/* Actions dropdown styling */
+.actions-dropdown {
+  position: relative;
+  margin-left: auto; /* Push to the right */
+}
+
+.actions-btn {
+  background-color: var(--brand-darkblue);
+  color: white;
+  border: none;
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.actions-btn:hover {
+  background-color: var(--brand-blue);
+}
+
+.dropdown-caret {
+  font-size: 0.7rem;
+  margin-top: 2px;
+}
+
+.actions-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  min-width: 180px;
+  margin-top: 5px;
+}
+.chat-placeholder {
+  margin-bottom: 12px; /* Same margin as the chat-actions had */
+}
+
+.actions-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-radius: 0;
+  color: var(--brand-darkblue);
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.actions-menu button:hover {
+  background-color: #f5f5f5;
+}
+
+/* Divider between menu items */
+.menu-divider {
+  height: 1px;
+  background-color: #ddd;
+  margin: 4px 0;
+}
+
+/* Styling for the clear session button */
+.actions-menu .clear-session-btn {
+  color: #dc3545; /* Red color for warning/destructive action */
+  font-weight: 500;
+}
+
+.actions-menu .clear-session-btn:hover {
+  background-color: #fff8f8; /* Light red background on hover */
+}
+
+/* Add a divider line between menu items (optional) */
+.actions-menu button:not(:last-child) {
+  border-bottom: 1px solid #eee;
+}
+
+
 .report-writer-container {
   /* padding: 1rem; */
   padding: 0 1rem 1rem 2rem; /* Reduce top padding */
@@ -284,11 +369,11 @@
 }
 
 /* SVG icon styling */
-.voice-btn svg,
+/* .voice-btn svg,
 .action-btn svg {
-  /* color: #1167be; */
+  
   color: var(--brand-darkblue);
-}
+} */
 
 /* .ai-message strong, .user-message strong {
   color: var(--brand-blue);
@@ -297,7 +382,7 @@
 .voice-btn {
   background: transparent;
   border: none;
-  color: #8BB5E8; /* Lighter blue color to match the example */
+  color: white;
   width: 32px;
   height: 32px;
   padding: 0;
@@ -311,13 +396,21 @@
 }
 
 .voice-btn:hover {
-  background-color: rgba(139, 181, 232, 0.1); /* Matching hover color */
+  background-color: var(--brand-blue)
 }
 
-.voice-btn svg {
-  color: var(--brand-blue); /* Same lighter blue color */
+.voice-btn svg path {
+  fill: white;
+  /* stroke: white; */
 }
 
+.voice-btn[data-recording="true"] {
+  background-color: rgba(255, 76, 76, 0.1); /* Light red background */
+}
+
+.voice-btn[data-recording="true"] svg path {
+  fill: #ff4c4c !important; /* Red color when recording */
+}
 /* .report-preview-header {
   display: flex;
   justify-content: space-between;
