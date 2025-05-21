@@ -1,4 +1,16 @@
 /* frontend/src/styles/report-writer.css */
+/* Add this to frontend/src/styles/report-writer.css */
+.message-wrapper {
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+
+.message-content {
+  flex: 1;
+  white-space: pre-wrap;
+}
+
 /* Actions dropdown styling */
 .actions-dropdown {
   position: relative;

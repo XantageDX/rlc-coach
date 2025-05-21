@@ -8,6 +8,11 @@ import axios from 'axios';
 import { useModel } from '../../context/ModelContext';
 import { useReportWriter } from '../../context/ReportWriterContext';
 
+// FEEDBACK
+import FeedbackButtons from '../common/FeedbackButtons';
+import FeedbackModal from '../common/FeedbackModal';
+import feedbackService from '../../services/feedbackService';
+
 const API_URL = 'https://api.spark.rapidlearningcycles.com';
 
 const ReportWriter = () => {
@@ -37,6 +42,51 @@ const ReportWriter = () => {
       content: "Welcome to the RLC report writing assistant. I'm an AI designed to help you complete reports more quickly. I won't write anything for you, but I will help you quickly repackage your thoughts into well-structured reports. You have a few options to get started:\n\n1. You can fill in the report on screen.\n2. You can chat with me and give me instructions to fill it in.\n3. You can use the voice assistant and tell me everything you know about this report; then I will organize the information.\n\nAt the very end you can click \"Evaluate Report\" and I can help guide you on any missing information. You can also check your report against older reports from other projects by clicking \"Check Archive\"."
     }
   ]);
+
+  // FEEDBACK - Add feedback state variables
+  const [feedbackMessageId, setFeedbackMessageId] = useState(null);
+  const [feedbackRating, setFeedbackRating] = useState(null);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+
+  // Handle feedback button click
+  const handleFeedbackSubmit = (messageId, rating) => {
+    setFeedbackMessageId(messageId);
+    setFeedbackRating(rating);
+    setShowFeedbackModal(true);
+  };
+
+  // Handle feedback modal submit
+  const handleFeedbackModalSubmit = async (feedbackText) => {
+    try {
+      // Find the message that feedback is for
+      const message = chatMessages.find((msg, idx) => idx === feedbackMessageId);
+      if (!message) return;
+      
+      // Get the previous user message if this is an AI response
+      const previousUserMessage = feedbackMessageId > 0 && message.role === 'ai' 
+        ? chatMessages[feedbackMessageId - 1]?.content || ''
+        : '';
+      
+      await feedbackService.submitFeedback({
+        component: 'ReportWriter',
+        modelId: selectedModel,
+        conversationId: sessionId || 'default-session',
+        userInput: previousUserMessage,
+        aiOutput: message.content,
+        rating: feedbackRating,
+        feedbackText
+      });
+      
+      // Show success message (optional)
+      console.log('Feedback submitted successfully');
+      
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+    } finally {
+      setShowFeedbackModal(false);
+    }
+  };
+  // END FEEDBACK
 
   // Auto-scroll to bottom of chat when messages change
   const scrollToBottom = () => {
@@ -562,21 +612,7 @@ const startVoiceInput = () => {
       </div>
     );
   };
-  
-  // Render the selected report template
-  // const renderSelectedReport = () => {
-  //   if (!selectedReport) {
-  //     return <p className="select-report-prompt">Please select a report from the dropdown above.</p>;
-  //   }
-    
-  //   if (selectedReport === 'key_decision') {
-  //     return renderKeyDecisionReport();
-  //   } else if (selectedReport === 'knowledge_gap') {
-  //     return renderKnowledgeGapReport();
-  //   }
-    
-  //   return null;
-  // };
+
   const renderSelectedReport = () => {
     if (!selectedReport) {
       return (
@@ -601,35 +637,6 @@ const startVoiceInput = () => {
     return null;
   };
   
-  // Helper function to format message text with basic markdown-like styling
-  // const formatMessage = (text) => {
-  //   if (!text) return '';
-    
-  //   // First, clean up any unexpected characters or encoding issues
-  //   text = text.replace(/\$2/g, ''); // Remove any $2 placeholders
-  //   text = text.replace(/\n\s*\n/g, '\n'); // Normalize multiple newlines
-    
-  //   // Replace headers
-  //   text = text.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-  //   text = text.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-  //   text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-  
-  //   // Bold text
-  //   text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  
-  //   // Lists (handle both bullet and numbered)
-  //   text = text.replace(/^([-•]\s+)(.+)$/gm, '<li>$2</li>');
-  //   text = text.replace(/^(\d+\.\s+)(.+)$/gm, '<li>$2</li>');
-    
-  //   // Wrap consecutive list items
-  //   text = text.replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
-  
-  //   // Additional cleanup
-  //   text = text.replace(/\s+/g, ' ').trim();
-  
-  //   return text;
-  // };
-  // Update the formatMessage function
 const formatMessage = (text) => {
   if (!text) return '';
   
@@ -1271,70 +1278,6 @@ const formatMessage = (text) => {
     }
   };
 
-
-  // const checkReportArchive = async () => {
-  //   if (!selectedReport) {
-  //     setChatMessages(prev => [...prev, {
-  //       role: 'ai',
-  //       content: "Please select a report type first."
-  //     }]);
-  //     return;
-  //   }
-    
-  //   // Add user message to chat
-  //   setChatMessages(prev => [...prev, {
-  //     role: 'user',
-  //     content: "Check Archive"
-  //   }]);
-    
-  //   // Add a loading message
-  //   setChatMessages(prev => [...prev, {
-  //     role: 'ai',
-  //     content: "Searching archive for relevant documents...",
-  //     isLoading: true
-  //   }]);
-    
-  //   setIsAiLoading(true);
-    
-  //   try {
-  //     // Get report context (all field values)
-  //     const reportData = getReportFieldValues();
-      
-  //     // Determine the report type
-  //     const reportType = selectedReport === 'knowledge_gap' ? 'kg' : 'kd';
-      
-  //     // Call the check archive service
-  //     const result = await reportAiService.checkArchive(reportData, reportType);
-      
-  //     // Remove the loading message and add the real response
-  //     setChatMessages(prev => {
-  //       const filteredMessages = prev.filter(msg => !msg.isLoading);
-  //       return [
-  //         ...filteredMessages,
-  //         {
-  //           role: 'ai',
-  //           content: result.ai_response || "I've searched the archive but couldn't find relevant documents."
-  //         }
-  //       ];
-  //     });
-  //   } catch (err) {
-  //     console.error('Error checking archive:', err);
-      
-  //     // Remove the loading message and add the error message
-  //     setChatMessages(prev => {
-  //       const filteredMessages = prev.filter(msg => !msg.isLoading);
-  //       return [
-  //         ...filteredMessages,
-  //         {
-  //           role: 'ai',
-  //           content: "Sorry, there was an error searching the archive. Please try again later."
-  //         }
-  //       ];
-  //     });
-  //   } finally {
-  //     setIsAiLoading(false);
-  //   }
-  // };
   const checkReportArchive = async () => {
     if (!selectedReport) {
       setChatMessages(prev => [...prev, {
@@ -1532,80 +1475,6 @@ const formatMessage = (text) => {
     return documents;
   };
 
-  // Add this function to the ReportWriter component
-  // const handleOpenDocument = async (projectId, documentId, filename) => {
-  //   try {
-  //     // Get the auth token
-  //     const user = JSON.parse(localStorage.getItem('user'));
-  //     const token = user?.access_token;
-      
-  //     if (!token) {
-  //       alert('Authentication token not found. Please log in again.');
-  //       return;
-  //     }
-      
-  //     // Get file extension
-  //     const fileExtension = filename.split('.').pop().toLowerCase();
-      
-  //     if (fileExtension === 'pdf') {
-  //       // PDFs can be viewed in the browser
-  //       const response = await axios({
-  //         url: `http://localhost:8000/archive/projects/${projectId}/documents/${documentId}/view`,
-  //         method: 'GET',
-  //         responseType: 'blob',
-  //         headers: { 'Authorization': `Bearer ${token}` }
-  //       });
-        
-  //       const blob = new Blob([response.data], { type: 'application/pdf' });
-  //       const url = window.URL.createObjectURL(blob);
-  //       window.open(url, '_blank');
-  //     } else if (['pptx', 'ppt', 'docx', 'doc'].includes(fileExtension)) {
-  //       // For PowerPoint and Word files, show message and download
-  //       // eslint-disable-next-line no-restricted-globals
-  //       if (confirm(`Browser cannot display ${fileExtension.toUpperCase()} files directly. Do you want to download the file?`)) {
-  //         const response = await axios({
-  //           url: `http://localhost:8000/archive/projects/${projectId}/documents/${documentId}/view`,
-  //           method: 'GET',
-  //           responseType: 'blob',
-  //           headers: { 'Authorization': `Bearer ${token}` }
-  //         });
-          
-  //         const blob = new Blob([response.data]);
-  //         const url = window.URL.createObjectURL(blob);
-          
-  //         const link = document.createElement('a');
-  //         link.href = url;
-  //         link.setAttribute('download', filename);
-  //         document.body.appendChild(link);
-  //         link.click();
-  //         document.body.removeChild(link);
-  //         window.URL.revokeObjectURL(url);
-  //       }
-  //     } else {
-  //       // For all other file types, just download
-  //       const response = await axios({
-  //         url: `http://localhost:8000/archive/projects/${projectId}/documents/${documentId}/view`,
-  //         method: 'GET',
-  //         responseType: 'blob',
-  //         headers: { 'Authorization': `Bearer ${token}` }
-  //       });
-        
-  //       const blob = new Blob([response.data]);
-  //       const url = window.URL.createObjectURL(blob);
-        
-  //       const link = document.createElement('a');
-  //       link.href = url;
-  //       link.setAttribute('download', filename);
-  //       document.body.appendChild(link);
-  //       link.click();
-  //       document.body.removeChild(link);
-  //       window.URL.revokeObjectURL(url);
-  //     }
-  //   } catch (err) {
-  //     console.error('Error opening document:', err);
-  //     alert('Failed to open file: ' + (err.response?.data?.detail || err.message));
-  //   }
-  // };
   const handleOpenDocument = async (projectId, documentId, filename) => {
     try {
       // Get the auth token
@@ -1732,316 +1601,300 @@ const formatMessage = (text) => {
     }
   };
 
-
-  // Main component render
-//   return (
-//     <div className="report-writer-container">
-//       <div className="report-select-container">
-//         {/* <h2>Report Writer</h2> */}
-//         <select 
-//           id="report-selection" 
-//           className="report-select"
-//           value={selectedReport}
-//           onChange={handleReportSelect}
-//         >
-//           <option value="">--Choose a Report--</option>
-//           <option value="knowledge_gap">Knowledge Gap</option>
-//           <option value="key_decision">Key Decision</option>
-//         </select>
+// return (
+//   <div className="report-writer-container">
+    
+//     <div className="report-layout">
+//       <div className="report-chat">
+//         <h3>Chat Assistant</h3>
+//         <div className="chat-messages" id="report-chat-response">
+//           {chatMessages.map((msg, index) => (
+//             <div key={index} className={`chat-message ${msg.role}-message ${msg.isLoading ? 'loading' : ''}`}>
+//               <strong>{msg.role === 'ai' ? 'AI:' : 'You:'}</strong>{' '}
+//               {msg.isLoading ? (
+//                 <div className="loading-indicator">
+//                   <span className="dot"></span>
+//                   <span className="dot"></span>
+//                   <span className="dot"></span>
+//                 </div>
+//               ) : (
+//                 <div 
+//                   className="message-content"
+//                   dangerouslySetInnerHTML={{ __html: formatMessage(msg.content) }}
+//                 />
+//               )}
+//             </div>
+//           ))}
+//           <div ref={messagesEndRef} />
+//         </div>
+//         <div className="chat-input-area">
+//           <textarea
+//             id="report-chat-input"
+//             value={chatInput}
+//             onChange={(e) => setChatInput(e.target.value)}
+//             placeholder="Type a message..."
+//             disabled={isAiLoading} // Disable input while loading
+//             onKeyDown={(e) => {
+//               if (e.key === 'Enter' && !e.shiftKey) {
+//                 e.preventDefault(); // Prevent default to avoid newline
+//                 handleChatSubmit();
+//               }
+//             }}
+//           ></textarea>
+//           <button 
+//             className="voice-btn" 
+//             onClick={startVoiceInput} 
+//             aria-label="Voice Input"
+//             disabled={isAiLoading}
+//           >
+//             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+//               <path id="mic-top" d="M12 15C13.66 15 15 13.66 15 12V6C15 4.34 13.66 3 12 3C10.34 3 9 4.34 9 6V12C9 13.66 10.34 15 12 15Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
+//               <path id="mic-bottom" d="M17 12C17 14.76 14.76 17 12 17C9.24 17 7 14.76 7 12H5C5 15.53 7.61 18.43 11 18.93V21H13V18.93C16.39 18.43 19 15.53 19 12H17Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
+//             </svg>
+//           </button>
+//         </div>
+//         <div className="chat-placeholder"></div>
+//         {/* Sources section */}
+//         {sources.length > 0 && (
+//           <div className="sources-section">
+//             <h4>Sources</h4>
+//             <ul className="sources-list">
+//               {sources.map((doc, index) => (
+//                 <li key={index} className="source-item">
+//                   <a 
+//                     href="#" 
+//                     onClick={(e) => {
+//                       e.preventDefault();
+//                       handleOpenDocument(doc.project_id, doc.document_id, doc.filename);
+//                     }}
+//                     className="source-link"
+//                   >
+//                     {doc.filename}
+//                   </a>
+//                 </li>
+//               ))}
+//             </ul>
+//           </div>
+//         )}
 //       </div>
       
-//       <div className="report-layout">
-//         <div className="report-chat">
-//           <h3>Chat Assistant</h3>
-//           <div className="chat-messages" id="report-chat-response">
-//             {chatMessages.map((msg, index) => (
-//               <div key={index} className={`chat-message ${msg.role}-message ${msg.isLoading ? 'loading' : ''}`}>
-//                 <strong>{msg.role === 'ai' ? 'AI:' : 'You:'}</strong>{' '}
-//                 {msg.isLoading ? (
-//                   <div className="loading-indicator">
-//                     <span className="dot"></span>
-//                     <span className="dot"></span>
-//                     <span className="dot"></span>
-//                   </div>
-//                 ) : (
-//                   <div 
-//                     className="message-content"
-//                     dangerouslySetInnerHTML={{ __html: formatMessage(msg.content) }}
-//                   />
-//                 )}
-//               </div>
-//             ))}
-//             <div ref={messagesEndRef} />
-//           </div>
-//           <div className="chat-input-area">
-//             <textarea
-//               id="report-chat-input"
-//               value={chatInput}
-//               onChange={(e) => setChatInput(e.target.value)}
-//               placeholder="Type a message..."
-//               disabled={isAiLoading} // Disable input while loading
-//               onKeyDown={(e) => {
-//                 if (e.key === 'Enter' && !e.shiftKey) {
-//                   e.preventDefault(); // Prevent default to avoid newline
-//                   handleChatSubmit();
-//                 }
-//               }}
-//             ></textarea>
-//             <button 
-//               className="voice-btn" 
-//               onClick={startVoiceInput} 
-//               aria-label="Voice Input"
-//               disabled={isAiLoading}
+//       <div className="report-preview">
+//         <div className="report-preview-header">
+//           <h3>Report Preview</h3>
+//           <div className="report-select-container">
+//             <select 
+//               id="report-selection" 
+//               className="report-select"
+//               value={selectedReport}
+//               onChange={handleReportSelect}
 //             >
-//               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-//                 <path id="mic-top" d="M12 15C13.66 15 15 13.66 15 12V6C15 4.34 13.66 3 12 3C10.34 3 9 4.34 9 6V12C9 13.66 10.34 15 12 15Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
-//                 <path id="mic-bottom" d="M17 12C17 14.76 14.76 17 12 17C9.24 17 7 14.76 7 12H5C5 15.53 7.61 18.43 11 18.93V21H13V18.93C16.39 18.43 19 15.53 19 12H17Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
-//               </svg>
-//             </button>
-//           </div>
-//           <div className="chat-actions">
-//             <button 
-//               className="action-btn archive-btn" 
-//               onClick={checkReportArchive}
-//               disabled={isAiLoading}
-//             >
-//               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-//                 <path d="M21 8V21H3V8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-//                 <path d="M3 4H21V8H3V4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-//               </svg>
-//               <span className="btn-text">Check Archive</span>
-//             </button>
-//             <button 
-//               className="action-btn evaluate-btn" 
-//               onClick={evaluateReport}
-//               disabled={isAiLoading}
-//             >
-//               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-//                 <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-//               </svg>
-//               <span className="btn-text">Evaluate Report</span>
-//             </button>
+//               <option value="">--Choose a Report--</option>
+//               <option value="knowledge_gap">Knowledge Gap</option>
+//               <option value="key_decision">Key Decision</option>
+//             </select>
 //           </div>
 
-//           {/* Sources section */}
-//           {sources.length > 0 && (
-//             <div className="sources-section">
-//               <h4>Sources</h4>
-//               <ul className="sources-list">
-//                 {sources.map((doc, index) => (
-//                   <li key={index} className="source-item">
-//                     <a 
-//                       href="#" 
-//                       onClick={(e) => {
-//                         e.preventDefault();
-//                         handleOpenDocument(doc.project_id, doc.document_id, doc.filename);
-//                       }}
-//                       className="source-link"
-//                     >
-//                       {doc.filename}
-//                     </a>
-//                   </li>
-//                 ))}
-//               </ul>
-//             </div>
-//           )}
+//           <div className="actions-dropdown">
+//             <button className="actions-btn" onClick={() => setShowActionsMenu(!showActionsMenu)}>
+//               Actions
+//               <span className="dropdown-caret">▼</span>
+//             </button>
+//             {showActionsMenu && (
+//               <div className="actions-menu">
+//                 <button onClick={() => {
+//                   checkReportArchive();
+//                   setShowActionsMenu(false);
+//                 }}>Check Archive</button>
+//                 <button onClick={() => {
+//                   evaluateReport();
+//                   setShowActionsMenu(false);
+//                 }}>Evaluate Report</button>
+//                 <button onClick={() => {
+//                   exportPowerPoint();
+//                   setShowActionsMenu(false);
+//                 }}>Export as PPT</button>
+//                 <button onClick={() => {
+//                   exportPDF();
+//                   setShowActionsMenu(false);
+//                 }}>Export as PDF</button>
+//                 <div className="menu-divider"></div>
+//                 <button 
+//                   className="clear-session-btn" 
+//                   onClick={() => {
+//                     handleNewReport();
+//                     setShowActionsMenu(false);
+//                   }}
+//                 >Clear & Start New Session</button>
+//               </div>
+//             )}
+//           </div>
 //         </div>
-        
-//         <div className="report-preview">
-//           <div className="report-preview-header">
-//             <h3>Report Preview</h3>
-//             <div className="report-buttons">
-//               <button onClick={exportPowerPoint}>Export PPT</button>
-//               <button onClick={exportPDF}>Export PDF</button>
-//             </div>
-//           </div>
-//           <div id="report-form-container">
-//             {renderSelectedReport()}
-//           </div>
+//         <div id="report-form-container">
+//           {renderSelectedReport()}
 //         </div>
 //       </div>
 //     </div>
-//   );
+//   </div>
+// );
 // };
 
-return (
-  <div className="report-writer-container">
-    
-    <div className="report-layout">
-      <div className="report-chat">
-        <h3>Chat Assistant</h3>
-        <div className="chat-messages" id="report-chat-response">
-          {chatMessages.map((msg, index) => (
-            <div key={index} className={`chat-message ${msg.role}-message ${msg.isLoading ? 'loading' : ''}`}>
-              <strong>{msg.role === 'ai' ? 'AI:' : 'You:'}</strong>{' '}
-              {msg.isLoading ? (
-                <div className="loading-indicator">
-                  <span className="dot"></span>
-                  <span className="dot"></span>
-                  <span className="dot"></span>
+// export default ReportWriter;
+
+  // Modify the rendered chat messages to include feedback buttons
+  return (
+    <div className="report-writer-container">
+      
+      <div className="report-layout">
+        <div className="report-chat">
+          <h3>Chat Assistant</h3>
+          <div className="chat-messages" id="report-chat-response">
+            {chatMessages.map((msg, index) => (
+              <div key={index} className={`chat-message ${msg.role}-message ${msg.isLoading ? 'loading' : ''}`}>
+                <strong>{msg.role === 'ai' ? 'AI:' : 'You:'}</strong>{' '}
+                {msg.isLoading ? (
+                  <div className="loading-indicator">
+                    <span className="dot"></span>
+                    <span className="dot"></span>
+                    <span className="dot"></span>
+                  </div>
+                ) : (
+                  // Add a wrapper div to hold both content and feedback buttons
+                  <div className="message-wrapper">
+                    <div 
+                      className="message-content"
+                      dangerouslySetInnerHTML={{ __html: formatMessage(msg.content) }}
+                    />
+                    
+                    {/* Add feedback buttons only to AI messages */}
+                    {msg.role === 'ai' && !msg.isLoading && (
+                      <FeedbackButtons 
+                        messageId={index}
+                        onFeedbackSubmit={handleFeedbackSubmit}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+          <div className="chat-input-area">
+            <textarea
+              id="report-chat-input"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              placeholder="Type a message..."
+              disabled={isAiLoading} // Disable input while loading
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault(); // Prevent default to avoid newline
+                  handleChatSubmit();
+                }
+              }}
+            ></textarea>
+            <button 
+              className="voice-btn" 
+              onClick={startVoiceInput} 
+              aria-label="Voice Input"
+              disabled={isAiLoading}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path id="mic-top" d="M12 15C13.66 15 15 13.66 15 12V6C15 4.34 13.66 3 12 3C10.34 3 9 4.34 9 6V12C9 13.66 10.34 15 12 15Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
+                <path id="mic-bottom" d="M17 12C17 14.76 14.76 17 12 17C9.24 17 7 14.76 7 12H5C5 15.53 7.61 18.43 11 18.93V21H13V18.93C16.39 18.43 19 15.53 19 12H17Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
+              </svg>
+            </button>
+          </div>
+          <div className="chat-placeholder"></div>
+          {/* Sources section */}
+          {sources.length > 0 && (
+            <div className="sources-section">
+              <h4>Sources</h4>
+              <ul className="sources-list">
+                {sources.map((doc, index) => (
+                  <li key={index} className="source-item">
+                    <a 
+                      href="#" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleOpenDocument(doc.project_id, doc.document_id, doc.filename);
+                      }}
+                      className="source-link"
+                    >
+                      {doc.filename}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+        
+        <div className="report-preview">
+          <div className="report-preview-header">
+            <h3>Report Preview</h3>
+            <div className="report-select-container">
+              <select 
+                id="report-selection" 
+                className="report-select"
+                value={selectedReport}
+                onChange={handleReportSelect}
+              >
+                <option value="">--Choose a Report--</option>
+                <option value="knowledge_gap">Knowledge Gap</option>
+                <option value="key_decision">Key Decision</option>
+              </select>
+            </div>
+
+            <div className="actions-dropdown">
+              <button className="actions-btn" onClick={() => setShowActionsMenu(!showActionsMenu)}>
+                Actions
+                <span className="dropdown-caret">▼</span>
+              </button>
+              {showActionsMenu && (
+                <div className="actions-menu">
+                  <button onClick={() => {
+                    checkReportArchive();
+                    setShowActionsMenu(false);
+                  }}>Check Archive</button>
+                  <button onClick={() => {
+                    evaluateReport();
+                    setShowActionsMenu(false);
+                  }}>Evaluate Report</button>
+                  <button onClick={() => {
+                    exportPowerPoint();
+                    setShowActionsMenu(false);
+                  }}>Export as PPT</button>
+                  <button onClick={() => {
+                    exportPDF();
+                    setShowActionsMenu(false);
+                  }}>Export as PDF</button>
+                  <div className="menu-divider"></div>
+                  <button 
+                    className="clear-session-btn" 
+                    onClick={() => {
+                      handleNewReport();
+                      setShowActionsMenu(false);
+                    }}
+                  >Clear & Start New Session</button>
                 </div>
-              ) : (
-                <div 
-                  className="message-content"
-                  dangerouslySetInnerHTML={{ __html: formatMessage(msg.content) }}
-                />
               )}
             </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-        <div className="chat-input-area">
-          <textarea
-            id="report-chat-input"
-            value={chatInput}
-            onChange={(e) => setChatInput(e.target.value)}
-            placeholder="Type a message..."
-            disabled={isAiLoading} // Disable input while loading
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault(); // Prevent default to avoid newline
-                handleChatSubmit();
-              }
-            }}
-          ></textarea>
-          <button 
-            className="voice-btn" 
-            onClick={startVoiceInput} 
-            aria-label="Voice Input"
-            disabled={isAiLoading}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path id="mic-top" d="M12 15C13.66 15 15 13.66 15 12V6C15 4.34 13.66 3 12 3C10.34 3 9 4.34 9 6V12C9 13.66 10.34 15 12 15Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
-              <path id="mic-bottom" d="M17 12C17 14.76 14.76 17 12 17C9.24 17 7 14.76 7 12H5C5 15.53 7.61 18.43 11 18.93V21H13V18.93C16.39 18.43 19 15.53 19 12H17Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
-            </svg>
-          </button>
-        </div>
-        {/* <div className="chat-actions">
-          <button 
-            className="action-btn archive-btn" 
-            onClick={checkReportArchive}
-            disabled={isAiLoading}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21 8V21H3V8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 4H21V8H3V4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span className="btn-text">Check Archive</span>
-          </button>
-          <button 
-            className="action-btn evaluate-btn" 
-            onClick={evaluateReport}
-            disabled={isAiLoading}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span className="btn-text">Evaluate Report</span>
-          </button>
-        </div> */}
-        <div className="chat-placeholder"></div>
-        {/* Sources section */}
-        {sources.length > 0 && (
-          <div className="sources-section">
-            <h4>Sources</h4>
-            <ul className="sources-list">
-              {sources.map((doc, index) => (
-                <li key={index} className="source-item">
-                  <a 
-                    href="#" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleOpenDocument(doc.project_id, doc.document_id, doc.filename);
-                    }}
-                    className="source-link"
-                  >
-                    {doc.filename}
-                  </a>
-                </li>
-              ))}
-            </ul>
           </div>
-        )}
+          <div id="report-form-container">
+            {renderSelectedReport()}
+          </div>
+        </div>
       </div>
-      
-      <div className="report-preview">
-        <div className="report-preview-header">
-          <h3>Report Preview</h3>
-          <div className="report-select-container">
-            <select 
-              id="report-selection" 
-              className="report-select"
-              value={selectedReport}
-              onChange={handleReportSelect}
-            >
-              <option value="">--Choose a Report--</option>
-              <option value="knowledge_gap">Knowledge Gap</option>
-              <option value="key_decision">Key Decision</option>
-            </select>
-          </div>
 
-          <div className="actions-dropdown">
-            <button className="actions-btn" onClick={() => setShowActionsMenu(!showActionsMenu)}>
-              Actions
-              <span className="dropdown-caret">▼</span>
-            </button>
-            {/* {showActionsMenu && (
-              <div className="actions-menu">
-                <button onClick={() => {
-                  exportPowerPoint();
-                  setShowActionsMenu(false);
-                }}>Export as PPT</button>
-                <button onClick={() => {
-                  exportPDF();
-                  setShowActionsMenu(false);
-                }}>Export as PDF</button>
-                <div className="menu-divider"></div>
-                <button 
-                  className="clear-session-btn" 
-                  onClick={() => {
-                    handleNewReport();
-                    setShowActionsMenu(false);
-                  }}
-                >Clear & Start New Session</button>
-              </div>
-            )} */}
-            {showActionsMenu && (
-              <div className="actions-menu">
-                <button onClick={() => {
-                  checkReportArchive();
-                  setShowActionsMenu(false);
-                }}>Check Archive</button>
-                <button onClick={() => {
-                  evaluateReport();
-                  setShowActionsMenu(false);
-                }}>Evaluate Report</button>
-                <button onClick={() => {
-                  exportPowerPoint();
-                  setShowActionsMenu(false);
-                }}>Export as PPT</button>
-                <button onClick={() => {
-                  exportPDF();
-                  setShowActionsMenu(false);
-                }}>Export as PDF</button>
-                <div className="menu-divider"></div>
-                <button 
-                  className="clear-session-btn" 
-                  onClick={() => {
-                    handleNewReport();
-                    setShowActionsMenu(false);
-                  }}
-                >Clear & Start New Session</button>
-              </div>
-            )}
-          </div>
-        </div>
-        <div id="report-form-container">
-          {renderSelectedReport()}
-        </div>
-      </div>
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={showFeedbackModal}
+        rating={feedbackRating}
+        onClose={() => setShowFeedbackModal(false)}
+        onSubmit={handleFeedbackModalSubmit}
+      />
     </div>
-  </div>
-);
+  );
 };
 
 export default ReportWriter;
