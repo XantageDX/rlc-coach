@@ -78,14 +78,16 @@ async def process_report_message(
                 data.message,
                 data.report_id,
                 data.report_context,
-                data.model_id
+                data.model_id,
+                data.session_id  # Make sure this is being passed
             )
         else:
             result = await process_kg_message(
                 data.message,
                 data.report_id, 
                 data.report_context,
-                data.model_id
+                data.model_id,
+                data.session_id  # Make sure this is being passed
             )
         
         # If successful, add AI response to session history

@@ -188,14 +188,16 @@ const handleReportSelect = (e) => {
           userMessage.content,
           null, // No report ID since we're not using the database
           reportContext,
-          selectedModel
+          selectedModel,
+          sessionId // Make sure you're passing the sessionId here
         );
       } else if (selectedReport === 'key_decision') {
         response = await reportAiService.processKDMessage(
           userMessage.content,
           null, // No report ID
           reportContext,
-          selectedModel
+          selectedModel,
+          sessionId // Make sure you're passing the sessionId here
         );
       } else {
         throw new Error("Please select a report type first.");
