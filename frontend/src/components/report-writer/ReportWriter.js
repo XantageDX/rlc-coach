@@ -15,33 +15,88 @@ import feedbackService from '../../services/feedbackService';
 
 const API_URL = 'https://api.spark.rapidlearningcycles.com';
 
+// const ReportWriter = () => {
+//   const { selectedModel } = useModel();
+//   // CLEAR CONVERSATION MEMORY
+//   // Add this for the actions dropdown
+//   // const [showActionsMenu, setShowActionsMenu] = useState(false); // replaced down here
+//   // Add this to connect to the ReportWriter context
+//   // const {
+//   //   currentReport,
+//   //   reportType,
+//   //   formData,
+//   //   sessionId,  // Add this
+//   //   clearReport
+//   // } = useReportWriter(); // replaced down here
+//   //  
+//   // const [selectedReport, setSelectedReport] = useState(''); // replaced down here
+//   // const [sources, setSources] = useState([]); // replaced down here
+//   // const [chatInput, setChatInput] = useState(''); // replaced down here
+//   // const [isAiLoading, setIsAiLoading] = useState(false); // replaced down here
+//   const messagesEndRef = useRef(null);
+//   // const [chatMessages, setChatMessages] = useState([
+//   //   {
+//   //     role: 'ai',
+//   //     content: "Welcome to the RLC report writing assistant. I'm an AI designed to help you complete reports more quickly. I won't write anything for you, but I will help you quickly repackage your thoughts into well-structured reports. You have a few options to get started:\n\n1. You can fill in the report on screen.\n2. You can chat with me and give me instructions to fill it in.\n3. You can use the voice assistant and tell me everything you know about this report; then I will organize the information.\n\nAt the very end you can click \"Evaluate Report\" and I can help guide you on any missing information. You can also check your report against older reports from other projects by clicking \"Check Archive\"."
+//   //   }
+//   // ]); // replaced down here
+//   const {
+//     currentReport,
+//     reportType,
+//     formData,
+//     sessionId,
+//     clearReport,
+    
+//     // State from context
+//     selectedReport,
+//     chatMessages,
+//     chatInput,
+//     isAiLoading,
+//     sources,
+//     showActionsMenu,
+    
+//     // Methods from context
+//     setSelectedReport,
+//     setChatMessages,
+//     addChatMessage,
+//     setChatInput,
+//     setAiLoading,
+//     setSources,
+//     setShowActionsMenu
+//   } = useReportWriter();
 const ReportWriter = () => {
   const { selectedModel } = useModel();
-  // CLEAR CONVERSATION MEMORY
-  // Add this for the actions dropdown
-  const [showActionsMenu, setShowActionsMenu] = useState(false);
-  // Add this to connect to the ReportWriter context
+  const messagesEndRef = useRef(null);
+  
+  // Get everything from the context
   const {
     currentReport,
     reportType,
     formData,
-    sessionId,  // Add this
-    clearReport
+    sessionId,
+    clearReport,
+    
+    // State from context
+    selectedReport,
+    chatMessages,
+    chatInput,
+    isAiLoading,
+    sources,
+    showActionsMenu,
+    
+    // Methods from context
+    setSelectedReport,
+    setChatMessages,
+    addChatMessage,
+    setChatInput,
+    setAiLoading,
+    setSources,
+    setShowActionsMenu,
+    
+    // Add this line to include updateFormData
+    updateFormData
   } = useReportWriter();
-  //  
-  const [selectedReport, setSelectedReport] = useState('');
-  // const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState(null);
-  const [sources, setSources] = useState([]);
-  const [chatInput, setChatInput] = useState('');
-  const [isAiLoading, setIsAiLoading] = useState(false);
-  const messagesEndRef = useRef(null);
-  const [chatMessages, setChatMessages] = useState([
-    {
-      role: 'ai',
-      content: "Welcome to the RLC report writing assistant. I'm an AI designed to help you complete reports more quickly. I won't write anything for you, but I will help you quickly repackage your thoughts into well-structured reports. You have a few options to get started:\n\n1. You can fill in the report on screen.\n2. You can chat with me and give me instructions to fill it in.\n3. You can use the voice assistant and tell me everything you know about this report; then I will organize the information.\n\nAt the very end you can click \"Evaluate Report\" and I can help guide you on any missing information. You can also check your report against older reports from other projects by clicking \"Check Archive\"."
-    }
-  ]);
+//
 
   // FEEDBACK - Add feedback state variables
   const [feedbackMessageId, setFeedbackMessageId] = useState(null);
@@ -125,6 +180,44 @@ const ReportWriter = () => {
   
   // Handle report type selection
 // Update the handleReportSelect function
+// const handleReportSelect = (e) => {
+//   const newReportType = e.target.value;
+  
+//   // Only reset if the selection has changed (not on initial selection)
+//   if (selectedReport && newReportType !== selectedReport) {
+//     // Clear all form fields by resetting the form
+//     const formContainer = document.getElementById('report-form-container');
+//     if (formContainer) {
+//       const inputs = formContainer.querySelectorAll('input, textarea, select');
+//       inputs.forEach(input => {
+//         input.value = '';
+//       });
+      
+//       // For selects, reset to first option
+//       const selects = formContainer.querySelectorAll('select');
+//       selects.forEach(select => {
+//         if (select.options.length > 0) {
+//           select.selectedIndex = 0;
+//         }
+//       });
+//     }
+    
+//     // Reset chat messages to just the welcome message
+//     setChatMessages([
+//       {
+//         role: 'ai',
+//         content: "Welcome to the RLC report writing assistant. I'm an AI designed to help you complete reports more quickly. I won't write anything for you, but I will help you quickly repackage your thoughts into well-structured reports. You have a few options to get started:\n\n1. You can fill in the report on screen.\n2. You can chat with me and give me instructions to fill it in.\n3. You can use the voice assistant and tell me everything you know about this report; then I will organize the information.\n\nAt the very end you can click \"Evaluate Report\" and I can help guide you on any missing information. You can also check your report against older reports from other projects by clicking \"Check Archive\"."
+//       },
+//       {
+//         role: 'ai',
+//         content: `You've switched to a new ${newReportType === 'knowledge_gap' ? 'Knowledge Gap' : 'Key Decision'} report. All previous information has been cleared.`
+//       }
+//     ]);
+//   }
+  
+//   // Update the selected report type
+//   setSelectedReport(newReportType);
+// };
 const handleReportSelect = (e) => {
   const newReportType = e.target.value;
   
@@ -165,16 +258,69 @@ const handleReportSelect = (e) => {
 };
   
   // Handle chat submission
+  // const handleChatSubmit = async () => {
+  //   if (!chatInput.trim()) return;
+    
+  //   // Add user message to chat
+  //   const userMessage = { role: 'user', content: chatInput };
+  //   setChatMessages(prev => [...prev, userMessage]);
+    
+  //   // Clear input and show loading state
+  //   setChatInput('');
+  //   setIsAiLoading(true);
+    
+  //   try {
+  //     // Get report context
+  //     const reportContext = getReportFieldValues();
+      
+  //     let response;
+      
+  //     // Use the appropriate service based on report type
+  //     if (selectedReport === 'knowledge_gap') {
+  //       response = await reportAiService.processKGMessage(
+  //         userMessage.content,
+  //         null, // No report ID since we're not using the database
+  //         reportContext,
+  //         selectedModel,
+  //         sessionId // Make sure you're passing the sessionId here
+  //       );
+  //     } else if (selectedReport === 'key_decision') {
+  //       response = await reportAiService.processKDMessage(
+  //         userMessage.content,
+  //         null, // No report ID
+  //         reportContext,
+  //         selectedModel,
+  //         sessionId // Make sure you're passing the sessionId here
+  //       );
+  //     } else {
+  //       throw new Error("Please select a report type first.");
+  //     }
+      
+  //     // Add AI response
+  //     setChatMessages(prev => [...prev, {
+  //       role: 'ai',
+  //       content: response.answer || response.error || "Sorry, I couldn't process your request."
+  //     }]);
+  //   } catch (err) {
+  //     console.error('Error from AI:', err);
+  //     setChatMessages(prev => [...prev, {
+  //       role: 'ai',
+  //       content: err.message || "Sorry, there was an error processing your request. Please try again."
+  //     }]);
+  //   } finally {
+  //     setIsAiLoading(false);
+  //   }
+  // };
   const handleChatSubmit = async () => {
     if (!chatInput.trim()) return;
     
     // Add user message to chat
     const userMessage = { role: 'user', content: chatInput };
-    setChatMessages(prev => [...prev, userMessage]);
+    addChatMessage(userMessage); // Use context method instead of setChatMessages
     
     // Clear input and show loading state
     setChatInput('');
-    setIsAiLoading(true);
+    setAiLoading(true); // Use context method instead of setIsAiLoading
     
     try {
       // Get report context
@@ -204,18 +350,18 @@ const handleReportSelect = (e) => {
       }
       
       // Add AI response
-      setChatMessages(prev => [...prev, {
+      addChatMessage({
         role: 'ai',
         content: response.answer || response.error || "Sorry, I couldn't process your request."
-      }]);
+      });
     } catch (err) {
       console.error('Error from AI:', err);
-      setChatMessages(prev => [...prev, {
+      addChatMessage({
         role: 'ai',
         content: err.message || "Sorry, there was an error processing your request. Please try again."
-      }]);
+      });
     } finally {
-      setIsAiLoading(false);
+      setAiLoading(false); // Use context method
     }
   };
   
@@ -401,6 +547,111 @@ const startVoiceInput = () => {
 // };
   
   // Render Key Decision report template
+  // const renderKeyDecisionReport = () => {
+  //   return (
+  //     <div className="template-grid" style={{
+  //       gridTemplateAreas: `
+  //         'bannerLeft  bannerRight'
+  //         'kdBox       learned'
+  //         'purpose     learned'
+  //         'doneBox     recBox'
+  //       `
+  //     }}>
+  //       <div className="banner-left banner-left-kd" style={{ gridArea: 'bannerLeft' }}>
+  //         <strong>Key Decision:</strong><br/>
+  //         <input 
+  //           type="text" 
+  //           className="field-kd-title"
+  //           // placeholder="Key Decision Title..." 
+  //           style={{width:'80%', marginBottom: '5px'}}
+  //         /><br/>
+  //         Owner: <input 
+  //           type="text" 
+  //           className="field-kd-owner" 
+  //           style={{width:'120px'}}
+  //         /><br/>
+  //         Decision Maker: <input 
+  //           type="text" 
+  //           className="field-kd-decision-maker" 
+  //           style={{width:'120px'}}
+  //         /><br/>
+  //         Integration Event: <input 
+  //           type="text" 
+  //           className="field-kd-integration-event-id" 
+  //           style={{width:'120px'}}
+  //         /><br/>
+  //         Sequence: <input 
+  //           type="text"
+  //           className="field-kd-sequence"
+  //           style={{width:'60px'}}
+  //           // placeholder="##"
+  //         />
+  //       </div>
+  //       <div className="banner-right banner-right-kd" style={{ gridArea: 'bannerRight' }}>
+  //         <strong>Project Name </strong><br/>
+  //         <input 
+  //           type="text" 
+  //           className="field-kd-project-name" 
+  //           style={{width:'90%', height:'3px'}}
+  //           //placeholder="Project Name"
+  //         /><br/>
+  //         Key Decision: <input 
+  //           type="text" 
+  //           className="field-kd-number" 
+  //           style={{width:'60px', height:'3px'}}
+  //           // placeholder="##"
+  //         /><br/>
+  //         Status: 
+  //         <select className="field-kd-status" style={{width: '100px', marginTop: '4px'}}>
+  //           <option value="draft">Draft</option>
+  //           <option value="in_progress">In Progress</option>
+  //           <option value="resolved">Resolved</option>
+  //           <option value="completed">Completed</option>
+  //         </select>
+  //       </div>
+  //       <div className="template-box" style={{ gridArea: 'kdBox' }}>
+  //         <h4>The Key Decision</h4>
+  //         <textarea 
+  //           className="field-kd-description"
+  //           // placeholder="Describe the key decision to be made..."
+  //         ></textarea>
+  //       </div>
+  //       <div className="template-box" style={{ gridArea: 'purpose' }}>
+  //         <h4>The Purpose</h4>
+  //         {/* <p style={{fontSize:'0.9em'}}>(link back to the project's Objectives)</p> */}
+  //         <textarea 
+  //           className="field-kd-purpose"
+  //           // placeholder="Explain why this decision is important..."
+  //         ></textarea>
+  //       </div>
+  //       <div className="template-box template-large" style={{ gridArea: 'learned' }}>
+  //         <h4>What We Have Learned – summary of all Knowledge Gaps</h4>
+  //         <textarea 
+  //           className="field-kd-what-we-have-learned" 
+  //           style={{height:'120px'}}
+  //           // placeholder="Summarize what has been learned from knowledge gaps..."
+  //         ></textarea>
+  //       </div>
+  //       <div className="template-box template-large" style={{ gridArea: 'doneBox' }}>
+  //         <h4>What We Have Done</h4>
+  //         {/* <p style={{fontSize:'0.9em'}}>summary of work to close knowledge gaps and build stakeholder alignment</p> */}
+  //         <textarea 
+  //           className="field-kd-what-we-have-done" 
+  //           style={{height:'120px'}}
+  //           // placeholder="Describe what has been done so far..."
+  //         ></textarea>
+  //       </div>
+  //       <div className="template-box template-large" style={{ gridArea: 'recBox' }}>
+  //         <h4>What We Recommend / What We Have Decided</h4>
+  //         <textarea 
+  //           className="field-kd-recommendations" 
+  //           style={{height:'80px'}}
+  //           // placeholder="Document the recommendation or decision..."
+  //         ></textarea>
+  //       </div>
+  //     </div>
+  //   );
+  // };
   const renderKeyDecisionReport = () => {
     return (
       <div className="template-grid" style={{
@@ -413,50 +664,65 @@ const startVoiceInput = () => {
       }}>
         <div className="banner-left banner-left-kd" style={{ gridArea: 'bannerLeft' }}>
           <strong>Key Decision:</strong><br/>
-          <input 
-            type="text" 
+          <input
+            type="text"
             className="field-kd-title"
-            // placeholder="Key Decision Title..." 
+            value={formData.title || ''}
+            onChange={(e) => updateFormData({title: e.target.value})}
             style={{width:'80%', marginBottom: '5px'}}
           /><br/>
-          Owner: <input 
-            type="text" 
-            className="field-kd-owner" 
+          Owner: <input
+            type="text"
+            className="field-kd-owner"
+            value={formData.owner || ''}
+            onChange={(e) => updateFormData({owner: e.target.value})}
             style={{width:'120px'}}
           /><br/>
-          Decision Maker: <input 
-            type="text" 
-            className="field-kd-decision-maker" 
+          Decision Maker: <input
+            type="text"
+            className="field-kd-decision-maker"
+            value={formData.decision_maker || ''}
+            onChange={(e) => updateFormData({decision_maker: e.target.value})}
             style={{width:'120px'}}
           /><br/>
-          Integration Event: <input 
-            type="text" 
-            className="field-kd-integration-event-id" 
+          Integration Event: <input
+            type="text"
+            className="field-kd-integration-event-id"
+            value={formData.integration_event_id || ''}
+            onChange={(e) => updateFormData({integration_event_id: e.target.value})}
             style={{width:'120px'}}
           /><br/>
-          Sequence: <input 
+          Sequence: <input
             type="text"
             className="field-kd-sequence"
+            value={formData.sequence || ''}
+            onChange={(e) => updateFormData({sequence: e.target.value})}
             style={{width:'60px'}}
-            // placeholder="##"
           />
         </div>
         <div className="banner-right banner-right-kd" style={{ gridArea: 'bannerRight' }}>
           <strong>Project Name </strong><br/>
-          <input 
-            type="text" 
-            className="field-kd-project-name" 
+          <input
+            type="text"
+            className="field-kd-project-name"
+            value={formData.project_name || ''}
+            onChange={(e) => updateFormData({project_name: e.target.value})}
             style={{width:'90%', height:'3px'}}
-            //placeholder="Project Name"
           /><br/>
-          Key Decision: <input 
-            type="text" 
-            className="field-kd-number" 
+          Key Decision: <input
+            type="text"
+            className="field-kd-number"
+            value={formData.kd_number || ''}
+            onChange={(e) => updateFormData({kd_number: e.target.value})}
             style={{width:'60px', height:'3px'}}
-            // placeholder="##"
           /><br/>
-          Status: 
-          <select className="field-kd-status" style={{width: '100px', marginTop: '4px'}}>
+          Status:
+          <select 
+            className="field-kd-status" 
+            value={formData.status || 'draft'}
+            onChange={(e) => updateFormData({status: e.target.value})}
+            style={{width: '100px', marginTop: '4px'}}
+          >
             <option value="draft">Draft</option>
             <option value="in_progress">In Progress</option>
             <option value="resolved">Resolved</option>
@@ -465,42 +731,45 @@ const startVoiceInput = () => {
         </div>
         <div className="template-box" style={{ gridArea: 'kdBox' }}>
           <h4>The Key Decision</h4>
-          <textarea 
+          <textarea
             className="field-kd-description"
-            // placeholder="Describe the key decision to be made..."
+            value={formData.description || ''}
+            onChange={(e) => updateFormData({description: e.target.value})}
           ></textarea>
         </div>
         <div className="template-box" style={{ gridArea: 'purpose' }}>
           <h4>The Purpose</h4>
-          {/* <p style={{fontSize:'0.9em'}}>(link back to the project's Objectives)</p> */}
-          <textarea 
+          <textarea
             className="field-kd-purpose"
-            // placeholder="Explain why this decision is important..."
+            value={formData.purpose || ''}
+            onChange={(e) => updateFormData({purpose: e.target.value})}
           ></textarea>
         </div>
         <div className="template-box template-large" style={{ gridArea: 'learned' }}>
           <h4>What We Have Learned – summary of all Knowledge Gaps</h4>
-          <textarea 
-            className="field-kd-what-we-have-learned" 
+          <textarea
+            className="field-kd-what-we-have-learned"
+            value={formData.what_we_have_learned || ''}
+            onChange={(e) => updateFormData({what_we_have_learned: e.target.value})}
             style={{height:'120px'}}
-            // placeholder="Summarize what has been learned from knowledge gaps..."
           ></textarea>
         </div>
         <div className="template-box template-large" style={{ gridArea: 'doneBox' }}>
           <h4>What We Have Done</h4>
-          {/* <p style={{fontSize:'0.9em'}}>summary of work to close knowledge gaps and build stakeholder alignment</p> */}
-          <textarea 
-            className="field-kd-what-we-have-done" 
+          <textarea
+            className="field-kd-what-we-have-done"
+            value={formData.what_we_have_done || ''}
+            onChange={(e) => updateFormData({what_we_have_done: e.target.value})}
             style={{height:'120px'}}
-            // placeholder="Describe what has been done so far..."
           ></textarea>
         </div>
         <div className="template-box template-large" style={{ gridArea: 'recBox' }}>
           <h4>What We Recommend / What We Have Decided</h4>
-          <textarea 
-            className="field-kd-recommendations" 
+          <textarea
+            className="field-kd-recommendations"
+            value={formData.recommendations || ''}
+            onChange={(e) => updateFormData({recommendations: e.target.value})}
             style={{height:'80px'}}
-            // placeholder="Document the recommendation or decision..."
           ></textarea>
         </div>
       </div>
@@ -508,6 +777,112 @@ const startVoiceInput = () => {
   };
   
   // Render Knowledge Gap report template
+  // const renderKnowledgeGapReport = () => {
+  //   return (
+  //     <div className="template-grid" style={{
+  //       gridTemplateAreas: `
+  //         'bannerLeft bannerRight'
+  //         'question   learned'
+  //         'purpose    learned'
+  //         'doneBox    recBox'
+  //       `
+  //     }}>
+  //       <div className="banner-left" style={{ gridArea: 'bannerLeft' }}>
+  //         <strong>Knowledge Gap: </strong>
+  //         <input 
+  //           type="text" 
+  //           className="field-title"
+  //           // placeholder="KG Title..." 
+  //           style={{width:'80%'}}
+  //         /><br/>
+  //         Owner: <input 
+  //           type="text" 
+  //           className="field-owner"
+  //           style={{width:'150px'}}
+  //         /><br/>
+  //         Contributors: <input 
+  //           type="text" 
+  //           className="field-contributors"
+  //           style={{width:'200px'}}
+  //           // placeholder="Comma separated names"
+  //         /><br/>
+  //         Learning Cycle: <input 
+  //           type="text" 
+  //           className="field-learning_cycle"
+  //           style={{width:'100px'}}
+  //         /><br/>
+  //         Sequence: <input 
+  //           type="text"
+  //           className="field-sequence"
+  //           style={{width:'60px'}}
+  //           // placeholder="##"
+  //         />
+  //       </div>
+  //       <div className="banner-right" style={{ gridArea: 'bannerRight' }}>
+  //         <strong>Project Name: </strong><br/>
+  //         <input 
+  //           type="text" 
+  //           className="field-project-name" 
+  //           style={{width:'90%', height:'3px'}}
+  //           // placeholder="Project Name"
+  //         /><br/>
+  //         Knowledge Gap <input 
+  //           type="text" 
+  //           className="field-kg-number" 
+  //           style={{width:'60px', height:'3px'}}
+  //           // placeholder="##"
+  //         /><br/>
+  //         Status: 
+  //         <select className="field-status" style={{width: '100px', marginTop: '4px'}}>
+  //           <option value="in_progress">In Progress</option>
+  //           <option value="completed">Completed</option>
+  //           <option value="draft">Draft</option>
+  //         </select>
+  //       </div>
+  //       <div className="template-box" style={{ gridArea: 'question' }}>
+  //         <h4>The Question to Answer</h4>
+  //         <textarea 
+  //           className="field-description"
+  //           style={{height:'80px'}}
+  //           // placeholder="What question needs to be answered?"
+  //         ></textarea>
+  //       </div>
+  //       <div className="template-box template-large" style={{ gridArea: 'learned' }}>
+  //         <h4>What We Have Learned</h4>
+  //         <textarea 
+  //           className="field-what_we_have_learned"
+  //           style={{height:'120px'}}
+  //           // placeholder="Document what you have learned..."
+  //         ></textarea>
+  //       </div>
+  //       <div className="template-box" style={{ gridArea: 'purpose' }}>
+  //         <h4>The Purpose</h4>
+  //         {/* <p style={{fontSize:'0.9em'}}>(link back to the Knowledge Gap's Key Decision)</p> */}
+  //         <textarea 
+  //           className="field-purpose"
+  //           style={{height:'120px'}}
+  //           // placeholder="Explain why this knowledge gap matters..."
+  //         ></textarea>
+  //       </div>
+  //       <div className="template-box template-large" style={{ gridArea: 'doneBox' }}>
+  //         <h4>What We Have Done</h4>
+  //         <textarea 
+  //           className="field-what_we_have_done"
+  //           style={{height:'120px'}}
+  //           // placeholder="Describe what has been done to address this knowledge gap..."
+  //         ></textarea>
+  //       </div>
+  //       <div className="template-box template-large" style={{ gridArea: 'recBox' }}>
+  //         <h4>Recommendations and Next Steps</h4>
+  //         <textarea 
+  //           className="field-recommendations"
+  //           style={{height:'80px'}}
+  //           // placeholder="Provide recommendations based on what was learned..."
+  //         ></textarea>
+  //       </div>
+  //     </div>
+  //   );
+  // };
   const renderKnowledgeGapReport = () => {
     return (
       <div className="template-grid" style={{
@@ -520,51 +895,65 @@ const startVoiceInput = () => {
       }}>
         <div className="banner-left" style={{ gridArea: 'bannerLeft' }}>
           <strong>Knowledge Gap: </strong>
-          <input 
-            type="text" 
+          <input
+            type="text"
             className="field-title"
-            // placeholder="KG Title..." 
+            value={formData.title || ''}
+            onChange={(e) => updateFormData({title: e.target.value})}
             style={{width:'80%'}}
           /><br/>
-          Owner: <input 
-            type="text" 
+          Owner: <input
+            type="text"
             className="field-owner"
+            value={formData.owner || ''}
+            onChange={(e) => updateFormData({owner: e.target.value})}
             style={{width:'150px'}}
           /><br/>
-          Contributors: <input 
-            type="text" 
+          Contributors: <input
+            type="text"
             className="field-contributors"
+            value={formData.contributors || ''}
+            onChange={(e) => updateFormData({contributors: e.target.value})}
             style={{width:'200px'}}
-            // placeholder="Comma separated names"
           /><br/>
-          Learning Cycle: <input 
-            type="text" 
+          Learning Cycle: <input
+            type="text"
             className="field-learning_cycle"
+            value={formData.learning_cycle || ''}
+            onChange={(e) => updateFormData({learning_cycle: e.target.value})}
             style={{width:'100px'}}
           /><br/>
-          Sequence: <input 
+          Sequence: <input
             type="text"
             className="field-sequence"
+            value={formData.sequence || ''}
+            onChange={(e) => updateFormData({sequence: e.target.value})}
             style={{width:'60px'}}
-            // placeholder="##"
           />
         </div>
         <div className="banner-right" style={{ gridArea: 'bannerRight' }}>
           <strong>Project Name: </strong><br/>
-          <input 
-            type="text" 
-            className="field-project-name" 
+          <input
+            type="text"
+            className="field-project-name"
+            value={formData.project_name || ''}
+            onChange={(e) => updateFormData({project_name: e.target.value})}
             style={{width:'90%', height:'3px'}}
-            // placeholder="Project Name"
           /><br/>
-          Knowledge Gap <input 
-            type="text" 
-            className="field-kg-number" 
+          Knowledge Gap <input
+            type="text"
+            className="field-kg-number"
+            value={formData.kg_number || ''}
+            onChange={(e) => updateFormData({kg_number: e.target.value})}
             style={{width:'60px', height:'3px'}}
-            // placeholder="##"
           /><br/>
-          Status: 
-          <select className="field-status" style={{width: '100px', marginTop: '4px'}}>
+          Status:
+          <select 
+            className="field-status" 
+            value={formData.status || 'in_progress'}
+            onChange={(e) => updateFormData({status: e.target.value})}
+            style={{width: '100px', marginTop: '4px'}}
+          >
             <option value="in_progress">In Progress</option>
             <option value="completed">Completed</option>
             <option value="draft">Draft</option>
@@ -572,43 +961,47 @@ const startVoiceInput = () => {
         </div>
         <div className="template-box" style={{ gridArea: 'question' }}>
           <h4>The Question to Answer</h4>
-          <textarea 
+          <textarea
             className="field-description"
+            value={formData.description || ''}
+            onChange={(e) => updateFormData({description: e.target.value})}
             style={{height:'80px'}}
-            // placeholder="What question needs to be answered?"
           ></textarea>
         </div>
         <div className="template-box template-large" style={{ gridArea: 'learned' }}>
           <h4>What We Have Learned</h4>
-          <textarea 
+          <textarea
             className="field-what_we_have_learned"
+            value={formData.what_we_have_learned || ''}
+            onChange={(e) => updateFormData({what_we_have_learned: e.target.value})}
             style={{height:'120px'}}
-            // placeholder="Document what you have learned..."
           ></textarea>
         </div>
         <div className="template-box" style={{ gridArea: 'purpose' }}>
           <h4>The Purpose</h4>
-          {/* <p style={{fontSize:'0.9em'}}>(link back to the Knowledge Gap's Key Decision)</p> */}
-          <textarea 
+          <textarea
             className="field-purpose"
+            value={formData.purpose || ''}
+            onChange={(e) => updateFormData({purpose: e.target.value})}
             style={{height:'120px'}}
-            // placeholder="Explain why this knowledge gap matters..."
           ></textarea>
         </div>
         <div className="template-box template-large" style={{ gridArea: 'doneBox' }}>
           <h4>What We Have Done</h4>
-          <textarea 
+          <textarea
             className="field-what_we_have_done"
+            value={formData.what_we_have_done || ''}
+            onChange={(e) => updateFormData({what_we_have_done: e.target.value})}
             style={{height:'120px'}}
-            // placeholder="Describe what has been done to address this knowledge gap..."
           ></textarea>
         </div>
         <div className="template-box template-large" style={{ gridArea: 'recBox' }}>
           <h4>Recommendations and Next Steps</h4>
-          <textarea 
+          <textarea
             className="field-recommendations"
+            value={formData.recommendations || ''}
+            onChange={(e) => updateFormData({recommendations: e.target.value})}
             style={{height:'80px'}}
-            // placeholder="Provide recommendations based on what was learned..."
           ></textarea>
         </div>
       </div>
@@ -1280,32 +1673,102 @@ const formatMessage = (text) => {
     }
   };
 
+  // const checkReportArchive = async () => {
+  //   if (!selectedReport) {
+  //     setChatMessages(prev => [...prev, {
+  //       role: 'ai',
+  //       content: "Please select a report type first."
+  //     }]);
+  //     return;
+  //   }
+    
+  //   // Add user message to chat
+  //   setChatMessages(prev => [...prev, {
+  //     role: 'user',
+  //     content: "Check Archive"
+  //   }]);
+    
+  //   // Add a loading message
+  //   setChatMessages(prev => [...prev, {
+  //     role: 'ai',
+  //     content: "Searching archive for relevant documents...",
+  //     isLoading: true
+  //   }]);
+    
+  //   // Clear the sources list
+  //   setSources([]);
+    
+  //   setIsAiLoading(true);
+    
+  //   try {
+  //     // Get report context (all field values)
+  //     const reportData = getReportFieldValues();
+      
+  //     // Determine the report type
+  //     const reportType = selectedReport === 'knowledge_gap' ? 'kg' : 'kd';
+      
+  //     // Call the check archive service
+  //     const result = await reportAiService.checkArchive(reportData, reportType, selectedModel);
+      
+  //     // Remove the loading message and add the real response
+  //     setChatMessages(prev => {
+  //       const filteredMessages = prev.filter(msg => !msg.isLoading);
+  //       return [
+  //         ...filteredMessages,
+  //         {
+  //           role: 'ai',
+  //           content: result.ai_response || "I couldn't find any relevant documents in our archive."
+  //         }
+  //       ];
+  //     });
+      
+  //     // Update the sources state if we found any documents
+  //     if (result.document_metadata && result.document_metadata.length > 0) {
+  //       setSources(result.document_metadata);
+  //     }
+  //   } catch (err) {
+  //     console.error('Error checking archive:', err);
+      
+  //     // Remove the loading message and add the error message
+  //     setChatMessages(prev => {
+  //       const filteredMessages = prev.filter(msg => !msg.isLoading);
+  //       return [
+  //         ...filteredMessages,
+  //         {
+  //           role: 'ai',
+  //           content: "Sorry, there was an error searching the archive. Please try again later."
+  //         }
+  //       ];
+  //     });
+  //   } finally {
+  //     setIsAiLoading(false);
+  //   }
+  // };
   const checkReportArchive = async () => {
     if (!selectedReport) {
-      setChatMessages(prev => [...prev, {
+      addChatMessage({
         role: 'ai',
         content: "Please select a report type first."
-      }]);
+      });
       return;
     }
     
     // Add user message to chat
-    setChatMessages(prev => [...prev, {
+    addChatMessage({
       role: 'user',
       content: "Check Archive"
-    }]);
+    });
     
     // Add a loading message
-    setChatMessages(prev => [...prev, {
+    addChatMessage({
       role: 'ai',
       content: "Searching archive for relevant documents...",
       isLoading: true
-    }]);
+    });
     
     // Clear the sources list
     setSources([]);
-    
-    setIsAiLoading(true);
+    setAiLoading(true);
     
     try {
       // Get report context (all field values)
@@ -1318,16 +1781,15 @@ const formatMessage = (text) => {
       const result = await reportAiService.checkArchive(reportData, reportType, selectedModel);
       
       // Remove the loading message and add the real response
-      setChatMessages(prev => {
-        const filteredMessages = prev.filter(msg => !msg.isLoading);
-        return [
-          ...filteredMessages,
-          {
-            role: 'ai',
-            content: result.ai_response || "I couldn't find any relevant documents in our archive."
-          }
-        ];
-      });
+      // We need to get current messages from context first
+      const filteredMessages = chatMessages.filter(msg => !msg.isLoading);
+      setChatMessages([
+        ...filteredMessages,
+        {
+          role: 'ai',
+          content: result.ai_response || "I couldn't find any relevant documents in our archive."
+        }
+      ]);
       
       // Update the sources state if we found any documents
       if (result.document_metadata && result.document_metadata.length > 0) {
@@ -1337,37 +1799,83 @@ const formatMessage = (text) => {
       console.error('Error checking archive:', err);
       
       // Remove the loading message and add the error message
-      setChatMessages(prev => {
-        const filteredMessages = prev.filter(msg => !msg.isLoading);
-        return [
-          ...filteredMessages,
-          {
-            role: 'ai',
-            content: "Sorry, there was an error searching the archive. Please try again later."
-          }
-        ];
-      });
+      const filteredMessages = chatMessages.filter(msg => !msg.isLoading);
+      setChatMessages([
+        ...filteredMessages,
+        {
+          role: 'ai',
+          content: "Sorry, there was an error searching the archive. Please try again later."
+        }
+      ]);
     } finally {
-      setIsAiLoading(false);
+      setAiLoading(false);
     }
   };
   
   // Function to evaluate the report using AI
+  // const evaluateReport = async () => {
+  //   if (!selectedReport) {
+  //     setChatMessages(prev => [...prev, {
+  //       role: 'ai',
+  //       content: "Please select a report to evaluate first."
+  //     }]);
+  //     return;
+  //   }
+    
+  //   setChatMessages(prev => [...prev, {
+  //     role: 'user',
+  //     content: "Evaluate this report."
+  //   }]);
+    
+  //   setIsAiLoading(true);
+    
+  //   try {
+  //     // Get all report field values
+  //     const reportData = getReportFieldValues();
+      
+  //     // Add debugging logs
+  //     console.log("Report data being sent to AI:", reportData);
+  //     console.log("Form elements found:", document.querySelectorAll('#report-form-container input, #report-form-container textarea').length);
+      
+  //     let response;
+      
+  //     // Use the appropriate service based on report type
+  //     if (selectedReport === 'knowledge_gap') {
+  //       response = await reportAiService.evaluateKGReport(reportData, selectedModel);
+  //     } else if (selectedReport === 'key_decision') {
+  //       response = await reportAiService.evaluateKDReport(reportData, selectedModel);
+  //     }
+      
+  //     // Add AI response
+  //     setChatMessages(prev => [...prev, {
+  //       role: 'ai',
+  //       content: response.evaluation || response.error || "I couldn't evaluate the report."
+  //     }]);
+  //   } catch (err) {
+  //     console.error('Error evaluating report:', err);
+  //     setChatMessages(prev => [...prev, {
+  //       role: 'ai',
+  //       content: err.message || "Sorry, there was an error evaluating your report. Please try again."
+  //     }]);
+  //   } finally {
+  //     setIsAiLoading(false);
+  //   }
+  // };
   const evaluateReport = async () => {
     if (!selectedReport) {
-      setChatMessages(prev => [...prev, {
+      addChatMessage({
         role: 'ai',
         content: "Please select a report to evaluate first."
-      }]);
+      });
       return;
     }
     
-    setChatMessages(prev => [...prev, {
+    addChatMessage({
       role: 'user',
       content: "Evaluate this report."
-    }]);
+    });
     
-    setIsAiLoading(true);
+    setAiLoading(true);
     
     try {
       // Get all report field values
@@ -1387,73 +1895,77 @@ const formatMessage = (text) => {
       }
       
       // Add AI response
-      setChatMessages(prev => [...prev, {
+      addChatMessage({
         role: 'ai',
         content: response.evaluation || response.error || "I couldn't evaluate the report."
-      }]);
+      });
     } catch (err) {
       console.error('Error evaluating report:', err);
-      setChatMessages(prev => [...prev, {
+      addChatMessage({
         role: 'ai',
         content: err.message || "Sorry, there was an error evaluating your report. Please try again."
-      }]);
+      });
     } finally {
-      setIsAiLoading(false);
+      setAiLoading(false);
     }
   };
 
   // Get values from all form fields
+  // const getReportFieldValues = () => {
+  //   const formContainer = document.getElementById('report-form-container');
+  //   if (!formContainer) return {};
+    
+  //   const fields = {};
+    
+  //   // Helper function to get field value by class name
+  //   const getFieldValue = (className) => {
+  //     const element = formContainer.querySelector(`.${className}`);
+  //     return element ? element.value : '';
+  //   };
+    
+  //   if (selectedReport === 'knowledge_gap') {
+  //     // For KG reports, collect all fields by their class names
+  //     fields.title = getFieldValue('field-title');
+  //     fields.owner = getFieldValue('field-owner');
+  //     fields.contributors = getFieldValue('field-contributors');
+  //     fields.learning_cycle = getFieldValue('field-learning_cycle');
+  //     fields.sequence = getFieldValue('field-sequence');
+  //     fields.status = getFieldValue('field-status');
+      
+  //     // Main content fields
+  //     fields.description = getFieldValue('field-description');
+  //     fields.purpose = getFieldValue('field-purpose');
+  //     fields.what_we_have_learned = getFieldValue('field-what_we_have_learned');
+  //     fields.what_we_have_done = getFieldValue('field-what_we_have_done');
+  //     fields.recommendations = getFieldValue('field-recommendations');
+  //     fields.project_name = getFieldValue('field-project-name');
+  //     fields.kg_number = getFieldValue('field-kg-number');
+      
+  //   } else if (selectedReport === 'key_decision') {
+  //     // For KD reports, use the specific class names
+  //     fields.title = getFieldValue('field-kd-title');
+  //     fields.owner = getFieldValue('field-kd-owner');
+  //     fields.decision_maker = getFieldValue('field-kd-decision-maker');
+  //     fields.integration_event_id = getFieldValue('field-kd-integration-event-id');
+  //     fields.sequence = getFieldValue('field-kd-sequence');
+  //     fields.status = getFieldValue('field-kd-status');
+      
+  //     // Main content fields
+  //     fields.description = getFieldValue('field-kd-description');
+  //     fields.purpose = getFieldValue('field-kd-purpose');
+  //     fields.what_we_have_learned = getFieldValue('field-kd-what-we-have-learned');
+  //     fields.what_we_have_done = getFieldValue('field-kd-what-we-have-done');
+  //     fields.recommendations = getFieldValue('field-kd-recommendations');
+  //     fields.project_name = getFieldValue('field-kd-project-name');
+  //     fields.kd_number = getFieldValue('field-kd-number');
+  //   }
+    
+  //   console.log("Collected fields for evaluation:", fields);
+  //   return fields;
+  // };
   const getReportFieldValues = () => {
-    const formContainer = document.getElementById('report-form-container');
-    if (!formContainer) return {};
-    
-    const fields = {};
-    
-    // Helper function to get field value by class name
-    const getFieldValue = (className) => {
-      const element = formContainer.querySelector(`.${className}`);
-      return element ? element.value : '';
-    };
-    
-    if (selectedReport === 'knowledge_gap') {
-      // For KG reports, collect all fields by their class names
-      fields.title = getFieldValue('field-title');
-      fields.owner = getFieldValue('field-owner');
-      fields.contributors = getFieldValue('field-contributors');
-      fields.learning_cycle = getFieldValue('field-learning_cycle');
-      fields.sequence = getFieldValue('field-sequence');
-      fields.status = getFieldValue('field-status');
-      
-      // Main content fields
-      fields.description = getFieldValue('field-description');
-      fields.purpose = getFieldValue('field-purpose');
-      fields.what_we_have_learned = getFieldValue('field-what_we_have_learned');
-      fields.what_we_have_done = getFieldValue('field-what_we_have_done');
-      fields.recommendations = getFieldValue('field-recommendations');
-      fields.project_name = getFieldValue('field-project-name');
-      fields.kg_number = getFieldValue('field-kg-number');
-      
-    } else if (selectedReport === 'key_decision') {
-      // For KD reports, use the specific class names
-      fields.title = getFieldValue('field-kd-title');
-      fields.owner = getFieldValue('field-kd-owner');
-      fields.decision_maker = getFieldValue('field-kd-decision-maker');
-      fields.integration_event_id = getFieldValue('field-kd-integration-event-id');
-      fields.sequence = getFieldValue('field-kd-sequence');
-      fields.status = getFieldValue('field-kd-status');
-      
-      // Main content fields
-      fields.description = getFieldValue('field-kd-description');
-      fields.purpose = getFieldValue('field-kd-purpose');
-      fields.what_we_have_learned = getFieldValue('field-kd-what-we-have-learned');
-      fields.what_we_have_done = getFieldValue('field-kd-what-we-have-done');
-      fields.recommendations = getFieldValue('field-kd-recommendations');
-      fields.project_name = getFieldValue('field-kd-project-name');
-      fields.kd_number = getFieldValue('field-kd-number');
-    }
-    
-    console.log("Collected fields for evaluation:", fields);
-    return fields;
+    // No need to query the DOM anymore; simply return the formData from context
+    return formData;
   };
   
   // Add this function to the ReportWriter component
@@ -1553,6 +2065,55 @@ const formatMessage = (text) => {
 
   // CLEAR CONVERSATION MEMORY
   // Add the new handler function for creating a new report
+  // const handleNewReport = async () => {
+  //   try {
+  //     // First clear the local state using the context method
+  //     clearReport();
+      
+  //     // Reset chat messages to just the welcome message
+  //     setChatMessages([
+  //       {
+  //         role: 'ai',
+  //         content: "Welcome to the RLC report writing assistant. I'm an AI designed to help you complete reports more quickly. I won't write anything for you, but I will help you quickly repackage your thoughts into well-structured reports. You have a few options to get started:\n\n1. You can fill in the report on screen.\n2. You can chat with me and give me instructions to fill it in.\n3. You can use the voice assistant and tell me everything you know about this report; then I will organize the information.\n\nAt the very end you can click \"Evaluate Report\" and I can help guide you on any missing information. You can also check your report against older reports from other projects by clicking \"Check Archive\"."
+  //       },
+  //       {
+  //         role: 'ai',
+  //         content: `I've started a new report. Please select a report type and begin filling in the details.`
+  //       }
+  //     ]);
+      
+  //     // Clear any search results
+  //     setSources([]);
+      
+  //     // Reset selected report type
+  //     setSelectedReport('');
+      
+  //     // Then clear the backend session if needed
+  //     if (currentReport?.id) {
+  //       await reportAiService.clearReportSession(currentReport.id, reportType, sessionId);
+  //     }
+      
+  //     // Clear all form fields
+  //     const formContainer = document.getElementById('report-form-container');
+  //     if (formContainer) {
+  //       const inputs = formContainer.querySelectorAll('input, textarea, select');
+  //       inputs.forEach(input => {
+  //         input.value = '';
+  //       });
+        
+  //       // For selects, reset to first option
+  //       const selects = formContainer.querySelectorAll('select');
+  //       selects.forEach(select => {
+  //         if (select.options.length > 0) {
+  //           select.selectedIndex = 0;
+  //         }
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.warn('Failed to clear report session:', error);
+  //     // Don't block UI on backend errors
+  //   }
+  // };
   const handleNewReport = async () => {
     try {
       // First clear the local state using the context method

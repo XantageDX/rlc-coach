@@ -3,24 +3,51 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 // Create the context
 const ReportWriterContext = createContext();
 
-// Define the initial state
 const initialState = {
   currentReport: null,
   reportType: 'kg',  // 'kg' or 'kd'
-  sessionId: `report-session-${Date.now()}`, // Add this line
+  sessionId: `report-session-${Date.now()}`,
   formData: {
+    // Common fields that exist in both report types
     title: '',
     purpose: '',
     description: '',
     what_we_have_done: '',
     what_we_have_learned: '',
     recommendations: '',
-    status: 'draft'
+    status: 'draft',
+    
+    // Add these missing fields for both types
+    owner: '',
+    sequence: '',
+    project_name: '',
+    
+    // Knowledge Gap specific fields
+    contributors: '',
+    learning_cycle: '',
+    kg_number: '',
+    
+    // Key Decision specific fields
+    decision_maker: '',
+    integration_event_id: '',
+    kd_number: ''
   },
+  // Rest of initialState remains the same
   aiSuggestions: [],
   isLoading: false,
   error: null,
-  lastSaved: null
+  lastSaved: null,
+  selectedReport: '',
+  chatMessages: [
+    {
+      role: 'ai',
+      content: "Welcome to the RLC report writing assistant. I'm an AI designed to help you complete reports more quickly. I won't write anything for you, but I will help you quickly repackage your thoughts into well-structured reports. You have a few options to get started:\n\n1. You can fill in the report on screen.\n2. You can chat with me and give me instructions to fill it in.\n3. You can use the voice assistant and tell me everything you know about this report; then I will organize the information.\n\nAt the very end you can click \"Evaluate Report\" and I can help guide you on any missing information. You can also check your report against older reports from other projects by clicking \"Check Archive\"."
+    }
+  ],
+  chatInput: '',
+  isAiLoading: false,
+  sources: [],
+  showActionsMenu: false
 };
 
 // Define action types
@@ -34,7 +61,15 @@ const actionTypes = {
   SET_ERROR: 'SET_ERROR',
   MARK_SAVED: 'MARK_SAVED',
   CLEAR_REPORT: 'CLEAR_REPORT',
-  RESTORE_STATE: 'RESTORE_STATE'
+  RESTORE_STATE: 'RESTORE_STATE',
+  // New action types for conversation memory
+  SET_CHAT_MESSAGES: 'SET_CHAT_MESSAGES',
+  ADD_CHAT_MESSAGE: 'ADD_CHAT_MESSAGE',
+  SET_CHAT_INPUT: 'SET_CHAT_INPUT',
+  SET_SELECTED_REPORT: 'SET_SELECTED_REPORT',
+  SET_SOURCES: 'SET_SOURCES',
+  SET_AI_LOADING: 'SET_AI_LOADING',
+  SET_SHOW_ACTIONS_MENU: 'SET_SHOW_ACTIONS_MENU'
 };
 
 // Reducer function
@@ -71,6 +106,21 @@ const reportWriterReducer = (state, action) => {
       };
     case actionTypes.RESTORE_STATE:
       return { ...state, ...action.payload };
+    // Cases for conversation memory
+    case actionTypes.SET_CHAT_MESSAGES:
+      return { ...state, chatMessages: action.payload };
+    case actionTypes.ADD_CHAT_MESSAGE:
+      return { ...state, chatMessages: [...state.chatMessages, action.payload] };
+    case actionTypes.SET_CHAT_INPUT:
+      return { ...state, chatInput: action.payload };
+    case actionTypes.SET_SELECTED_REPORT:
+      return { ...state, selectedReport: action.payload };
+    case actionTypes.SET_SOURCES:
+      return { ...state, sources: action.payload };
+    case actionTypes.SET_AI_LOADING:
+      return { ...state, isAiLoading: action.payload };
+    case actionTypes.SET_SHOW_ACTIONS_MENU:
+      return { ...state, showActionsMenu: action.payload };
     default:
       return state;
   }
@@ -86,7 +136,13 @@ const saveStateToStorage = (state) => {
       currentReport: state.currentReport,
       reportType: state.reportType,
       formData: state.formData,
-      aiSuggestions: state.aiSuggestions
+      aiSuggestions: state.aiSuggestions,
+      // Save conversation memory state
+      selectedReport: state.selectedReport,
+      chatMessages: state.chatMessages,
+      chatInput: state.chatInput,
+      sources: state.sources
+      // Note: We don't save loading states or UI states like showActionsMenu
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
   } catch (error) {
@@ -122,9 +178,19 @@ export const ReportWriterProvider = ({ children }) => {
   // Save state to localStorage whenever relevant state changes
   useEffect(() => {
     saveStateToStorage(state);
-  }, [state.currentReport, state.reportType, state.formData, state.aiSuggestions]);
+  }, [
+    state.currentReport,
+    state.reportType,
+    state.formData,
+    state.aiSuggestions,
+    // Add conversation memory dependencies
+    state.selectedReport,
+    state.chatMessages,
+    state.chatInput,
+    state.sources
+  ]);
 
-  // Action creators
+  // Original action creators
   const setCurrentReport = (report) => {
     dispatch({ type: actionTypes.SET_CURRENT_REPORT, payload: report });
   };
@@ -169,9 +235,38 @@ export const ReportWriterProvider = ({ children }) => {
     });
   };
 
+  // New action creators for conversation memory
+  const setSelectedReport = (report) => {
+    dispatch({ type: actionTypes.SET_SELECTED_REPORT, payload: report });
+  };
+
+  const setChatMessages = (messages) => {
+    dispatch({ type: actionTypes.SET_CHAT_MESSAGES, payload: messages });
+  };
+
+  const addChatMessage = (message) => {
+    dispatch({ type: actionTypes.ADD_CHAT_MESSAGE, payload: message });
+  };
+
+  const setChatInput = (input) => {
+    dispatch({ type: actionTypes.SET_CHAT_INPUT, payload: input });
+  };
+
+  const setAiLoading = (loading) => {
+    dispatch({ type: actionTypes.SET_AI_LOADING, payload: loading });
+  };
+
+  const setSources = (sources) => {
+    dispatch({ type: actionTypes.SET_SOURCES, payload: sources });
+  };
+
+  const setShowActionsMenu = (show) => {
+    dispatch({ type: actionTypes.SET_SHOW_ACTIONS_MENU, payload: show });
+  };
+
   // Context value
   const value = {
-    // State
+    // Original state
     currentReport: state.currentReport,
     reportType: state.reportType,
     formData: state.formData,
@@ -179,8 +274,17 @@ export const ReportWriterProvider = ({ children }) => {
     isLoading: state.isLoading,
     error: state.error,
     lastSaved: state.lastSaved,
+    sessionId: state.sessionId,
     
-    // Actions
+    // New state for conversation memory
+    selectedReport: state.selectedReport,
+    chatMessages: state.chatMessages,
+    chatInput: state.chatInput,
+    isAiLoading: state.isAiLoading, 
+    sources: state.sources,
+    showActionsMenu: state.showActionsMenu,
+    
+    // Original actions
     setCurrentReport,
     setReportType,
     updateFormData,
@@ -189,7 +293,16 @@ export const ReportWriterProvider = ({ children }) => {
     setLoading,
     setError,
     markSaved,
-    clearReport
+    clearReport,
+    
+    // New actions for conversation memory
+    setSelectedReport,
+    setChatMessages,
+    addChatMessage,
+    setChatInput,
+    setAiLoading,
+    setSources,
+    setShowActionsMenu
   };
 
   return (
