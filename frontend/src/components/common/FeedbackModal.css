@@ -19,12 +19,18 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   }
   
-  .feedback-modal-header {
+  /* .feedback-modal-header {
     padding: 16px;
     border-bottom: 1px solid #eee;
     display: flex;
     justify-content: space-between;
     align-items: center;
+  } */
+  .feedback-modal-header {
+    padding: 16px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    position: relative;
   }
   
   .feedback-modal-header h3 {
@@ -33,12 +39,34 @@
     color: var(--brand-darkblue);
   }
   
-  .close-button {
+  /* .close-button {
     background: none;
     border: none;
     font-size: 24px;
     cursor: pointer;
     color: #777;
+  } */
+  .close-button {
+    position: absolute;
+    top: 0px;
+    right: 10px;
+    background: var(--brand-darkblue);
+    border: 1px solid var(--brand-darkblue);
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 4px;
+  }
+  
+  .close-button:hover {
+    background-color: var(--brand-blue)
   }
   
   .feedback-modal-body {
@@ -52,6 +80,9 @@
     border-radius: 4px;
     font-family: inherit;
     resize: vertical;
+    min-height: 100px;
+    box-sizing: border-box; /* Important: ensures padding is included in width */
+    margin: 0; /* Remove any existing margins */
   }
   
   .feedback-modal-footer {
@@ -64,8 +95,10 @@
   
   .cancel-button {
     background-color: #f5f5f5;
+    color: var(--brand-darkblue);
     border: none;
     padding: 8px 16px;
+    border: 1px solid var(--brand-darkblue);
     border-radius: 4px;
     cursor: pointer;
   }

@@ -35,7 +35,7 @@ backend/archive_chroma_db/
 # Documents
 backend/uploads
 *.pptx
-
+backend/scripts
 
 # Build files
 /build
