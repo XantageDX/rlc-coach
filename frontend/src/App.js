@@ -104,6 +104,9 @@ import './styles/auth.css';
 import './styles/ai-coach.css';
 import './styles/archive.css';
 
+import './components/common/FeedbackButtons.css';
+import './components/common/FeedbackModal.css';
+
 // Layout wrapper for protected routes with header and sidebar
 const ProtectedLayout = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);

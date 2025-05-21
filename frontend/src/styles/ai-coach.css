@@ -1,4 +1,61 @@
 /* AI Coach styles */
+
+.message-wrapper {
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+
+.message-content {
+  flex: 1;
+  white-space: pre-wrap;
+}
+.feedback-buttons-container {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  min-height: 24px;
+  margin-left: 5px;
+}
+
+.feedback-buttons {
+  display: flex;
+  gap: 8px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 4px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.feedback-button {
+  background: none;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  padding: 4px;
+  color: #555;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feedback-button:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.thumbs-up:hover {
+  color: var(--brand-darkblue);
+}
+
+.thumbs-down:hover {
+  color: #d32f2f;
+}
+
 .ai-coach-container {
   display: flex;
   flex-direction: column;

@@ -1,35 +1,34 @@
 .feedback-buttons-container {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .feedback-buttons {
-    display: flex;
-    gap: 8px;
-    position: absolute;
-    right: -20px;
-    top: 0;
-  }
-  
-  .feedback-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-    color: #888;
-    border-radius: 4px;
-    transition: background-color 0.2s, color 0.2s;
-  }
-  
-  .feedback-button:hover {
-    background-color: #f0f0f0;
-    color: #333;
-  }
-  
-  .thumbs-up:hover {
-    color: var(--brand-darkblue);
-  }
-  
-  .thumbs-down:hover {
-    color: #d32f2f;
-  }
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.feedback-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.feedback-button {
+  background: none;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  padding: 4px;
+  color: #999;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+  display: flex;
+}
+
+.feedback-button:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.thumbs-up:hover {
+  color: var(--brand-darkblue);
+}
+
+.thumbs-down:hover {
+  color: #d32f2f;
+}

@@ -500,12 +500,30 @@ const AICoach = () => {
       
       <div className="messages-container">
         {messages.map((message, index) => (
+          // <div 
+          //   key={index}
+          //   className={`message ${message.role === 'user' ? 'user-message' : 'assistant-message'}`}
+          // >
+          //   <div className="message-content">
+          //     {message.content}
+              
+          //     {/* Add feedback buttons only to assistant messages */}
+          //     {message.role === 'assistant' && (
+          //       <FeedbackButtons 
+          //         messageId={index}
+          //         onFeedbackSubmit={handleFeedbackSubmit}
+          //       />
+          //     )}
+          //   </div>
+          // </div>
           <div 
             key={index}
             className={`message ${message.role === 'user' ? 'user-message' : 'assistant-message'}`}
           >
-            <div className="message-content">
-              {message.content}
+            <div className="message-wrapper">
+              <div className="message-content">
+                {message.content}
+              </div>
               
               {/* Add feedback buttons only to assistant messages */}
               {message.role === 'assistant' && (
