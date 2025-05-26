@@ -11,26 +11,6 @@ const getAuthHeader = () => {
 
 // Report AI service - handles both KG and KD
 const reportAiService = {
-  // Process a message for KG report writing assistance
-  // processKGMessage: async (message, reportId = null, reportContext = null, modelId = null) => {
-  //   try {
-  //     const response = await axios.post(
-  //       `${API_URL}/report-ai/message`,
-  //       { 
-  //         message, 
-  //         report_id: reportId,
-  //         report_context: reportContext,
-  //         report_type: 'kg',
-  //         model_id: modelId
-  //       },
-  //       { headers: getAuthHeader() }
-  //     );
-  //     return response.data;
-  //   } catch (error) {
-  //     console.error('Error from KG report AI service:', error);
-  //     throw error;
-  //   }
-  // },
   processKGMessage: async (message, reportId = null, reportContext = null, modelId = null, sessionId = null) => {
     try {
       const response = await axios.post(
@@ -54,7 +34,6 @@ const reportAiService = {
   
 
   // CLEAR CONVERSATION MEMORY
-  // Add this method to the reportAiService object
 
   clearReportSession: async (reportId = null, reportType = 'kg', sessionId = null) => {
     try {
@@ -74,26 +53,6 @@ const reportAiService = {
     }
   },
 
-  // Process a message for KD report writing assistance
-  // processKDMessage: async (message, reportId = null, reportContext = null, modelId = null) => {
-  //   try {
-  //     const response = await axios.post(
-  //       `${API_URL}/report-ai/message`,
-  //       { 
-  //         message, 
-  //         report_id: reportId,
-  //         report_context: reportContext,
-  //         report_type: 'kd',
-  //         model_id: modelId
-  //       },
-  //       { headers: getAuthHeader() }
-  //     );
-  //     return response.data;
-  //   } catch (error) {
-  //     console.error('Error from KD report AI service:', error);
-  //     throw error;
-  //   }
-  // },
   processKDMessage: async (message, reportId = null, reportContext = null, modelId = null, sessionId = null) => {
     try {
       const response = await axios.post(

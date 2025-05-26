@@ -479,38 +479,6 @@ Don't give much context: go to the point.
 - In Conclusion: ...
 """
 
-# async def process_kg_message(user_message, report_context=None, model_id=None):
-#     """Process a user message for Knowledge Gap report assistance"""
-#     try:
-#         llm = get_bedrock_llm(model_id)
-        
-#         messages = [
-#             {"role": "system", "content": KG_SYSTEM_PROMPT},
-#         ]
-        
-#         # Add report context if available
-#         if report_context:
-#             messages.append({
-#                 "role": "system", 
-#                 "content": f"Current report context: {report_context}"
-#             })
-            
-#         # Add user message
-#         messages.append({"role": "user", "content": user_message})
-        
-#         response = llm.invoke(messages)
-        
-#         return {
-#             "answer": response.content,
-#             "success": True
-#         }
-#     except Exception as e:
-#         print(f"Error in KG report assistant: {e}")
-#         return {
-#             "error": "An error occurred while processing your question.",
-#             "details": str(e),
-#             "success": False
-#         }
 ### CLEAR CONVERSATION MEMORY
 async def process_kg_message(user_message, report_id=None, report_context=None, model_id=None, session_id=None):
     """Process a user message for Knowledge Gap report assistance"""
@@ -593,39 +561,6 @@ async def evaluate_kg_report(report_data, model_id=None):
             "success": False
         }
     
-# Add KD functions
-# async def process_kd_message(user_message, report_context=None, model_id=None):
-#     """Process a user message for Key Decision report assistance"""
-#     try:
-#         llm = get_bedrock_llm(model_id)
-        
-#         messages = [
-#             {"role": "system", "content": KD_SYSTEM_PROMPT},
-#         ]
-        
-#         # Add report context if available
-#         if report_context:
-#             messages.append({
-#                 "role": "system", 
-#                 "content": f"Current report context: {report_context}"
-#             })
-            
-#         # Add user message
-#         messages.append({"role": "user", "content": user_message})
-        
-#         response = llm.invoke(messages)
-        
-#         return {
-#             "answer": response.content,
-#             "success": True
-#         }
-#     except Exception as e:
-#         print(f"Error in KD report assistant: {e}")
-#         return {
-#             "error": "An error occurred while processing your question.",
-#             "details": str(e),
-#             "success": False
-#         }
 ### CLEAR CONVERSATION MEMORY
 async def process_kd_message(user_message, report_id=None, report_context=None, model_id=None, session_id=None):
     """Process a user message for Key Decision report assistance"""

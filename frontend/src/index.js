@@ -15,6 +15,7 @@ import './styles/brandColors.css';
 import './styles/sidebar.css';
 import './styles/layout.css';
 import './styles/dashboard.css';
+import './components/common/MarkdownRenderer.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

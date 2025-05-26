@@ -32,21 +32,6 @@ async def startup_event():
     logger.info(f"AWS_REGION: {os.getenv('AWS_REGION', 'NOT SET')}")
     logger.info(f"AWS credentials available: {'Yes' if os.getenv('AWS_ACCESS_KEY_ID') and os.getenv('AWS_SECRET_ACCESS_KEY') else 'No'}")
 
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=[
-#         "http://localhost:3000",  # React development server
-#         "http://127.0.0.1:3000",
-#         "https://d22ybva4cupp8q.cloudfront.net",  # CloudFront distribution
-#         #"http://rlc-coach-frontend.s3-website-us-east-1.amazonaws.com"  # Be cautious with this in production
-#         "https://rapidlearningcycles.xantage.co",  # Custom domain
-#         "https://api.rapidlearningcycles.xantage.co"  # Add this line
-#     ],
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-#     expose_headers=["Content-Disposition"],  # Important for file downloads
-# )
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
