@@ -2,9 +2,9 @@ name: CI/CD Backend
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, staging ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, staging ]
 
 jobs:
   build-and-push:
@@ -23,6 +23,20 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+      - name: Determine tag
+        id: tag
+        run: |
+          if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
+            echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "env=prod" >> $GITHUB_OUTPUT
+          elif [[ ${{ github.ref }} == 'refs/heads/staging' ]]; then
+            echo "tag=stage" >> $GITHUB_OUTPUT
+            echo "env=stage" >> $GITHUB_OUTPUT
+          else
+            echo "tag=dev-${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "env=dev" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
@@ -30,6 +44,8 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           platforms: linux/arm64,linux/amd64
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/rlc-coach-backend:latest
+          tags: |
+            renatomoretti/rlc-coach-backend:${{ steps.tag.outputs.tag }}
+            renatomoretti/rlc-coach-backend:${{ steps.tag.outputs.env }}-${{ github.sha }}
           build-args: |
             S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}

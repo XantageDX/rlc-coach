@@ -1917,6 +1917,8 @@ const ReportWriter = () => {
   } = useReportWriter();
 //
 
+const [isTyping, setIsTyping] = useState(false);
+
   // FEEDBACK - Add feedback state variables
   const [feedbackMessageId, setFeedbackMessageId] = useState(null);
   const [feedbackRating, setFeedbackRating] = useState(null);
@@ -2045,6 +2047,7 @@ const handleReportSelect = (e) => {
     
     // Clear input and show loading state
     setChatInput('');
+    setIsTyping(false); // Reset typing state when message is sent
     setAiLoading(true); // Use context method instead of setIsAiLoading
     
     try {
@@ -2194,8 +2197,18 @@ const startVoiceInput = () => {
     resetRecordingState();
     
     // Only submit if we have a transcript
+    // if (finalTranscript.trim()) {
+    //   setChatInput(finalTranscript.trim());
+      
+    //   // Small delay to ensure the UI updates before submitting
+    //   setTimeout(() => {
+    //     handleChatSubmit();
+    //   }, 300);
+    // }
+    // Only submit if we have a transcript
     if (finalTranscript.trim()) {
       setChatInput(finalTranscript.trim());
+      setIsTyping(true); // Show send button after voice input
       
       // Small delay to ensure the UI updates before submitting
       setTimeout(() => {
@@ -3422,7 +3435,12 @@ const startVoiceInput = () => {
             <textarea
               id="report-chat-input"
               value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
+              // onChange={(e) => setChatInput(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setChatInput(value);
+                setIsTyping(value.trim().length > 0); // Set typing state based on input
+              }}
               placeholder="Type a message..."
               disabled={isAiLoading} // Disable input while loading
               onKeyDown={(e) => {
@@ -3432,17 +3450,34 @@ const startVoiceInput = () => {
                 }
               }}
             ></textarea>
-            <button 
-              className="voice-btn" 
-              onClick={startVoiceInput} 
-              aria-label="Voice Input"
-              disabled={isAiLoading}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path id="mic-top" d="M12 15C13.66 15 15 13.66 15 12V6C15 4.34 13.66 3 12 3C10.34 3 9 4.34 9 6V12C9 13.66 10.34 15 12 15Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
-                <path id="mic-bottom" d="M17 12C17 14.76 14.76 17 12 17C9.24 17 7 14.76 7 12H5C5 15.53 7.61 18.43 11 18.93V21H13V18.93C16.39 18.43 19 15.53 19 12H17Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
-              </svg>
-            </button>
+            {isTyping ? (
+              // Show send button when user is typing (no visible content)
+              <button 
+                className="voice-btn send-btn" 
+                onClick={() => {
+                  if (chatInput.trim()) {
+                    handleChatSubmit();
+                  }
+                }}
+                aria-label="Send message"
+                disabled={isAiLoading || !chatInput.trim()}
+              >
+              </button>
+            ) : (
+              // Show microphone button when user is not typing
+              <button 
+                className="voice-btn" 
+                onClick={startVoiceInput} 
+                aria-label="Voice Input"
+                disabled={isAiLoading}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path id="mic-top" d="M12 15C13.66 15 15 13.66 15 12V6C15 4.34 13.66 3 12 3C10.34 3 9 4.34 9 6V12C9 13.66 10.34 15 12 15Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
+                  <path id="mic-bottom" d="M17 12C17 14.76 14.76 17 12 17C9.24 17 7 14.76 7 12H5C5 15.53 7.61 18.43 11 18.93V21H13V18.93C16.39 18.43 19 15.53 19 12H17Z" fill={isAiLoading ? "#cccccc" : "#8BB5E8"}/>
+                </svg>
+              </button>
+            )}
+            
           </div>
           <div className="chat-placeholder"></div>
           {/* Sources section */}

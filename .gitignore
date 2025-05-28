@@ -19,6 +19,7 @@ __pycache__/
 venv/
 ENV/
 env/
+backend/.env.backup
 
 # Logs
 logs
@@ -53,6 +54,7 @@ knowledge_base
 
 # .pem
 rlc-coach-key.pem
+rlc-core-key.pem
 
 # actions
 .github/workflows/ci-cd-frontend.yml
