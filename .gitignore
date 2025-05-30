@@ -32,6 +32,7 @@ yarn-error.log*
 *.sqlite3
 backend/archive_chroma_db/
 #backend/chroma_db
+/mongodb-backup-20250527.tar.gz/
 
 # Documents
 backend/uploads
@@ -58,3 +59,6 @@ rlc-core-key.pem
 
 # actions
 .github/workflows/ci-cd-frontend.yml
+
+# Build
+/frontend/build/

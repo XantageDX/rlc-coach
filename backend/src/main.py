@@ -37,9 +37,9 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "https://d22ybva4cupp8q.cloudfront.net",
-        #"https://rapidlearningcycles.xantage.co"
-        "https://spark.rapidlearningcycles.com"
+        "https://d22ybva4cupp8q.cloudfront.net",  # OLD CloudFront
+        "https://d326q0y9hbx0xe.cloudfront.net",  # NEW CloudFront
+        "https://spark.rapidlearningcycles.com"  # Final domain
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
