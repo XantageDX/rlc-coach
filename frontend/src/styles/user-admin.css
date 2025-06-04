@@ -123,3 +123,269 @@
     border-radius: 4px;
     margin-bottom: 1rem;
   }
+
+/* NEW STYLES FOR PHASE 14 */
+
+/* Impersonation Banner */
+.impersonation-banner {
+  background-color: #ff9800;
+  color: white;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
+
+.stop-impersonation-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0;
+  width: auto;
+}
+
+.stop-impersonation-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  border-bottom: 2px solid #ddd;
+  margin-bottom: 2rem;
+}
+
+.tab-navigation button {
+  background: none;
+  border: none;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  color: var(--brand-darkblue);
+  font-weight: 500;
+  margin: 0;
+  width: auto;
+}
+
+.tab-navigation button:hover {
+  background-color: #f5f5f5;
+}
+
+.tab-navigation button.active {
+  border-bottom-color: var(--brand-darkblue);
+  background-color: #f0f8ff;
+}
+
+/* Tenants Grid */
+.tenants-section {
+  padding: 1rem;
+}
+
+.tenants-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.tenant-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tenant-card h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--brand-darkblue);
+}
+
+.tenant-card p {
+  margin: 0 0 1rem 0;
+  color: #666;
+}
+
+.impersonate-btn {
+  background-color: var(--brand-blue);
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  margin: 0;
+}
+
+.impersonate-btn:hover {
+  background-color: var(--brand-darkblue);
+}
+
+/* Usage Monitoring */
+.usage-section {
+  padding: 1rem;
+}
+
+.usage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.refresh-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0;
+  width: auto;
+}
+
+.refresh-btn:hover {
+  background-color: #45a049;
+}
+
+.usage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.usage-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.usage-card h4 {
+  margin: 0 0 1rem 0;
+  color: var(--brand-darkblue);
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.usage-stats {
+  margin-bottom: 1rem;
+}
+
+.usage-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.usage-item span:first-child {
+  font-weight: 500;
+  color: #333;
+}
+
+.usage-item span:last-child {
+  color: var(--brand-darkblue);
+  font-weight: bold;
+}
+
+.usage-progress {
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  height: 20px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.token-limit-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.token-limit-control label {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0;
+}
+
+.token-limit-control input {
+  width: 80px;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin: 0;
+}
+
+/* Enhanced user items */
+.user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9f9f9;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.user-details strong {
+  color: var(--brand-darkblue);
+}
+
+.user-details .user-role {
+  color: #666;
+  font-size: 0.8rem;
+  background-color: #e7f3ff;
+  color: var(--brand-darkblue);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 0.25rem;
+  width: fit-content;
+}
+
+.user-details .tenant-info {
+  color: #666;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+/* Form improvements */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: var(--brand-darkblue);
+}
+
+.form-group input,
+.form-group select {
+  width: 95%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}

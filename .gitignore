@@ -62,3 +62,6 @@ rlc-core-key.pem
 
 # Build
 /frontend/build/
+
+# Old Config
+/frontend/temp-cloudfront-configs
