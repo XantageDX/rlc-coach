@@ -38,6 +38,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "http://localhost:3001",
         "https://d22ybva4cupp8q.cloudfront.net",  # OLD CloudFront
         "https://d326q0y9hbx0xe.cloudfront.net",  # NEW CloudFront
         "https://spark.rapidlearningcycles.com"  # Final domain
