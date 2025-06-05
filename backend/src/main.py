@@ -13,6 +13,7 @@ from src.controllers.report_ai_controller import router as report_ai_router
 from src.controllers.archive_controller import router as archive_router
 from src.controllers.user_admin_controller import router as user_admin_router
 from src.controllers.feedback_controller import router as feedback_router
+from src.controllers.token_usage_controller import router as token_usage_router
 
 # Load environment variables
 load_dotenv()
@@ -37,6 +38,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "http://localhost:3001",
         "https://d22ybva4cupp8q.cloudfront.net",  # OLD CloudFront
         "https://d326q0y9hbx0xe.cloudfront.net",  # NEW CloudFront
         "https://spark.rapidlearningcycles.com"  # Final domain
@@ -55,6 +57,7 @@ app.include_router(report_ai_router, prefix="/report-ai", tags=["report-ai"])
 app.include_router(archive_router, prefix="/archive", tags=["archive"])
 app.include_router(user_admin_router, prefix="/admin", tags=["user-admin"])
 app.include_router(feedback_router, prefix="/feedback", tags=["feedback"])
+app.include_router(token_usage_router, prefix="/token-usage", tags=["token-usage"])
 
 
 # Configure logging
