@@ -389,3 +389,114 @@
   border: 1px solid #ddd;
   border-radius: 4px;
 }
+
+/* Tenant Management Styles */
+.tenant-management-section {
+  padding: 1rem;
+}
+
+.tenant-creation-section {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tenant-creation-section h4 {
+  margin: 0 0 1rem 0;
+  color: var(--brand-darkblue);
+}
+
+.tenant-creation-form {
+  max-width: 500px;
+}
+
+.tenant-creation-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.tenant-creation-form textarea {
+  width: 95%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.create-tenant-btn {
+  background-color: var(--brand-darkblue);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0;
+  width: auto;
+}
+
+.create-tenant-btn:hover {
+  background-color: var(--brand-blue);
+}
+
+.existing-tenants-section {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.existing-tenants-section h4 {
+  margin: 0 0 1rem 0;
+  color: var(--brand-darkblue);
+}
+
+.tenants-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.tenant-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9f9f9;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.tenant-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tenant-details strong {
+  color: var(--brand-darkblue);
+  font-size: 1.1rem;
+}
+
+.tenant-details span {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.delete-tenant-btn {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0;
+  width: auto;
+}
+
+.delete-tenant-btn:hover {
+  background-color: #fecaca;
+}

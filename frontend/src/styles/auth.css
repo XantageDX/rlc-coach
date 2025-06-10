@@ -35,23 +35,18 @@ label {
   font-weight: bold;
 }
 
-/* input {
-  width: 100%;
-  padding: 0.75rem;
+.login-form .form-group input,
+.register-form .form-group input {
+  width: 100% !important;
+  padding: 0.75rem !important;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
-} */
-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  box-sizing: border-box; /* This ensures padding is included in the width */
+  box-sizing: border-box;
 }
 
-button {
+.login-form button,
+.register-form button {
   width: 100%;
   padding: 0.75rem;
   background-color: var(--brand-darkblue);
@@ -61,7 +56,29 @@ button {
   font-size: 1rem;
   cursor: pointer;
   margin-top: 1rem;
+  box-sizing: border-box;
 }
+/* input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
+} */
+
+/* button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--brand-darkblue);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+} */
+ 
 
 button:hover {
   background-color: var(--brand-blue);

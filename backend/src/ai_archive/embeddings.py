@@ -12,7 +12,7 @@ def initialize_archive_vector_db(persist_directory="./archive_chroma_db"):
     # Initialize Bedrock embeddings (same as AI Coach)
     embeddings = BedrockEmbeddings(
         model_id="amazon.titan-embed-text-v2:0",
-        region_name=os.getenv("AWS_REGION", "us-west-2"),
+        region_name=os.getenv("AWS_REGION", "us-east-1"),
     )
     
     # Create the client
@@ -32,7 +32,7 @@ def get_archive_retriever(persist_directory="./archive_chroma_db"):
     # Initialize Bedrock embeddings
     embeddings = BedrockEmbeddings(
         model_id="amazon.titan-embed-text-v2:0",
-        region_name=os.getenv("AWS_REGION", "us-west-2"),
+        region_name=os.getenv("AWS_REGION", "us-east-1"),
     )
     
     # Load the existing vector store
@@ -59,7 +59,7 @@ def add_document_to_vectordb(docs, persist_directory="./archive_chroma_db"):
         # Initialize Bedrock embeddings
         embeddings = BedrockEmbeddings(
             model_id="amazon.titan-embed-text-v2:0",
-            region_name=os.getenv("AWS_REGION", "us-west-2"),
+            region_name=os.getenv("AWS_REGION", "us-east-1"),
         )
         
         # Get the vector database
@@ -97,7 +97,7 @@ def delete_document_embeddings(document_filename, persist_directory="./archive_c
         # Initialize Bedrock embeddings
         embeddings = BedrockEmbeddings(
             model_id="amazon.titan-embed-text-v2:0",
-            region_name=os.getenv("AWS_REGION", "us-west-2"),
+            region_name=os.getenv("AWS_REGION", "us-east-1"),
         )
         
         # Get the vector database
