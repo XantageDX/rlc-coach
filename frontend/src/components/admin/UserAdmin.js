@@ -193,6 +193,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import userAdminService from '../../services/userAdminService';
+import TenantManagement from './TenantManagement';
 import './../../styles/user-admin.css';
 
 const UserAdmin = () => {
@@ -387,6 +388,12 @@ const UserAdmin = () => {
         {isSuperAdmin && (
           <>
             <button 
+              className={activeTab === 'tenant-management' ? 'active' : ''}
+              onClick={() => setActiveTab('tenant-management')}
+            >
+              Tenant Management
+            </button>
+            <button 
               className={activeTab === 'tenants' ? 'active' : ''}
               onClick={() => setActiveTab('tenants')}
             >
@@ -560,7 +567,9 @@ const UserAdmin = () => {
           </div>
         </div>
       )}
-
+      {activeTab === 'tenant-management' && isSuperAdmin && (
+        <TenantManagement />
+      )}
       {/* Token Usage Monitoring Tab */}
       {activeTab === 'usage' && isSuperAdmin && (
         <div className="usage-section">

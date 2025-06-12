@@ -97,8 +97,7 @@ const Sidebar = () => {
       </div>
 
       {/* MIDDLE SECTION */}
-      <div className="sidebar-section sidebar-middle">
-        {/* Model selector dropdown - Only show when not collapsed */}
+      {/* <div className="sidebar-section sidebar-middle">
         {!isCollapsed && (
           <div className="model-selector">
             <label htmlFor="model-select">LLM Model:</label>
@@ -116,7 +115,7 @@ const Sidebar = () => {
             </select>
           </div>
         )}
-      </div>
+      </div> */}
       
       {/* BOTTOM SECTION */}
       <div className="sidebar-section sidebar-bottom">

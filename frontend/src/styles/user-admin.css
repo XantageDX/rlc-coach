@@ -500,3 +500,273 @@
 .delete-tenant-btn:hover {
   background-color: #fecaca;
 }
+
+/* Add these styles to your existing frontend/src/styles/user-admin.css file */
+
+/* Tenant Management Section */
+.tenant-management-section {
+  padding: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+/* Toggle and Action Buttons */
+.toggle-form-btn,
+.create-tenant-btn,
+.refresh-btn,
+.retry-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.toggle-form-btn,
+.create-tenant-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.toggle-form-btn:hover,
+.create-tenant-btn:hover {
+  background-color: #0056b3;
+}
+
+.create-tenant-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.refresh-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.refresh-btn:hover {
+  background-color: #218838;
+}
+
+.retry-btn {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.retry-btn:hover {
+  background-color: #e0a800;
+}
+
+/* Tenant Creation Form */
+.tenant-creation-section {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.tenant-creation-form {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.tenant-creation-form .form-group {
+  margin-bottom: 15px;
+}
+
+.tenant-creation-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #333;
+}
+
+.tenant-creation-form input,
+.tenant-creation-form textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.tenant-creation-form input:focus,
+.tenant-creation-form textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Tenants List Section */
+.tenants-list-section {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.tenants-table-container {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+
+.tenants-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+.tenants-table th,
+.tenants-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.tenants-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tenants-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.tenants-table .no-data {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 40px;
+}
+
+/* Tenant Info in Table */
+.tenant-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.tenant-info strong {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.tenant-email {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.aws-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.aws-info div {
+  font-weight: 500;
+  color: #333;
+}
+
+.aws-info small {
+  font-size: 11px;
+  color: #6c757d;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.status-creating {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.status-setting-up {
+  background-color: #cce5ff;
+  color: #004085;
+  border: 1px solid #99d6ff;
+}
+
+.status-ready {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #a3d4a7;
+}
+
+.status-failed {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f1aeb5;
+}
+
+.status-unknown {
+  background-color: #e2e3e5;
+  color: #383d41;
+  border: 1px solid #ced4da;
+}
+
+/* Auto-refresh Indicator */
+.auto-refresh-indicator {
+  text-align: center;
+  font-size: 12px;
+  color: #6c757d;
+  margin-top: 15px;
+  font-style: italic;
+}
+
+/* Loading Container */
+.loading-container {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
+}
+
+/* Error Message (if not already in your CSS) */
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  border: 1px solid #f1aeb5;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .tenants-table {
+    font-size: 14px;
+  }
+  
+  .tenants-table th,
+  .tenants-table td {
+    padding: 8px;
+  }
+}
