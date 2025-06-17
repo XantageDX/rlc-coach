@@ -1,5 +1,7 @@
+# #### PHASE 3.2 ####
 # """
-# Utility functions for cross-account AWS operations.
+# Enhanced utility functions for cross-account AWS operations.
+# Now includes Bedrock Agent client for Knowledge Base management.
 # Handles role assumption and client creation for tenant accounts.
 # """
 
@@ -84,6 +86,27 @@
 #         )
     
 #     @staticmethod
+#     def get_tenant_bedrock_agent_client(aws_account_id: str):
+#         """
+#         NEW: Get Bedrock Agent client for tenant account (for Knowledge Base management).
+        
+#         Args:
+#             aws_account_id: Target tenant AWS account ID
+            
+#         Returns:
+#             boto3 Bedrock Agent client with tenant account access
+#         """
+#         credentials = CrossAccountClient.assume_tenant_role(aws_account_id, "bedrock-agent")
+        
+#         return boto3.client(
+#             'bedrock-agent',
+#             aws_access_key_id=credentials['AccessKeyId'],
+#             aws_secret_access_key=credentials['SecretAccessKey'],
+#             aws_session_token=credentials['SessionToken'],
+#             region_name='us-east-1'
+#         )
+    
+#     @staticmethod
 #     def get_tenant_iam_client(aws_account_id: str):
 #         """
 #         Get IAM client for tenant account.
@@ -146,7 +169,7 @@
 # # Global instance for easy import
 # cross_account_client = CrossAccountClient()
 
-#### PHASE 3.2 ####
+#### PHASE 4.1 ####
 """
 Enhanced utility functions for cross-account AWS operations.
 Now includes Bedrock Agent client for Knowledge Base management.
@@ -164,7 +187,7 @@ class CrossAccountClient:
     @staticmethod
     def assume_tenant_role(aws_account_id: str, session_name_suffix: str = "") -> Dict[str, Any]:
         """
-        Assume role in tenant AWS account.
+        Assume role in tenant AWS account with external ID for security.
         
         Args:
             aws_account_id: Target tenant AWS account ID
@@ -180,15 +203,22 @@ class CrossAccountClient:
             if session_name_suffix:
                 session_name += f"-{session_name_suffix}"
             
+            # CHANGE: Add external ID for security (matches our new trust policy)
             assumed_role = sts_client.assume_role(
                 RoleArn=f"arn:aws:iam::{aws_account_id}:role/CoreAppAccess",
-                RoleSessionName=session_name
+                RoleSessionName=session_name,
+                ExternalId=f"tenant-{aws_account_id}"  # NEW LINE
             )
             
             return assumed_role['Credentials']
             
         except ClientError as e:
-            print(f"Error assuming role in account {aws_account_id}: {str(e)}")
+            # ENHANCED: Better error messages
+            error_code = e.response['Error']['Code']
+            if error_code == 'AccessDenied':
+                print(f"❌ Access denied - CoreAppAccess role may not exist in account {aws_account_id}")
+            else:
+                print(f"❌ Error assuming role in account {aws_account_id}: {str(e)}")
             raise Exception(f"Failed to assume role in tenant account: {str(e)}")
     
     @staticmethod
@@ -278,7 +308,7 @@ class CrossAccountClient:
     @staticmethod
     def test_tenant_access(aws_account_id: str) -> Dict[str, Any]:
         """
-        Test access to tenant account and return basic information.
+        Test access to tenant account and return detailed information.
         
         Args:
             aws_account_id: Target tenant AWS account ID
@@ -287,6 +317,8 @@ class CrossAccountClient:
             Dict with test results and account information
         """
         try:
+            print(f"🔍 Testing cross-account access to: {aws_account_id}")
+            
             credentials = CrossAccountClient.assume_tenant_role(aws_account_id, "test")
             
             # Create STS client with assumed credentials to verify access
@@ -300,18 +332,24 @@ class CrossAccountClient:
             
             identity = sts_client.get_caller_identity()
             
+            print(f"✅ Cross-account access successful for: {aws_account_id}")
+            
             return {
                 "success": True,
                 "account_id": identity['Account'],
                 "assumed_role_arn": identity['Arn'],
-                "access_verified": True
+                "access_verified": True,
+                "test_timestamp": datetime.utcnow().isoformat()  # NEW
             }
             
         except Exception as e:
+            print(f"❌ Cross-account access test failed for: {aws_account_id}: {str(e)}")
             return {
                 "success": False,
                 "error": str(e),
-                "access_verified": False
+                "access_verified": False,
+                "account_id": aws_account_id,  # NEW
+                "test_timestamp": datetime.utcnow().isoformat()  # NEW
             }
 
 # Global instance for easy import
