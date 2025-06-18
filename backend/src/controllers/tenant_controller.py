@@ -532,7 +532,8 @@ async def create_tenant_with_aws_account(
         result = await tenant_aws_service.create_tenant_account(
             tenant_name=tenant_data.name,
             tenant_email=tenant_data.email,
-            created_by=current_user.email
+            #created_by=current_user.email
+            created_by=current_user.username
         )
         
         if result["success"]:

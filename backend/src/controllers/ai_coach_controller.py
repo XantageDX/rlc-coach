@@ -309,7 +309,8 @@ async def ask_question(
         if user_tenant_id:
             print(f"🔒 AI Coach request from tenant {user_tenant_id}: {data.conversation_id}")
         else:
-            print(f"🔓 AI Coach request from super admin: {current_user.email}")
+            #print(f"🔓 AI Coach request from super admin: {current_user.email}")
+            print(f"🔓 AI Coach request from super admin: {current_user.username}")
         
         # Get AI Coach response with standardized model and ENFORCED tenant isolation
         response = await ask_ai_coach(
@@ -515,7 +516,8 @@ async def get_active_conversations_endpoint(current_user = Depends(get_current_u
         
         # Add user context
         conversations["user_info"] = {
-            "user_email": current_user.email,
+            #"user_email": current_user.email,
+            "user_email": current_user.username,
             "user_role": current_user.role,
             "tenant_id": user_tenant_id,
             "isolation_enforced": True

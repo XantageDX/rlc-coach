@@ -470,7 +470,8 @@ async def process_report_message(
         # PHASE 5.2 AUDIT: Log the report request for security monitoring
         request_log = {
             "endpoint": "/report-ai/message",
-            "user_email": current_user.email,
+            #"user_email": current_user.email,
+            "user_email": current_user.username,
             "user_role": current_user.role,
             "tenant_id": user_tenant_id,
             "report_type": data.report_type,
@@ -799,7 +800,8 @@ async def clear_report_session_endpoint(
         # PHASE 5.2 AUDIT: Log the clear operation for security monitoring
         clear_log = {
             "operation": "clear_report_session",
-            "user_email": current_user.email,
+            #"user_email": current_user.email,
+            "user_email": current_user.username,
             "user_role": current_user.role,
             "tenant_id": user_tenant_id,
             "session_id": session_id,
@@ -905,7 +907,8 @@ async def get_active_report_sessions(current_user = Depends(get_current_user)):
         
         # Add user context
         sessions_data["user_info"] = {
-            "user_email": current_user.email,
+            #"user_email": current_user.email,
+            "user_email": current_user.username,
             "user_role": current_user.role,
             "tenant_id": user_tenant_id,
             "isolation_level": sessions_data["isolation_level"]
@@ -952,7 +955,8 @@ async def get_session_statistics(current_user = Depends(get_current_user)):
         
         # Add user context
         stats["user_info"] = {
-            "user_email": current_user.email,
+            #"user_email": current_user.email,
+            "user_email": current_user.username,
             "user_role": current_user.role,
             "tenant_id": user_tenant_id
         }
