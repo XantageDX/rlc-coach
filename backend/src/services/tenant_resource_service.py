@@ -950,6 +950,7 @@ class TenantResourceService:
                     {
                         'ID': 'DeleteOldVersions',
                         'Status': 'Enabled',
+                        'Filter': {'Prefix': ''},  # Apply to all objects
                         'NoncurrentVersionExpiration': {
                             'NoncurrentDays': 90
                         }
