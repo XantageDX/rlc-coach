@@ -205,9 +205,10 @@ class CrossAccountClient:
             
             # CHANGE: Add external ID for security (matches our new trust policy)
             assumed_role = sts_client.assume_role(
-                RoleArn=f"arn:aws:iam::{aws_account_id}:role/CoreAppAccess",
+                #RoleArn=f"arn:aws:iam::{aws_account_id}:role/CoreAppAccess",
+                RoleArn=f"arn:aws:iam::{aws_account_id}:role/OrganizationAccountAccessRole",
                 RoleSessionName=session_name,
-                ExternalId=f"tenant-{aws_account_id}"  # NEW LINE
+                #ExternalId=f"tenant-{aws_account_id}"  # NEW LINE
             )
             
             return assumed_role['Credentials']
