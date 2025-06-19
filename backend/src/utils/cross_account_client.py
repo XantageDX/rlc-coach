@@ -199,7 +199,8 @@ class CrossAccountClient:
         try:
             sts_client = boto3.client('sts')
             
-            session_name = f"CoreAppAccess-{int(datetime.utcnow().timestamp())}"
+            #session_name = f"CoreAppAccess-{int(datetime.utcnow().timestamp())}"
+            session_name = f"RLCAccess-{int(datetime.utcnow().timestamp())}"
             if session_name_suffix:
                 session_name += f"-{session_name_suffix}"
             
@@ -207,7 +208,7 @@ class CrossAccountClient:
             assumed_role = sts_client.assume_role(
                 #RoleArn=f"arn:aws:iam::{aws_account_id}:role/CoreAppAccess",
                 RoleArn=f"arn:aws:iam::{aws_account_id}:role/OrganizationAccountAccessRole",
-                RoleSessionName=session_name,
+                RoleSessionName=session_name
                 #ExternalId=f"tenant-{aws_account_id}"  # NEW LINE
             )
             
@@ -217,7 +218,8 @@ class CrossAccountClient:
             # ENHANCED: Better error messages
             error_code = e.response['Error']['Code']
             if error_code == 'AccessDenied':
-                print(f"❌ Access denied - CoreAppAccess role may not exist in account {aws_account_id}")
+                #print(f"❌ Access denied - CoreAppAccess role may not exist in account {aws_account_id}")
+                print(f"❌ Access denied - OrganizationAccountAccessRole may not exist in account {aws_account_id}")
             else:
                 print(f"❌ Error assuming role in account {aws_account_id}: {str(e)}")
             raise Exception(f"Failed to assume role in tenant account: {str(e)}")
