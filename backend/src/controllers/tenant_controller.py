@@ -942,3 +942,27 @@ async def get_tenant_details(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error retrieving tenant details: {str(e)}"
         )
+
+@router.get("/debug/{tenant_id}")
+async def debug_tenant_status(tenant_id: str):
+    """DEBUG: Test the status method directly"""
+    try:
+        # Test database lookup
+        tenant = tenants_collection.find_one({"_id": ObjectId(tenant_id)})
+        if not tenant:
+            return {"error": "Tenant not found in database", "tenant_id": tenant_id}
+        
+        # Test service method
+        result = await tenant_aws_service.get_tenant_status(tenant_id)
+        
+        return {
+            "tenant_from_db": {
+                "name": tenant.get("name"),
+                "status": tenant.get("status"),
+                "aws_request_id": tenant.get("aws_request_id"),
+                "aws_account_id": tenant.get("aws_account_id")
+            },
+            "service_result": result
+        }
+    except Exception as e:
+        return {"error": str(e), "type": str(type(e))}
