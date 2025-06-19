@@ -945,23 +945,23 @@ class TenantResourceService:
             )
             
             # Configure bucket lifecycle (optional - clean up old versions)
-            lifecycle_config = {
-                'Rules': [
-                    {
-                        'ID': 'DeleteOldVersions',
-                        'Status': 'Enabled',
-                        'Filter': {'Prefix': ''},  # Apply to all objects
-                        'NoncurrentVersionExpiration': {
-                            'NoncurrentDays': 90
-                        }
-                    }
-                ]
-            }
+            # lifecycle_config = {
+            #     'Rules': [
+            #         {
+            #             'ID': 'DeleteOldVersions',
+            #             'Status': 'Enabled',
+            #             'Filter': {'Prefix': ''},  # Apply to all objects
+            #             'NoncurrentVersionExpiration': {
+            #                 'NoncurrentDays': 90
+            #             }
+            #         }
+            #     ]
+            # }
             
-            s3_client.put_bucket_lifecycle_configuration(
-                Bucket=bucket_name,
-                LifecycleConfiguration=lifecycle_config
-            )
+            # s3_client.put_bucket_lifecycle_configuration(
+            #     Bucket=bucket_name,
+            #     LifecycleConfiguration=lifecycle_config
+            # )
             
             # Configure bucket public access block (security)
             s3_client.put_public_access_block(
