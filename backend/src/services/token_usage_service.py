@@ -382,7 +382,8 @@ class TokenUsageLogger:
         
         monthly_collection.update_one(
             {"tenant_id": tenant_id, "month": current_month},
-            update_fields,
+            #update_fields,
+            {"$set": update_fields},  # ✅ Proper MongoDB syntax
             upsert=True
         )
 
