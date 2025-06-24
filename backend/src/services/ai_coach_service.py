@@ -250,9 +250,26 @@ from datetime import datetime
 # Tenant-scoped conversation storage for Phase 2 (preparing for Phase 5 isolation)
 _rag_chains = {}
 
-def get_rag_chain(conversation_id=None, tenant_id=None):
+# def get_rag_chain(conversation_id=None, tenant_id=None):
+#     """
+#     Get or create the RAG chain for a specific conversation with tenant scoping.
+#     Model is now standardized to Llama 3.3 - no model selection needed.
+#     """
+#     global _rag_chains
+    
+#     # Use default conversation if none provided
+#     if not conversation_id:
+#         conversation_id = "default"
+    
+#     # Create tenant-scoped conversation key (Phase 5 preparation)
+#     if tenant_id:
+#         chain_key = f"tenant_{tenant_id}_{conversation_id}"
+#     else:
+#         # Super admin or system operations use global scope
+#         chain_key = f"global_{conversation_id}"
+def get_rag_chain(conversation_id=None, tenant_id=None, user_email=None):
     """
-    Get or create the RAG chain for a specific conversation with tenant scoping.
+    Get or create the RAG chain for a specific conversation with tenant+user scoping.
     Model is now standardized to Llama 3.3 - no model selection needed.
     """
     global _rag_chains
@@ -261,8 +278,12 @@ def get_rag_chain(conversation_id=None, tenant_id=None):
     if not conversation_id:
         conversation_id = "default"
     
-    # Create tenant-scoped conversation key (Phase 5 preparation)
-    if tenant_id:
+    # Create tenant+user-scoped conversation key for complete isolation
+    if tenant_id and user_email:
+        # Full isolation: tenant + user + conversation
+        chain_key = f"tenant_{tenant_id}_user_{user_email}_{conversation_id}"
+    elif tenant_id:
+        # Fallback: tenant-only scoping (for backwards compatibility)
         chain_key = f"tenant_{tenant_id}_{conversation_id}"
     else:
         # Super admin or system operations use global scope
@@ -282,14 +303,29 @@ def get_rag_chain(conversation_id=None, tenant_id=None):
     
     return _rag_chains[chain_key]
 
-def clear_conversation_memory(conversation_id, tenant_id=None):
+# def clear_conversation_memory(conversation_id, tenant_id=None):
+#     """
+#     Clear the memory for a specific conversation with tenant scoping.
+#     """
+#     global _rag_chains
+    
+#     # Create the same key format as get_rag_chain
+#     if tenant_id:
+#         chain_key = f"tenant_{tenant_id}_{conversation_id}"
+#     else:
+#         chain_key = f"global_{conversation_id}"
+def clear_conversation_memory(conversation_id, tenant_id=None, user_email=None):
     """
-    Clear the memory for a specific conversation with tenant scoping.
+    Clear the memory for a specific conversation with tenant+user scoping.
     """
     global _rag_chains
     
     # Create the same key format as get_rag_chain
-    if tenant_id:
+    if tenant_id and user_email:
+        # Full isolation: tenant + user + conversation
+        chain_key = f"tenant_{tenant_id}_user_{user_email}_{conversation_id}"
+    elif tenant_id:
+        # Fallback: tenant-only scoping
         chain_key = f"tenant_{tenant_id}_{conversation_id}"
     else:
         chain_key = f"global_{conversation_id}"
@@ -333,23 +369,62 @@ def get_conversation_history(conversation_id: str, tenant_id=None):
         print(f"Error getting conversation history: {e}")
         return []
 
-async def ask_ai_coach(question: str, conversation_id: str = None, model_id: str = None, tenant_id: str = None):
+# async def ask_ai_coach(question: str, conversation_id: str = None, model_id: str = None, tenant_id: str = None):
+#     """
+#     Ask a question to the AI Coach with standardized model and tenant scoping.
+    
+#     Args:
+#         question: The user's question
+#         conversation_id: Conversation identifier for memory
+#         model_id: IGNORED - always uses standardized Llama 3.3
+#         tenant_id: Tenant identifier for conversation isolation
+#     """
+#     try:
+#         # Ensure we have a conversation ID
+#         if not conversation_id:
+#             conversation_id = "default"
+        
+#         # Get RAG chain with tenant scoping (model is standardized)
+#         chain = get_rag_chain(conversation_id, tenant_id)
+        
+#         # Process the question
+#         result = chain({"question": question})
+        
+#         return {
+#             "answer": result["answer"],
+#             "conversation_id": conversation_id,
+#             "model_used": LLM_MODEL,  # Always Llama 3.3
+#             "tenant_id": tenant_id,
+#             "sources": result.get("source_documents", [])
+#         }
+        
+#     except Exception as e:
+#         print(f"Error in AI Coach: {e}")
+#         return {
+#             "error": "An error occurred while processing your question.",
+#             "details": str(e),
+#             "model_used": LLM_MODEL,
+#             "conversation_id": conversation_id,
+#             "tenant_id": tenant_id
+#         }
+async def ask_ai_coach(question: str, conversation_id: str = None, model_id: str = None, tenant_id: str = None, user_email: str = None):
     """
-    Ask a question to the AI Coach with standardized model and tenant scoping.
+    Ask a question to the AI Coach with standardized model and tenant+user scoping.
     
     Args:
         question: The user's question
         conversation_id: Conversation identifier for memory
         model_id: IGNORED - always uses standardized Llama 3.3
         tenant_id: Tenant identifier for conversation isolation
+        user_email: User identifier for complete isolation within tenant
     """
     try:
         # Ensure we have a conversation ID
         if not conversation_id:
             conversation_id = "default"
         
-        # Get RAG chain with tenant scoping (model is standardized)
-        chain = get_rag_chain(conversation_id, tenant_id)
+        # Get RAG chain with tenant+user scoping (model is standardized)
+        chain = get_rag_chain(conversation_id, tenant_id, user_email)
         
         # Process the question
         result = chain({"question": question})
@@ -359,6 +434,7 @@ async def ask_ai_coach(question: str, conversation_id: str = None, model_id: str
             "conversation_id": conversation_id,
             "model_used": LLM_MODEL,  # Always Llama 3.3
             "tenant_id": tenant_id,
+            "user_email": user_email,  # Add user tracking
             "sources": result.get("source_documents", [])
         }
         
@@ -369,7 +445,8 @@ async def ask_ai_coach(question: str, conversation_id: str = None, model_id: str
             "details": str(e),
             "model_used": LLM_MODEL,
             "conversation_id": conversation_id,
-            "tenant_id": tenant_id
+            "tenant_id": tenant_id,
+            "user_email": user_email
         }
 
 def clear_all_conversations(tenant_id=None):

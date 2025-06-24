@@ -312,12 +312,20 @@ async def ask_question(
             #print(f"🔓 AI Coach request from super admin: {current_user.email}")
             print(f"🔓 AI Coach request from super admin: {current_user.username}")
         
-        # Get AI Coach response with standardized model and ENFORCED tenant isolation
+        # # Get AI Coach response with standardized model and ENFORCED tenant isolation
+        # response = await ask_ai_coach(
+        #     question=data.question,
+        #     conversation_id=data.conversation_id,
+        #     model_id=standardized_model,  # Force standardization
+        #     tenant_id=user_tenant_id  # ENFORCED: Pass tenant_id for isolation
+        # )
+        # Get AI Coach response with standardized model and ENFORCED tenant+user isolation
         response = await ask_ai_coach(
             question=data.question,
             conversation_id=data.conversation_id,
             model_id=standardized_model,  # Force standardization
-            tenant_id=user_tenant_id  # ENFORCED: Pass tenant_id for isolation
+            tenant_id=user_tenant_id,  # ENFORCED: Pass tenant_id for isolation
+            user_email=current_user.username  # ENFORCED: Pass user_email for complete isolation
         )
         
         if "error" in response:
@@ -388,16 +396,27 @@ async def clear_conversation(
                 }
             )
         
-        # PHASE 5.1 AUDIT: Log the clear operation
+        # # PHASE 5.1 AUDIT: Log the clear operation
+        # if user_tenant_id:
+        #     print(f"🔒 Clearing conversation for tenant {user_tenant_id}: {data.conversation_id}")
+        # else:
+        #     print(f"🔓 Super admin clearing conversation: {data.conversation_id}")
+        # PHASE 5.1 AUDIT: Log conversation clearing for security monitoring with user isolation
         if user_tenant_id:
-            print(f"🔒 Clearing conversation for tenant {user_tenant_id}: {data.conversation_id}")
+            print(f"🗑️ Clearing conversation {data.conversation_id} for tenant {user_tenant_id}, user {current_user.username}")
         else:
-            print(f"🔓 Super admin clearing conversation: {data.conversation_id}")
+            print(f"🗑️ Clearing global conversation {data.conversation_id} by super admin: {current_user.username}")
         
-        # Clear conversation with ENFORCED tenant isolation
+        # # Clear conversation with ENFORCED tenant isolation
+        # success = clear_conversation_memory(
+        #     conversation_id=data.conversation_id,
+        #     tenant_id=user_tenant_id  # ENFORCED: Pass tenant_id for isolation
+        # )
+        # Clear conversation memory with tenant+user scoping for complete isolation
         success = clear_conversation_memory(
             conversation_id=data.conversation_id,
-            tenant_id=user_tenant_id  # ENFORCED: Pass tenant_id for isolation
+            tenant_id=user_tenant_id,
+            user_email=current_user.username  # Add user-level isolation
         )
         
         return {

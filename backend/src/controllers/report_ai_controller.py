@@ -486,12 +486,20 @@ async def process_report_message(
         # Import the session service with ENFORCED tenant isolation
         from src.services.report_session_service import get_report_session, update_report_session
         
-        # Get or create the session for this report with ENFORCED tenant scoping
+        # # Get or create the session for this report with ENFORCED tenant scoping
+        # session = get_report_session(
+        #     session_id=data.session_id,
+        #     report_id=data.report_id,
+        #     report_type=data.report_type,
+        #     tenant_id=user_tenant_id  # ENFORCED: Pass tenant_id for isolation
+        # )
+        # Get or create the session for this report with complete isolation
         session = get_report_session(
             session_id=data.session_id,
             report_id=data.report_id,
             report_type=data.report_type,
-            tenant_id=user_tenant_id  # ENFORCED: Pass tenant_id for isolation
+            tenant_id=user_tenant_id,  # ENFORCED: Pass tenant_id for isolation
+            user_email=current_user.username  # ENFORCED: Pass user_email for complete isolation
         )
         
         # Add the user message to the session history
@@ -537,11 +545,18 @@ async def process_report_message(
                 "model_used": standardized_model
             })
             
+            # # Update session with new message
+            # update_report_session(
+            #     session_id=data.session_id or f"{data.report_type}_{data.report_id or 'default'}",
+            #     data=session,
+            #     tenant_id=user_tenant_id  # ENFORCED: Pass tenant_id for isolation
+            # )
             # Update session with new message
             update_report_session(
                 session_id=data.session_id or f"{data.report_type}_{data.report_id or 'default'}",
                 data=session,
-                tenant_id=user_tenant_id  # ENFORCED: Pass tenant_id for isolation
+                tenant_id=user_tenant_id,  # ENFORCED: Pass tenant_id for isolation
+                user_email=current_user.username  # ENFORCED: Pass user_email for complete isolation
             )
         
         # PHASE 5.2 TOKEN LOGGING: Enhanced token tracking with tenant attribution
@@ -814,12 +829,20 @@ async def clear_report_session_endpoint(
         
         from src.services.report_session_service import clear_report_session
         
-        # Clear session with ENFORCED tenant isolation
+        # # Clear session with ENFORCED tenant isolation
+        # success = clear_report_session(
+        #     session_id=session_id,
+        #     report_id=report_id,
+        #     report_type=report_type,
+        #     tenant_id=user_tenant_id  # ENFORCED: Pass tenant_id for isolation
+        # )
+        # Clear session with ENFORCED tenant+user isolation for complete privacy
         success = clear_report_session(
             session_id=session_id,
             report_id=report_id,
             report_type=report_type,
-            tenant_id=user_tenant_id  # ENFORCED: Pass tenant_id for isolation
+            tenant_id=user_tenant_id,  # ENFORCED: Pass tenant_id for isolation
+            user_email=current_user.username  # ENFORCED: Pass user_email for complete isolation
         )
         
         if success:

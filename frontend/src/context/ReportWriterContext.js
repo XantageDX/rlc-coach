@@ -127,10 +127,34 @@ const reportWriterReducer = (state, action) => {
 };
 
 // localStorage key
-const STORAGE_KEY = 'rlc-reportwriter-state';
+// const STORAGE_KEY = 'rlc-reportwriter-state';
+
+// Dynamic storage key based on current user
+  const getStorageKey = (userEmail) => {
+    return userEmail ? `rlc-reportwriter-state-${userEmail}` : 'rlc-reportwriter-state-guest';
+  };
 
 // Helper function to save state to localStorage
-const saveStateToStorage = (state) => {
+// const saveStateToStorage = (state) => {
+//   try {
+//     const stateToSave = {
+//       currentReport: state.currentReport,
+//       reportType: state.reportType,
+//       formData: state.formData,
+//       aiSuggestions: state.aiSuggestions,
+//       // Save conversation memory state
+//       selectedReport: state.selectedReport,
+//       chatMessages: state.chatMessages,
+//       chatInput: state.chatInput,
+//       sources: state.sources
+//       // Note: We don't save loading states or UI states like showActionsMenu
+//     };
+//     localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+//   } catch (error) {
+//     console.warn('Failed to save Report Writer state to localStorage:', error);
+//   }
+// };
+const saveStateToStorage = (state, userEmail) => {
   try {
     const stateToSave = {
       currentReport: state.currentReport,
@@ -144,16 +168,29 @@ const saveStateToStorage = (state) => {
       sources: state.sources
       // Note: We don't save loading states or UI states like showActionsMenu
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+    const storageKey = getStorageKey(userEmail);
+    localStorage.setItem(storageKey, JSON.stringify(stateToSave));
   } catch (error) {
     console.warn('Failed to save Report Writer state to localStorage:', error);
   }
 };
 
 // Helper function to load state from localStorage
-const loadStateFromStorage = () => {
+// const loadStateFromStorage = () => {
+//   try {
+//     const savedState = localStorage.getItem(STORAGE_KEY);
+//     if (savedState) {
+//       return JSON.parse(savedState);
+//     }
+//   } catch (error) {
+//     console.warn('Failed to load Report Writer state from localStorage:', error);
+//   }
+//   return null;
+// };
+const loadStateFromStorage = (userEmail) => {
   try {
-    const savedState = localStorage.getItem(STORAGE_KEY);
+    const storageKey = getStorageKey(userEmail);
+    const savedState = localStorage.getItem(storageKey);
     if (savedState) {
       return JSON.parse(savedState);
     }
@@ -168,16 +205,44 @@ export const ReportWriterProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reportWriterReducer, initialState);
 
   // Load state from localStorage on initialization
+  // useEffect(() => {
+  //   const savedState = loadStateFromStorage();
+  //   if (savedState) {
+  //     dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
+  //   }
+  // }, []);
   useEffect(() => {
-    const savedState = loadStateFromStorage();
+    // Get current user email for user-specific storage
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    const userEmail = user?.email;
+    
+    const savedState = loadStateFromStorage(userEmail);
     if (savedState) {
       dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
     }
   }, []);
 
   // Save state to localStorage whenever relevant state changes
+  // useEffect(() => {
+  //   saveStateToStorage(state);
+  // }, [
+  //   state.currentReport,
+  //   state.reportType,
+  //   state.formData,
+  //   state.aiSuggestions,
+  //   // Add conversation memory dependencies
+  //   state.selectedReport,
+  //   state.chatMessages,
+  //   state.chatInput,
+  //   state.sources
+  // ]);
   useEffect(() => {
-    saveStateToStorage(state);
+    // Only save if we have actual content (avoid saving initial empty state)
+    if (state.currentReport || state.formData.title || state.chatMessages.length > 1) {
+      const user = JSON.parse(localStorage.getItem('user') || 'null');
+      const userEmail = user?.email;
+      saveStateToStorage(state, userEmail);
+    }
   }, [
     state.currentReport,
     state.reportType,
@@ -223,12 +288,27 @@ export const ReportWriterProvider = ({ children }) => {
     dispatch({ type: actionTypes.MARK_SAVED });
   };
 
+  // const clearReport = () => {
+  //   // Generate a new session ID
+  //   const newSessionId = `report-session-${Date.now()}`;
+    
+  //   // Clear both state and localStorage
+  //   localStorage.removeItem(STORAGE_KEY);
+  //   dispatch({ 
+  //     type: actionTypes.CLEAR_REPORT,
+  //     payload: { sessionId: newSessionId }
+  //   });
+  // };
   const clearReport = () => {
     // Generate a new session ID
     const newSessionId = `report-session-${Date.now()}`;
     
-    // Clear both state and localStorage
-    localStorage.removeItem(STORAGE_KEY);
+    // Clear user-specific localStorage
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    const userEmail = user?.email;
+    const storageKey = getStorageKey(userEmail);
+    localStorage.removeItem(storageKey);
+    
     dispatch({ 
       type: actionTypes.CLEAR_REPORT,
       payload: { sessionId: newSessionId }

@@ -64,10 +64,27 @@ const aiCoachReducer = (state, action) => {
 };
 
 // localStorage key
-const STORAGE_KEY = 'rlc-aicoach-state';
+// const STORAGE_KEY = 'rlc-aicoach-state';
+// Dynamic storage key based on current user
+const getStorageKey = (userEmail) => {
+  return userEmail ? `rlc-aicoach-state-${userEmail}` : 'rlc-aicoach-state-guest';
+};
 
 // Helper function to save state to localStorage
-const saveStateToStorage = (state) => {
+// const saveStateToStorage = (state) => {
+//   try {
+//     const stateToSave = {
+//       messages: state.messages,
+//       inputText: state.inputText,
+//       conversationId: state.conversationId,
+//       showSuggestions: state.showSuggestions
+//     };
+//     localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+//   } catch (error) {
+//     console.warn('Failed to save AI Coach state to localStorage:', error);
+//   }
+// };
+const saveStateToStorage = (state, userEmail) => {
   try {
     const stateToSave = {
       messages: state.messages,
@@ -75,16 +92,29 @@ const saveStateToStorage = (state) => {
       conversationId: state.conversationId,
       showSuggestions: state.showSuggestions
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+    const storageKey = getStorageKey(userEmail);
+    localStorage.setItem(storageKey, JSON.stringify(stateToSave));
   } catch (error) {
     console.warn('Failed to save AI Coach state to localStorage:', error);
   }
 };
 
 // Helper function to load state from localStorage
-const loadStateFromStorage = () => {
+// const loadStateFromStorage = () => {
+//   try {
+//     const savedState = localStorage.getItem(STORAGE_KEY);
+//     if (savedState) {
+//       return JSON.parse(savedState);
+//     }
+//   } catch (error) {
+//     console.warn('Failed to load AI Coach state from localStorage:', error);
+//   }
+//   return null;
+// };
+const loadStateFromStorage = (userEmail) => {
   try {
-    const savedState = localStorage.getItem(STORAGE_KEY);
+    const storageKey = getStorageKey(userEmail);
+    const savedState = localStorage.getItem(storageKey);
     if (savedState) {
       return JSON.parse(savedState);
     }
@@ -99,15 +129,36 @@ export const AICoachProvider = ({ children }) => {
   const [state, dispatch] = useReducer(aiCoachReducer, initialState);
 
   // Load state from localStorage on initialization
+  // useEffect(() => {
+  //   const savedState = loadStateFromStorage();
+  //   if (savedState) {
+  //     // If we have saved state, restore it
+  //     dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
+  //   } else {
+  //     // If no saved state, initialize with welcome message
+  //     const welcomeMessage = {
+  //       role: 'assistant',
+  //       content: 'Hello! I\'m your AI Coach for Rapid Learning Cycles. What would you like to know about RLC? Ask me a question in the box at the bottom of the screen or click on one of the following options to get started.'
+  //     };
+  //     const conversationId = `conversation-${Date.now()}`;
+      
+  //     dispatch({ type: actionTypes.SET_MESSAGES, payload: [welcomeMessage] });
+  //     dispatch({ type: actionTypes.SET_CONVERSATION_ID, payload: conversationId });
+  //   }
+  // }, []);
   useEffect(() => {
-    const savedState = loadStateFromStorage();
+    // Get current user email for user-specific storage
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    const userEmail = user?.email;
+    
+    const savedState = loadStateFromStorage(userEmail);
     if (savedState) {
-      // If we have saved state, restore it
       dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
     } else {
-      // If no saved state, initialize with welcome message
+      // Set welcome message if no saved state
       const welcomeMessage = {
-        role: 'assistant',
+        id: Date.now(),
+        type: 'ai',
         content: 'Hello! I\'m your AI Coach for Rapid Learning Cycles. What would you like to know about RLC? Ask me a question in the box at the bottom of the screen or click on one of the following options to get started.'
       };
       const conversationId = `conversation-${Date.now()}`;
@@ -118,10 +169,18 @@ export const AICoachProvider = ({ children }) => {
   }, []);
 
   // Save state to localStorage whenever relevant state changes
+  // useEffect(() => {
+  //   // Only save if we have messages (to avoid saving initial empty state)
+  //   if (state.messages.length > 0) {
+  //     saveStateToStorage(state);
+  //   }
+  // }, [state.messages, state.inputText, state.conversationId, state.showSuggestions]);
   useEffect(() => {
     // Only save if we have messages (to avoid saving initial empty state)
     if (state.messages.length > 0) {
-      saveStateToStorage(state);
+      const user = JSON.parse(localStorage.getItem('user') || 'null');
+      const userEmail = user?.email;
+      saveStateToStorage(state, userEmail);
     }
   }, [state.messages, state.inputText, state.conversationId, state.showSuggestions]);
 
@@ -160,26 +219,46 @@ export const AICoachProvider = ({ children }) => {
 //     dispatch({ type: actionTypes.CLEAR_CONVERSATION });
 //   };
 // CLEAR MEMORY CONVERSATION
+    // const clearConversation = async () => {
+    //     // Store the old conversation ID before clearing
+    //     const oldConversationId = state.conversationId;
+        
+    //     // Clear frontend state and localStorage first
+    //     localStorage.removeItem(STORAGE_KEY);
+    //     dispatch({ type: actionTypes.CLEAR_CONVERSATION });
+        
+    //     // Clear backend memory if we had a conversation ID
+    //     if (oldConversationId) {
+    //     try {
+    //         // We'll add this function to the service next
+    //         await aiCoachService.clearConversation(oldConversationId);
+    //     } catch (error) {
+    //         console.warn('Failed to clear backend conversation memory:', error);
+    //         // Don't block the UI if backend clearing fails
+    //     }
+    //     }
+    // };
     const clearConversation = async () => {
-        // Store the old conversation ID before clearing
-        const oldConversationId = state.conversationId;
-        
-        // Clear frontend state and localStorage first
-        localStorage.removeItem(STORAGE_KEY);
-        dispatch({ type: actionTypes.CLEAR_CONVERSATION });
-        
-        // Clear backend memory if we had a conversation ID
-        if (oldConversationId) {
+      // Store the old conversation ID before clearing
+      const oldConversationId = state.conversationId;
+      
+      // Clear frontend state and user-specific localStorage
+      const user = JSON.parse(localStorage.getItem('user') || 'null');
+      const userEmail = user?.email;
+      const storageKey = getStorageKey(userEmail);
+      localStorage.removeItem(storageKey);
+      dispatch({ type: actionTypes.CLEAR_CONVERSATION });
+      
+      // Clear backend memory if we had a conversation ID
+      if (oldConversationId) {
         try {
-            // We'll add this function to the service next
-            await aiCoachService.clearConversation(oldConversationId);
+          await aiCoachService.clearConversation(oldConversationId);
         } catch (error) {
-            console.warn('Failed to clear backend conversation memory:', error);
-            // Don't block the UI if backend clearing fails
+          console.warn('Failed to clear backend conversation memory:', error);
+          // Don't block the UI if backend clearing fails
         }
-        }
+      }
     };
-  // END EDITS 
 
   const clearCurrentMessage = () => {
     dispatch({ type: actionTypes.CLEAR_CURRENT_MESSAGE });
