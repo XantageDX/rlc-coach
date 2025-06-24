@@ -65,9 +65,11 @@ const billingService = {
                 total_tokens: tenant.usage?.total_tokens_used || 0,
                 token_limit: tenant.usage?.token_limit || 0,
                 usage_percentage: tenant.usage?.usage_percentage || 0,
-                // Estimate active users (you may need to adjust this)
-                active_users: Math.floor(Math.random() * 15) + 1, // Placeholder
-                max_users: 20 // Placeholder
+                // // Estimate active users (you may need to adjust this)
+                // active_users: Math.floor(Math.random() * 15) + 1, // Placeholder
+                // max_users: 20 // Placeholder
+                active_users: tenant.user_count || 0,  // Real user count from backend
+                max_users: tenant.usage?.token_limit ? Math.floor(tenant.usage.token_limit / 1000000) : 20  // Based on token limit
             }));
 
             return {

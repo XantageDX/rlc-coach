@@ -430,9 +430,46 @@ async def get_tenant_usage(
             detail=f"Error retrieving usage data: {str(e)}"
         )
 
+# @router.get("/usage-all")
+# async def get_all_tenants_usage(current_user = Depends(get_current_user)):
+#     """Get token usage for all tenants (super_admin only)"""
+#     if current_user.role != "super_admin":
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail="Only super admins can view all tenant usage"
+#         )
+    
+#     try:
+#         current_month = datetime.utcnow().strftime("%Y-%m")
+#         tenants_collection = db["tenants"]
+#         token_usage_collection = db["tenant_token_usage"]
+        
+#         # Get all tenants
+#         tenants = list(tenants_collection.find({}, {"_id": 1, "name": 1, "token_limit_millions": 1}))
+        
+#         usage_data = []
+#         for tenant in tenants:
+#             tenant_id = str(tenant["_id"])
+#             usage = await token_logger.get_tenant_usage_summary(tenant_id, current_month)
+            
+#             usage_data.append({
+#                 "tenant_id": tenant_id,
+#                 "tenant_name": tenant["name"],
+#                 "usage": usage
+#             })
+        
+#         return {
+#             "month": current_month,
+#             "tenants": usage_data,
+#             "total_tenants": len(usage_data)
+#         }
+#     except Exception as e:
+#         raise HTTPException(
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             detail=f"Error retrieving usage data: {str(e)}"
+#         )
 @router.get("/usage-all")
 async def get_all_tenants_usage(current_user = Depends(get_current_user)):
-    """Get token usage for all tenants (super_admin only)"""
     if current_user.role != "super_admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -443,6 +480,7 @@ async def get_all_tenants_usage(current_user = Depends(get_current_user)):
         current_month = datetime.utcnow().strftime("%Y-%m")
         tenants_collection = db["tenants"]
         token_usage_collection = db["tenant_token_usage"]
+        users_collection = db["users"]  # ADD THIS LINE
         
         # Get all tenants
         tenants = list(tenants_collection.find({}, {"_id": 1, "name": 1, "token_limit_millions": 1}))
@@ -452,16 +490,25 @@ async def get_all_tenants_usage(current_user = Depends(get_current_user)):
             tenant_id = str(tenant["_id"])
             usage = await token_logger.get_tenant_usage_summary(tenant_id, current_month)
             
+            # ADD THIS: Get actual user count for this tenant
+            user_count = users_collection.count_documents({"tenant_id": ObjectId(tenant_id)})
+            
             usage_data.append({
                 "tenant_id": tenant_id,
                 "tenant_name": tenant["name"],
-                "usage": usage
+                "usage": usage,
+                "user_count": user_count  # ADD THIS LINE
             })
+        
+        # ADD THIS: Also count super_admin users (tenant_id = null)
+        super_admin_count = users_collection.count_documents({"tenant_id": None})
         
         return {
             "month": current_month,
             "tenants": usage_data,
-            "total_tenants": len(usage_data)
+            "total_tenants": len(usage_data),
+            "super_admin_users": super_admin_count,  # ADD THIS LINE
+            "total_users": sum(tenant["user_count"] for tenant in usage_data) + super_admin_count  # ADD THIS LINE
         }
     except Exception as e:
         raise HTTPException(
