@@ -9,7 +9,7 @@ from langchain_community.document_loaders import DirectoryLoader, TextLoader, Do
 from src.ai_coach.cohere_embeddings import CohereBedrockEmbeddings
 from typing import List
 from langchain_core.documents import Document
-from langchain_core.retrievers import BaseRetriever
+
 
 # def load_and_split_documents(docs_directory):
 #     """Load documents from a directory and split them into chunks."""
@@ -168,43 +168,7 @@ def initialize_vector_db(chunks, persist_directory="./chroma_db"):
     return vectordb
 
 ###### DEBUG ######
-class DebugRetriever(BaseRetriever):
-    """Wrapper around retriever that prints retrieved chunks for debugging"""
-    
-    def __init__(self, base_retriever):
-        super().__init__()
-        self.base_retriever = base_retriever
-        self.debug_enabled = os.getenv("RAG_DEBUG_MODE", "false").lower() == "true"
-    
-    def _get_relevant_documents(self, query: str, *, run_manager=None) -> List[Document]:
-        """Get documents and print them if debug mode is enabled"""
-        # Get the documents from the base retriever
-        docs = self.base_retriever.get_relevant_documents(query)
-        
-        # Print debug info if enabled
-        if self.debug_enabled:
-            print(f"\n🔍 RAG DEBUG: Query: '{query}'")
-            print(f"📊 RAG DEBUG: Retrieved {len(docs)} chunks")
-            print("=" * 60)
-            
-            for i, doc in enumerate(docs, 1):
-                # Get source information
-                source = doc.metadata.get('source', 'Unknown source')
-                page = doc.metadata.get('page', 'N/A')
-                
-                # Print chunk information
-                print(f"📄 RAG DEBUG: Chunk {i}")
-                print(f"   Source: {source}")
-                if page != 'N/A':
-                    print(f"   Page: {page}")
-                print(f"   Content preview: {doc.page_content[:200]}...")
-                print(f"   Full content length: {len(doc.page_content)} chars")
-                print("-" * 40)
-            
-            print("=" * 60)
-            print(f"🔚 RAG DEBUG: End of retrieval for query: '{query}'\n")
-        
-        return docs
+
     
 ################
 
@@ -243,9 +207,45 @@ def get_retriever(persist_directory="./chroma_db"):
         )
         base_retriever = vectordb.as_retriever(search_kwargs={"k": 8})
         
-        # Wrap with debug retriever
-        debug_retriever = DebugRetriever(base_retriever)
-        return debug_retriever
+        # Check if debug mode is enabled
+        debug_enabled = os.getenv("RAG_DEBUG_MODE", "false").lower() == "true"
+        
+        if debug_enabled:
+            # Create a simple wrapper function
+            original_get_relevant_documents = base_retriever.get_relevant_documents
+            
+            def debug_get_relevant_documents(query):
+                # Get the documents from the original method
+                docs = original_get_relevant_documents(query)
+                
+                # Print debug info
+                print(f"\n🔍 RAG DEBUG: Query: '{query}'")
+                print(f"📊 RAG DEBUG: Retrieved {len(docs)} chunks")
+                print("=" * 60)
+                
+                for i, doc in enumerate(docs, 1):
+                    # Get source information
+                    source = doc.metadata.get('source', 'Unknown source')
+                    page = doc.metadata.get('page', 'N/A')
+                    
+                    # Print chunk information
+                    print(f"📄 RAG DEBUG: Chunk {i}")
+                    print(f"   Source: {source}")
+                    if page != 'N/A':
+                        print(f"   Page: {page}")
+                    print(f"   Content preview: {doc.page_content[:200]}...")
+                    print(f"   Full content length: {len(doc.page_content)} chars")
+                    print("-" * 40)
+                
+                print("=" * 60)
+                print(f"🔚 RAG DEBUG: End of retrieval for query: '{query}'\n")
+                
+                return docs
+            
+            # Replace the method with our debug version
+            base_retriever.get_relevant_documents = debug_get_relevant_documents
+        
+        return base_retriever
         
     except Exception as e:
         print(f"Error loading vector database: {e}")
