@@ -9,6 +9,7 @@ from langchain_community.document_loaders import DirectoryLoader, TextLoader, Do
 from src.ai_coach.cohere_embeddings import CohereBedrockEmbeddings
 from typing import List
 from langchain_core.documents import Document
+from langchain_core.retrievers import BaseRetriever
 
 # def load_and_split_documents(docs_directory):
 #     """Load documents from a directory and split them into chunks."""
@@ -167,14 +168,15 @@ def initialize_vector_db(chunks, persist_directory="./chroma_db"):
     return vectordb
 
 ###### DEBUG ######
-class DebugRetriever:
+class DebugRetriever(BaseRetriever):
     """Wrapper around retriever that prints retrieved chunks for debugging"""
     
     def __init__(self, base_retriever):
+        super().__init__()
         self.base_retriever = base_retriever
         self.debug_enabled = os.getenv("RAG_DEBUG_MODE", "false").lower() == "true"
     
-    def get_relevant_documents(self, query: str) -> List[Document]:
+    def _get_relevant_documents(self, query: str, *, run_manager=None) -> List[Document]:
         """Get documents and print them if debug mode is enabled"""
         # Get the documents from the base retriever
         docs = self.base_retriever.get_relevant_documents(query)
@@ -203,10 +205,6 @@ class DebugRetriever:
             print(f"🔚 RAG DEBUG: End of retrieval for query: '{query}'\n")
         
         return docs
-    
-    def __getattr__(self, name):
-        """Delegate any other method calls to the base retriever"""
-        return getattr(self.base_retriever, name)
     
 ################
 

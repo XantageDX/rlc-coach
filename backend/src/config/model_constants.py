@@ -9,7 +9,7 @@ EMBEDDING_MODEL = "cohere.embed-multilingual-v3"
 LLAMA_MODEL_KWARGS = {
     "temperature": 0,
     "top_p": 0.9,
-    "max_tokens": 2000
+    "max_tokens": 4000
 }
 
 # Model configuration for Cohere embeddings
