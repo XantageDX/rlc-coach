@@ -3,6 +3,7 @@ import os
 from langchain_aws import BedrockEmbeddings
 from langchain_community.vectorstores import Chroma
 import chromadb
+from src.config.model_constants import EMBEDDING_MODEL
 
 def initialize_archive_vector_db(persist_directory="./archive_chroma_db"):
     """Initialize a separate vector database for archive documents."""
@@ -11,8 +12,10 @@ def initialize_archive_vector_db(persist_directory="./archive_chroma_db"):
     
     # Initialize Bedrock embeddings (same as AI Coach)
     embeddings = BedrockEmbeddings(
-        model_id="amazon.titan-embed-text-v2:0",
+        # model_id="amazon.titan-embed-text-v2:0",
+        model_id=EMBEDDING_MODEL,
         region_name=os.getenv("AWS_REGION", "us-east-1"),
+        model_kwargs={"input_type": "search_document"}  # ADD THIS LINE
     )
     
     # Create the client
@@ -31,8 +34,10 @@ def get_archive_retriever(persist_directory="./archive_chroma_db"):
     """Get a retriever from the archive vector database."""
     # Initialize Bedrock embeddings
     embeddings = BedrockEmbeddings(
-        model_id="amazon.titan-embed-text-v2:0",
+        # model_id="amazon.titan-embed-text-v2:0",
+        model_id=EMBEDDING_MODEL,
         region_name=os.getenv("AWS_REGION", "us-east-1"),
+        model_kwargs={"input_type": "search_document"}  # ADD THIS LINE
     )
     
     # Load the existing vector store
@@ -58,8 +63,10 @@ def add_document_to_vectordb(docs, persist_directory="./archive_chroma_db"):
     try:
         # Initialize Bedrock embeddings
         embeddings = BedrockEmbeddings(
-            model_id="amazon.titan-embed-text-v2:0",
+            # model_id="amazon.titan-embed-text-v2:0",
+            model_id=EMBEDDING_MODEL,
             region_name=os.getenv("AWS_REGION", "us-east-1"),
+            model_kwargs={"input_type": "search_document"}  # ADD THIS LINE
         )
         
         # Get the vector database
@@ -96,8 +103,9 @@ def delete_document_embeddings(document_filename, persist_directory="./archive_c
     try:
         # Initialize Bedrock embeddings
         embeddings = BedrockEmbeddings(
-            model_id="amazon.titan-embed-text-v2:0",
+            model_id=EMBEDDING_MODEL,
             region_name=os.getenv("AWS_REGION", "us-east-1"),
+            model_kwargs={"input_type": "search_document"}  # ADD THIS LINE
         )
         
         # Get the vector database

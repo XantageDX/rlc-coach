@@ -31,7 +31,7 @@ yarn-error.log*
 # Database
 *.sqlite3
 backend/archive_chroma_db/
-#backend/chroma_db
+backend/chroma_db_titan
 /mongodb-backup-20250527.tar.gz/
 
 # Documents

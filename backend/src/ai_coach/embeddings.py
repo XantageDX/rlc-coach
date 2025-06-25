@@ -6,6 +6,7 @@ from langchain_community.vectorstores import Chroma
 import chromadb
 from src.config.model_constants import EMBEDDING_MODEL
 from langchain_community.document_loaders import DirectoryLoader, TextLoader, Docx2txtLoader
+from src.ai_coach.cohere_embeddings import CohereBedrockEmbeddings
 
 # def load_and_split_documents(docs_directory):
 #     """Load documents from a directory and split them into chunks."""
@@ -119,18 +120,18 @@ def load_and_split_documents(docs_directory):
     # Create loaders for different file types
     txt_loader = DirectoryLoader(
         docs_directory,
-        glob="*/.txt",
+        glob="*.txt",
         loader_cls=TextLoader
     )
     docx_loader = DirectoryLoader(
         docs_directory,
-        glob="*/.docx",
+        glob="*.docx",
         loader_cls=Docx2txtLoader
     )
     # Add PDF loader
     pdf_loader = DirectoryLoader(
         docs_directory,
-        glob="*/.pdf",
+        glob="*.pdf",
         loader_cls=PyPDFLoader
     )
     # Load all documents
@@ -140,8 +141,8 @@ def load_and_split_documents(docs_directory):
     documents = txt_documents + docx_documents + pdf_documents  # Add PDFs to the document list
     print(f"Loaded {len(documents)} files: {len(txt_documents)} .txt, {len(docx_documents)} .docx, and {len(pdf_documents)} .pdf")
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=50,
+        chunk_size=400,        # Reduced to stay under 2048 char limit
+        chunk_overlap=40,      # Proportionally reduced
         separators=["\n\n", "\n", ".", " ", ""]
     )
     chunks = text_splitter.split_documents(documents)
@@ -150,9 +151,10 @@ def load_and_split_documents(docs_directory):
 def initialize_vector_db(chunks, persist_directory="./chroma_db"):
     """Initialize the vector database with document chunks."""
     # Initialize Bedrock embeddings with Cohere
-    embeddings = BedrockEmbeddings(
+    embeddings = CohereBedrockEmbeddings(
         model_id=EMBEDDING_MODEL,  # "cohere.embed-multilingual-v3"
-        region_name=os.getenv("AWS_REGION", "us-east-1"),
+        region_name=os.getenv("AWS_REGION", "us-east-1")
+        #model_kwargs={"input_type": "search_document"}  # ADD THIS LINE
     )
     # Create and persist the vector store
     vectordb = Chroma.from_documents(
@@ -165,9 +167,10 @@ def initialize_vector_db(chunks, persist_directory="./chroma_db"):
 def get_retriever(persist_directory="./chroma_db"):
     """Get a retriever from an existing vector database."""
     # Initialize Bedrock embeddings with Cohere
-    embeddings = BedrockEmbeddings(
+    embeddings = CohereBedrockEmbeddings(
         model_id=EMBEDDING_MODEL,  # "cohere.embed-multilingual-v3"
-        region_name=os.getenv("AWS_REGION", "us-east-1"),
+        region_name=os.getenv("AWS_REGION", "us-east-1")
+        #model_kwargs={"input_type": "search_document"}  # ADD THIS LINE
     )
     # Load the existing vector store
     try:
@@ -184,9 +187,10 @@ def add_to_vector_db(chunks, persist_directory="./chroma_db"):
     """Add document chunks to an existing vector database."""
     try:
         # Initialize Bedrock embeddings with Cohere
-        embeddings = BedrockEmbeddings(
+        embeddings = CohereBedrockEmbeddings(
             model_id=EMBEDDING_MODEL,  # "cohere.embed-multilingual-v3"
-            region_name=os.getenv("AWS_REGION", "us-east-1"),
+            region_name=os.getenv("AWS_REGION", "us-east-1")
+            #model_kwargs={"input_type": "search_document"}  # ADD THIS LINE
         )
         # Load the existing vector store
         try:

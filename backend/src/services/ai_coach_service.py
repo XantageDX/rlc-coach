@@ -274,20 +274,26 @@ def get_rag_chain(conversation_id=None, tenant_id=None, user_email=None):
     """
     global _rag_chains
     
+    # VALIDATION: For tenant users, user_email is mandatory for isolation
+    if tenant_id and not user_email:
+        raise ValueError(
+            f"user_email is required for tenant operations (tenant_id: {tenant_id}). "
+            f"This ensures complete conversation isolation between users."
+        )
+    
     # Use default conversation if none provided
     if not conversation_id:
         conversation_id = "default"
     
-    # Create tenant+user-scoped conversation key for complete isolation
+    # Create session key with CONSISTENT format (no fallbacks to old format)
     if tenant_id and user_email:
         # Full isolation: tenant + user + conversation
         chain_key = f"tenant_{tenant_id}_user_{user_email}_{conversation_id}"
-    elif tenant_id:
-        # Fallback: tenant-only scoping (for backwards compatibility)
-        chain_key = f"tenant_{tenant_id}_{conversation_id}"
-    else:
-        # Super admin or system operations use global scope
+    elif not tenant_id:  # Super admin only
         chain_key = f"global_{conversation_id}"
+    else:
+        # This should never happen due to validation above
+        raise ValueError("Invalid session parameters: tenant_id provided without user_email")
     
     # Create chain if it doesn't exist
     if chain_key not in _rag_chains:
@@ -299,7 +305,7 @@ def get_rag_chain(conversation_id=None, tenant_id=None, user_email=None):
             model_id=LLM_MODEL  # Force Llama 3.3 70B
         )
         
-        print(f"Created new RAG chain for conversation: {chain_key} using {LLM_MODEL}")
+        print(f"✅ Created new RAG chain: {chain_key} using {LLM_MODEL}")
     
     return _rag_chains[chain_key]
 
@@ -320,32 +326,39 @@ def clear_conversation_memory(conversation_id, tenant_id=None, user_email=None):
     """
     global _rag_chains
     
+    # VALIDATION: Apply same validation as get_rag_chain
+    if tenant_id and not user_email:
+        raise ValueError(
+            f"user_email is required for tenant operations (tenant_id: {tenant_id}). "
+            f"Cannot clear conversation without proper user isolation."
+        )
+    
     # Create the same key format as get_rag_chain
     if tenant_id and user_email:
         # Full isolation: tenant + user + conversation
         chain_key = f"tenant_{tenant_id}_user_{user_email}_{conversation_id}"
-    elif tenant_id:
-        # Fallback: tenant-only scoping
-        chain_key = f"tenant_{tenant_id}_{conversation_id}"
-    else:
+    elif not tenant_id:  # Super admin only
         chain_key = f"global_{conversation_id}"
+    else:
+        # This should never happen due to validation above
+        raise ValueError("Invalid session parameters: tenant_id provided without user_email")
     
     # Remove the specific chain
     if chain_key in _rag_chains:
         del _rag_chains[chain_key]
-        print(f"Cleared memory for conversation chain: {chain_key}")
-        return True  # NEW: Return success status
+        print(f"✅ Cleared memory for conversation chain: {chain_key}")
+        return True
     else:
-        print(f"No conversation chain found for: {chain_key}")
-        return False  # NEW: Return failure status
+        print(f"⚠️  No conversation chain found for: {chain_key}")
+        return False
 
-def get_conversation_history(conversation_id: str, tenant_id=None):
+def get_conversation_history(conversation_id: str, tenant_id=None, user_email=None):
     """
-    Get conversation history for a specific conversation with tenant scoping.
+    Get conversation history for a specific conversation with tenant+user scoping.
     """
     try:
-        # Get the chain (this will create it if it doesn't exist)
-        chain = get_rag_chain(conversation_id, tenant_id)
+        # FIX: Pass all three parameters to maintain session key consistency
+        chain = get_rag_chain(conversation_id, tenant_id, user_email)
         
         # Extract conversation history from the chain's memory
         if hasattr(chain, 'memory') and hasattr(chain.memory, 'chat_memory'):
@@ -366,7 +379,7 @@ def get_conversation_history(conversation_id: str, tenant_id=None):
         return []
         
     except Exception as e:
-        print(f"Error getting conversation history: {e}")
+        print(f"❌ Error getting conversation history: {e}")
         return []
 
 # async def ask_ai_coach(question: str, conversation_id: str = None, model_id: str = None, tenant_id: str = None):
@@ -472,34 +485,56 @@ def clear_all_conversations(tenant_id=None):
 def get_active_conversations(requesting_tenant_id=None):
     """
     Get list of active conversations with optional tenant filtering.
+    Enhanced to handle new session key format: tenant_{tenant_id}_user_{user_email}_{conversation_id}
     """
     global _rag_chains
     
     conversations = {
         "total_chains": len(_rag_chains),
         "conversations": [],
-        "requesting_tenant": requesting_tenant_id  # NEW: Track who's requesting
+        "requesting_tenant": requesting_tenant_id
     }
     
     for chain_key in _rag_chains.keys():
         include_conversation = False
+        conversation_info = None
         
         if chain_key.startswith("tenant_"):
-            # Parse tenant conversation
-            parts = chain_key.split("_", 2)
-            if len(parts) >= 3:
+            # Parse tenant conversation - handle both old and new formats
+            parts = chain_key.split("_")
+            
+            if len(parts) >= 5 and parts[2] == "user":
+                # NEW FORMAT: tenant_{tenant_id}_user_{user_email}_{conversation_id}
                 conversation_tenant_id = parts[1]
-                conversation_id = parts[2]
+                user_email = parts[3]
+                conversation_id = "_".join(parts[4:])  # Handle conversation IDs with underscores
                 
                 conversation_info = {
                     "type": "tenant",
                     "tenant_id": conversation_tenant_id,
+                    "user_email": user_email,
                     "conversation_id": conversation_id,
-                    "chain_key": chain_key
+                    "chain_key": chain_key,
+                    "format": "user_scoped"
                 }
                 
-                # NEW: Only show conversations the requester can access
-                if requesting_tenant_id is None or requesting_tenant_id == conversation_tenant_id:
+            elif len(parts) >= 3:
+                # OLD FORMAT: tenant_{tenant_id}_{conversation_id} (for backwards compatibility)
+                conversation_tenant_id = parts[1]
+                conversation_id = "_".join(parts[2:])  # Handle conversation IDs with underscores
+                
+                conversation_info = {
+                    "type": "tenant",
+                    "tenant_id": conversation_tenant_id,
+                    "user_email": None,
+                    "conversation_id": conversation_id,
+                    "chain_key": chain_key,
+                    "format": "tenant_scoped"
+                }
+            
+            # Check if requester can access this conversation
+            if conversation_info:
+                if requesting_tenant_id is None or requesting_tenant_id == conversation_info["tenant_id"]:
                     include_conversation = True
                     
         elif chain_key.startswith("global_"):
@@ -508,16 +543,18 @@ def get_active_conversations(requesting_tenant_id=None):
             conversation_info = {
                 "type": "global",
                 "tenant_id": None,
+                "user_email": None,
                 "conversation_id": conversation_id,
-                "chain_key": chain_key
+                "chain_key": chain_key,
+                "format": "global"
             }
             
             # Only super admin (requesting_tenant_id=None) can see global conversations
             if requesting_tenant_id is None:
                 include_conversation = True
         
-        if include_conversation:
+        if include_conversation and conversation_info:
             conversations["conversations"].append(conversation_info)
     
-    conversations["total_chains"] = len(conversations["conversations"])  # NEW: Update count
+    conversations["total_chains"] = len(conversations["conversations"])
     return conversations
