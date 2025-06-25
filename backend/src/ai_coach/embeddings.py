@@ -7,6 +7,8 @@ import chromadb
 from src.config.model_constants import EMBEDDING_MODEL
 from langchain_community.document_loaders import DirectoryLoader, TextLoader, Docx2txtLoader
 from src.ai_coach.cohere_embeddings import CohereBedrockEmbeddings
+from typing import List
+from langchain_core.documents import Document
 
 # def load_and_split_documents(docs_directory):
 #     """Load documents from a directory and split them into chunks."""
@@ -164,8 +166,71 @@ def initialize_vector_db(chunks, persist_directory="./chroma_db"):
     )
     return vectordb
 
+###### DEBUG ######
+class DebugRetriever:
+    """Wrapper around retriever that prints retrieved chunks for debugging"""
+    
+    def __init__(self, base_retriever):
+        self.base_retriever = base_retriever
+        self.debug_enabled = os.getenv("RAG_DEBUG_MODE", "false").lower() == "true"
+    
+    def get_relevant_documents(self, query: str) -> List[Document]:
+        """Get documents and print them if debug mode is enabled"""
+        # Get the documents from the base retriever
+        docs = self.base_retriever.get_relevant_documents(query)
+        
+        # Print debug info if enabled
+        if self.debug_enabled:
+            print(f"\n🔍 RAG DEBUG: Query: '{query}'")
+            print(f"📊 RAG DEBUG: Retrieved {len(docs)} chunks")
+            print("=" * 60)
+            
+            for i, doc in enumerate(docs, 1):
+                # Get source information
+                source = doc.metadata.get('source', 'Unknown source')
+                page = doc.metadata.get('page', 'N/A')
+                
+                # Print chunk information
+                print(f"📄 RAG DEBUG: Chunk {i}")
+                print(f"   Source: {source}")
+                if page != 'N/A':
+                    print(f"   Page: {page}")
+                print(f"   Content preview: {doc.page_content[:200]}...")
+                print(f"   Full content length: {len(doc.page_content)} chars")
+                print("-" * 40)
+            
+            print("=" * 60)
+            print(f"🔚 RAG DEBUG: End of retrieval for query: '{query}'\n")
+        
+        return docs
+    
+    def __getattr__(self, name):
+        """Delegate any other method calls to the base retriever"""
+        return getattr(self.base_retriever, name)
+    
+################
+
+# def get_retriever(persist_directory="./chroma_db"):
+#     """Get a retriever from an existing vector database."""
+#     # Initialize Bedrock embeddings with Cohere
+#     embeddings = CohereBedrockEmbeddings(
+#         model_id=EMBEDDING_MODEL,  # "cohere.embed-multilingual-v3"
+#         region_name=os.getenv("AWS_REGION", "us-east-1")
+#         #model_kwargs={"input_type": "search_document"}  # ADD THIS LINE
+#     )
+#     # Load the existing vector store
+#     try:
+#         vectordb = Chroma(
+#             persist_directory=persist_directory,
+#             embedding_function=embeddings
+#         )
+#         return vectordb.as_retriever(search_kwargs={"k": 4})
+#     except Exception as e:
+#         print(f"Error loading vector database: {e}")
+#         return None
+# REPLACE your existing get_retriever function with this modified version:
 def get_retriever(persist_directory="./chroma_db"):
-    """Get a retriever from an existing vector database."""
+    """Get a retriever from an existing vector database with optional debug wrapper."""
     # Initialize Bedrock embeddings with Cohere
     embeddings = CohereBedrockEmbeddings(
         model_id=EMBEDDING_MODEL,  # "cohere.embed-multilingual-v3"
@@ -178,7 +243,12 @@ def get_retriever(persist_directory="./chroma_db"):
             persist_directory=persist_directory,
             embedding_function=embeddings
         )
-        return vectordb.as_retriever(search_kwargs={"k": 4})
+        base_retriever = vectordb.as_retriever(search_kwargs={"k": 8})
+        
+        # Wrap with debug retriever
+        debug_retriever = DebugRetriever(base_retriever)
+        return debug_retriever
+        
     except Exception as e:
         print(f"Error loading vector database: {e}")
         return None
