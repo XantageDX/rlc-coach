@@ -298,7 +298,7 @@ class TokenUsageLogger:
         tenant_id: str,
         user_email: str,
         api_endpoint: str,
-        model_type: str,  # "llm" or "embedding"
+        model_type: str,
         tokens_used: int,
         model: str = LLM_MODEL
     ):
@@ -355,7 +355,6 @@ class TokenUsageLogger:
                 }
             }
         else:
-            # Fallback for unknown types
             update_fields = {
                 "$inc": {
                     "total_other_tokens": tokens_used,
@@ -371,8 +370,7 @@ class TokenUsageLogger:
         
         update_fields["$setOnInsert"] = {
             "tenant_id": tenant_id,
-            "month": current_month,
-            "year": current_time.year,
+            # Removed month and year to avoid conflicts
             "total_llm_tokens": 0,
             "total_embedding_tokens": 0,
             "total_other_tokens": 0,
@@ -382,7 +380,7 @@ class TokenUsageLogger:
         
         monthly_collection.update_one(
             {"tenant_id": tenant_id, "month": current_month},
-            update_fields,  # ✅ CORRECT - Pass the operators directly
+            update_fields,
             upsert=True
         )
 
