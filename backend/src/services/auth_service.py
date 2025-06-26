@@ -166,6 +166,41 @@ async def authenticate_user(email: str, password: str):
     return user
 
 
+# async def login_user(email: str, password: str):
+#     """Login a user and return access token with tenant context"""
+#     user = await authenticate_user(email, password)
+#     if not user:
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="Incorrect email or password",
+#             headers={"WWW-Authenticate": "Bearer"},
+#         )
+    
+#     # Create token data with tenant context
+#     token_data = {
+#         "sub": user["email"],
+#         "role": user["role"],
+#         "first_name": user["first_name"],
+#         "last_name": user["last_name"],
+#         "tenant_id": user.get("tenant_id"),  # NEW: Include tenant_id in token
+#     }
+    
+#     # Create token
+#     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+#     access_token = create_access_token(
+#         data=token_data, expires_delta=access_token_expires
+#     )
+    
+#     return {
+#         "access_token": access_token,
+#         "token_type": "bearer",
+#         "role": user["role"],
+#         "first_name": user["first_name"],
+#         "last_name": user["last_name"],
+#         "email": user["email"],
+#         "tenant_id": user.get("tenant_id"),  # NEW: Include in login response
+#     }
+
 async def login_user(email: str, password: str):
     """Login a user and return access token with tenant context"""
     user = await authenticate_user(email, password)
@@ -175,22 +210,25 @@ async def login_user(email: str, password: str):
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     # Create token data with tenant context
     token_data = {
         "sub": user["email"],
         "role": user["role"],
         "first_name": user["first_name"],
         "last_name": user["last_name"],
-        "tenant_id": user.get("tenant_id"),  # NEW: Include tenant_id in token
+        "tenant_id": user.get("tenant_id"), # This goes to JWT (your auth.py handles ObjectId conversion)
     }
-    
+
     # Create token
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data=token_data, expires_delta=access_token_expires
     )
-    
+
+    # 🔧 FIX: Convert ObjectId to string for API response
+    tenant_id_response = str(user.get("tenant_id")) if user.get("tenant_id") else None
+
     return {
         "access_token": access_token,
         "token_type": "bearer",
@@ -198,7 +236,7 @@ async def login_user(email: str, password: str):
         "first_name": user["first_name"],
         "last_name": user["last_name"],
         "email": user["email"],
-        "tenant_id": user.get("tenant_id"),  # NEW: Include in login response
+        "tenant_id": tenant_id_response, # 🎯 NOW A STRING!
     }
 
 
