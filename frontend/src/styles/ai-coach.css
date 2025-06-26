@@ -350,3 +350,24 @@
     max-width: 36px !important;
   }
 }
+
+/* AI Coach Disclaimer - Blue Theme */
+.ai-coach-disclaimer {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background-color: #e7f3ff;
+  border: 1px solid #bee5ff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.disclaimer-content {
+  color: var(--brand-darkblue);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.disclaimer-content strong {
+  color: var(--brand-darkblue);
+  font-weight: 600;
+}

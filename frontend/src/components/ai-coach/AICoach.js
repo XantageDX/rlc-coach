@@ -507,6 +507,11 @@ const AICoach = () => {
         <span className="model-badge">🚀 Powered by Llama 3.3 70B</span>
         <span className="model-description">Optimized for RLC methodology guidance</span>
       </div> */}
+      <div className="ai-coach-disclaimer">
+        <div className="disclaimer-content">
+          <strong>Disclaimer:</strong> This AI Coach is still under development, please use the feedback tool to comment on any answers that may be incorrect. Please also indicate if answers are good, it will help reinforce the model.
+        </div>
+      </div>
       
       <div className="messages-container">
         {messages.map((message, index) => (

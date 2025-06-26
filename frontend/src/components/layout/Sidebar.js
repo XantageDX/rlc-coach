@@ -3,7 +3,11 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { useModel } from '../../context/ModelContext';
 import logo from '../../assets/powered_by_xantage.png';
-import sparkLogo from '../../assets/Pagina 2.png';
+import sparkLogo from '../../assets/RLC white transparent background arrow only.png';
+// import sparkLogo from '../../assets/RLCI Logo Only Reversed.jpg'; // SMALL LOGO
+// import sparkLogo from '../../assets/RLCI Horizontal Logo Reversed.png'; // BIG LOGO
+import sparkLogoHorizontal from '../../assets/RLCI Horizontal Logo Reversed.png';
+import sparkLogoCircular from '../../assets/RLC white transparent background arrow only.png';
 import { MdSmartToy, MdDescription, MdArchive, MdAdminPanelSettings } from 'react-icons/md';
 
 
@@ -55,7 +59,56 @@ const Sidebar = () => {
             </div>
           )}
         </div>
-        
+        {/* <div className="sidebar-brand">
+          {!isCollapsed ? (
+            <div className="brand-text">
+              <div className="brand-logo-large">
+                <img src={sparkLogo} alt="RLCI logo" className="spark-logo-large" />
+              </div>
+              <div className="brand-name">
+                <span>Rapid Learning Cycles</span>
+                <span>Spark</span>
+              </div>
+            </div>
+          ) : (
+            <div className="brand-icon">
+              <img src={sparkLogo} alt="RLCI logo" className="spark-logo-collapsed" />
+            </div>
+          )}
+        </div> */}
+        {/* <div className="sidebar-brand">
+          {!isCollapsed ? (
+            <div className="brand-horizontal">
+              <img src={sparkLogo} alt="RLCI logo" className="spark-logo-horizontal" />
+            </div>
+          ) : (
+            <div className="brand-icon">
+              <img src={sparkLogo} alt="RLCI logo" className="spark-logo-horizontal-collapsed" />
+            </div>
+          )}
+        </div> */}
+        {/* <div className="sidebar-brand">
+          {!isCollapsed ? (
+            <div className="brand-horizontal">
+              <img src={sparkLogo} alt="RLCI logo" className="spark-logo-horizontal" />
+            </div>
+          ) : (
+            <div className="brand-icon">
+              <img src={sparkLogo} alt="RLCI logo" className="spark-logo-horizontal-collapsed" />
+            </div>
+          )}
+        </div> */}
+        {/* <div className="sidebar-brand">
+          {!isCollapsed ? (
+            <div className="brand-horizontal">
+              <img src={sparkLogoHorizontal} alt="RLCI logo" className="spark-logo-horizontal" />
+            </div>
+          ) : (
+            <div className="brand-icon">
+              <img src={sparkLogoCircular} alt="RLCI logo" className="spark-logo-circular-collapsed" />
+            </div>
+          )}
+        </div> */}
         <ul className="nav-menu">
           {/* Main navigation items with icons */}
           <li className={isActivePath('/ai-coach') ? 'active' : ''}>

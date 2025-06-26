@@ -326,3 +326,122 @@
     justify-content: center;
     width: 100%;
   }
+
+  /* Scenario 2: Full-width horizontal logo replaces everything */
+/* .brand-horizontal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 15px;
+  width: 100%;
+}
+
+.spark-logo-horizontal {
+  width: 90%;
+  max-width: 200px;
+  height: auto;
+  object-fit: contain;
+  background-color: transparent;
+  filter: none;
+}
+
+.spark-logo-horizontal-collapsed {
+  width: 36px;
+  height: auto;
+  object-fit: contain;
+  background-color: transparent;
+  max-height: 36px;
+}
+
+.sidebar-brand {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
+} */
+
+/* Scenario 1: Large circular logo with text */
+/* .brand-logo-large {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.spark-logo-large {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: transparent;
+  filter: none;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.spark-logo-collapsed {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-brand .brand-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 10px;
+}
+
+.sidebar-brand .brand-name {
+  text-align: center;
+  line-height: 1.2;
+}
+
+.sidebar-brand .brand-name span {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+} */
+
+/* Extended sidebar: Full-width horizontal logo - LEFT ALIGNED */
+.brand-horizontal {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Changed from center to flex-start */
+  padding: 20px 15px;
+  width: 100%;
+}
+
+.spark-logo-horizontal {
+  width: 90%;
+  max-width: 200px;
+  height: auto;
+  object-fit: contain;
+  background-color: transparent;
+  filter: none;
+}
+
+/* Collapsed sidebar: Circular logo - LEFT ALIGNED */
+.spark-logo-circular-collapsed {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Brand section styling */
+.sidebar-brand {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
+  background-color: var(--brand-darkblue);
+}
+
+/* Ensure proper alignment for collapsed state - LEFT ALIGNED */
+.brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Changed from center to flex-start */
+  padding: 15px 15px; /* Increased left padding slightly for better positioning */
+}

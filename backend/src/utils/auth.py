@@ -106,14 +106,39 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
+# def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+#     """Create a new JWT token"""
+#     to_encode = data.copy()
+#     if expires_delta:
+#         expire = datetime.utcnow() + expires_delta
+#     else:
+#         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+#     to_encode.update({"exp": expire})
+#     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+#     return encoded_jwt
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    """Create a new JWT token"""
+    """Create a new JWT token with ObjectId serialization support"""
     to_encode = data.copy()
+    
+    # Convert ObjectId fields to strings for JWT serialization
+    # This handles tenant_id, _id, and any other ObjectId fields
+    for key, value in to_encode.items():
+        if hasattr(value, '__class__') and value.__class__.__name__ == 'ObjectId':
+            to_encode[key] = str(value)
+        # Handle the case where value might be a string representation already
+        elif key == 'tenant_id' and isinstance(value, str):
+            # Keep as string (already compatible)
+            pass
+    
+    # Set expiration
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    
     to_encode.update({"exp": expire})
+    
+    # Create and return JWT token
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
