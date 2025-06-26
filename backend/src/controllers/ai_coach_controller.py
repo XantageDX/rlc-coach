@@ -352,16 +352,33 @@ async def ask_question(
                     response["quota_warning"] = quota_check["message"]
         
         # PHASE 5.1: Enhanced token_info with isolation confirmation
+        # if token_info:
+        #     token_info["isolation_confirmed"] = user_tenant_id is not None
+        #     token_info["tenant_id"] = user_tenant_id
+        
+        # # Return enhanced response with standardized model info
+        # return AICoachResponse(
+        #     answer=response["answer"],
+        #     conversation_id=response.get("conversation_id", data.conversation_id or "default"),
+        #     model_used=standardized_model,  # Always show Llama 3.3
+        #     token_info=token_info  # Include token usage for debugging/transparency
+        # )
+        # PHASE 5.1: Enhanced token_info with isolation confirmation
         if token_info:
             token_info["isolation_confirmed"] = user_tenant_id is not None
             token_info["tenant_id"] = user_tenant_id
-        
+            
+            # 🔧 FIX: Convert any ObjectId fields to strings in token_info
+            for key, value in token_info.items():
+                if hasattr(value, '__class__') and value.__class__.__name__ == 'ObjectId':
+                    token_info[key] = str(value)
+
         # Return enhanced response with standardized model info
         return AICoachResponse(
             answer=response["answer"],
             conversation_id=response.get("conversation_id", data.conversation_id or "default"),
-            model_used=standardized_model,  # Always show Llama 3.3
-            token_info=token_info  # Include token usage for debugging/transparency
+            model_used=standardized_model,
+            token_info=token_info  # 🎯 Now clean of ObjectIds
         )
         
     except HTTPException:
