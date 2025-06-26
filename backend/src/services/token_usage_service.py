@@ -370,11 +370,6 @@ class TokenUsageLogger:
         
         update_fields["$setOnInsert"] = {
             "tenant_id": tenant_id,
-            # Removed month and year to avoid conflicts
-            "total_llm_tokens": 0,
-            "total_embedding_tokens": 0,
-            "total_other_tokens": 0,
-            "total_tokens": 0,
             "created_at": current_time
         }
         
