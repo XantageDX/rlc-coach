@@ -76,6 +76,7 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
+from bson import ObjectId
 
 # Load environment variables
 load_dotenv()
@@ -121,24 +122,16 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     
     # Convert ObjectId fields to strings for JWT serialization
-    # This handles tenant_id, _id, and any other ObjectId fields
     for key, value in to_encode.items():
-        if hasattr(value, '__class__') and value.__class__.__name__ == 'ObjectId':
+        if isinstance(value, ObjectId):
             to_encode[key] = str(value)
-        # Handle the case where value might be a string representation already
-        elif key == 'tenant_id' and isinstance(value, str):
-            # Keep as string (already compatible)
-            pass
     
-    # Set expiration
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     
     to_encode.update({"exp": expire})
-    
-    # Create and return JWT token
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
