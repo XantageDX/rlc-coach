@@ -105,11 +105,67 @@
     font-size: 1.5rem;
   }
   
-  .user-info {
+  /* .user-info {
     display: flex;
     align-items: center;
     gap: 1rem;
+  } */
+  /* Enhanced user info container for role badges */
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
   }
+  /* Role badge base styles */
+  .role-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  /* Role-specific colors */
+  .role-badge-super-admin {
+    background-color: #dc2626;
+    color: white;
+  }
+
+  .role-badge-tenant-admin {
+    background-color: #059669;
+    color: white;
+  }
+
+  .role-badge-user {
+    background-color: #6b7280;
+    color: white;
+  }
+
+  .role-badge-default {
+    background-color: #6b7280;
+    color: white;
+  }
+  /* Mobile responsiveness for role badges */
+  @media (max-width: 768px) {
+    .user-info {
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.25rem;
+    }
+    
+    .user-greeting {
+      font-size: 0.9rem;
+    }
+    
+    .role-badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+    }
+  }
+  /* End */
   
   .user-info button {
     margin: 0;

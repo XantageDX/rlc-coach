@@ -125,11 +125,50 @@ from src.services.auth_service import get_current_active_user
 from src.utils.auth import get_current_user
 from src.utils.db import db
 from bson import ObjectId
+from datetime import datetime
 
 router = APIRouter()
 users_collection = db["users"]
 tenants_collection = db["tenants"]
 
+# @router.get("/users", response_model=List[UserResponse])
+# async def list_users(current_user = Depends(get_current_user)):
+#     """
+#     Get users based on role:
+#     - super_admin: sees all users
+#     - tenant_admin: sees only users in their tenant
+#     """
+#     try:
+#         if current_user.role == "super_admin":
+#             # Super admin sees all users
+#             users = list(users_collection.find({}, {"hashed_password": 0}))
+#         elif current_user.role == "tenant_admin":
+#             # Tenant admin sees only users in their tenant
+#             if not current_user.tenant_id:
+#                 raise HTTPException(
+#                     status_code=status.HTTP_400_BAD_REQUEST,
+#                     detail="Tenant admin must be assigned to a tenant"
+#                 )
+#             users = list(users_collection.find(
+#                 {"tenant_id": current_user.tenant_id}, 
+#                 {"hashed_password": 0}
+#             ))
+#         else:
+#             # Regular users cannot manage other users
+#             raise HTTPException(
+#                 status_code=status.HTTP_403_FORBIDDEN,
+#                 detail="Not authorized to manage users"
+#             )
+        
+#         return [UserResponse(**user) for user in users]
+    
+#     except HTTPException:
+#         raise
+#     except Exception as e:
+#         raise HTTPException(
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             detail=f"Error retrieving users: {str(e)}"
+#         )
 @router.get("/users", response_model=List[UserResponse])
 async def list_users(current_user = Depends(get_current_user)):
     """
@@ -159,7 +198,33 @@ async def list_users(current_user = Depends(get_current_user)):
                 detail="Not authorized to manage users"
             )
         
-        return [UserResponse(**user) for user in users]
+        # Clean and convert users data before creating UserResponse objects
+        cleaned_users = []
+        for user in users:
+            try:
+                # Remove MongoDB-specific fields
+                if "_id" in user:
+                    del user["_id"]
+                
+                # Ensure all required fields exist with proper defaults and types
+                cleaned_user_data = {
+                    "email": str(user.get("email", "")),
+                    "first_name": str(user.get("first_name", "")),
+                    "last_name": str(user.get("last_name", "")), 
+                    "role": str(user.get("role", "user")),
+                    "tenant_id": str(user.get("tenant_id")) if user.get("tenant_id") else None
+                }
+                
+                # Only add users with valid email (basic validation)
+                if cleaned_user_data["email"] and "@" in cleaned_user_data["email"]:
+                    cleaned_users.append(UserResponse(**cleaned_user_data))
+                    
+            except Exception as user_error:
+                # Log individual user conversion errors but continue with other users
+                print(f"Error converting user {user.get('email', 'unknown')}: {user_error}")
+                continue
+        
+        return cleaned_users
     
     except HTTPException:
         raise
