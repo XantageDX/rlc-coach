@@ -8,7 +8,7 @@ import { ReportWriterProvider } from './context/ReportWriterContext'; // Import 
 
 // Auth Components
 import Login from './components/auth/Login';
-import Register from './components/auth/Register';
+// import Register from './components/auth/Register';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Layout Components
@@ -62,7 +62,7 @@ function App() {
               <Routes>
                 {/* Public routes */}
                 <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+                {/* <Route path="/register" element={<Register />} /> */}
                 
                 {/* Protected routes with layout */}
                 <Route element={<ProtectedRoute />}>
