@@ -65,3 +65,5 @@ rlc-core-key.pem
 
 # Old Config
 /frontend/temp-cloudfront-configs
+
+frontend/src/styles/user-admin-old.css

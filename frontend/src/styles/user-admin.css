@@ -124,6 +124,177 @@
     margin-bottom: 1rem;
   }
 
+/* ===========================================
+   NEW: SESSION MANAGEMENT STYLES
+   =========================================== */
+
+/* Session Status Bar */
+.session-status-bar {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.session-info {
+  color: var(--brand-darkblue);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.token-expiry {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.token-expiry.warning {
+  color: #dc2626;
+  font-weight: 600;
+  animation: pulse-warning 2s infinite;
+}
+
+@keyframes pulse-warning {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Session Warning Banner */
+.session-warning-banner {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+  animation: gentle-bounce 3s infinite;
+}
+
+@keyframes gentle-bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-2px); }
+  60% { transform: translateY(-1px); }
+}
+
+/* Session Expired Message */
+.session-expired-message {
+  background: white;
+  border: 2px solid #fee2e2;
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+  max-width: 500px;
+  margin: 2rem auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.session-expired-message h2 {
+  color: #dc2626;
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.session-expired-message p {
+  color: #6b7280;
+  margin: 0 0 2rem 0;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.session-expired-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.login-again-btn,
+.go-home-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  min-width: 140px;
+}
+
+.login-again-btn {
+  background: linear-gradient(135deg, var(--brand-darkblue) 0%, var(--brand-blue) 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.login-again-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.go-home-btn {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+}
+
+.go-home-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
+}
+
+/* Global Error Message */
+.global-error-message {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.1);
+}
+
+.dismiss-error {
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  margin: 0;
+  width: auto;
+}
+
+.dismiss-error:hover {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+/* ===========================================
+   END OF SESSION MANAGEMENT STYLES
+   =========================================== */
+
 /* NEW STYLES FOR PHASE 14 */
 
 /* Impersonation Banner */
@@ -768,6 +939,24 @@
   .tenants-table th,
   .tenants-table td {
     padding: 8px;
+  }
+
+  /* Session Management Responsive */
+  .session-status-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .session-expired-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .login-again-btn,
+  .go-home-btn {
+    width: 100%;
+    min-width: auto;
   }
 }
 
