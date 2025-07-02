@@ -141,16 +141,60 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Enhanced logout function
-  const logout = (reason = null) => {
+  // const logout = (reason = null) => {
+  //   localStorage.removeItem('user');
+  //   setCurrentUser(null);
+  //   setIsTokenExpired(false);
+  //   setError(null);
+    
+  //   if (reason === 'token_expired') {
+  //     setIsTokenExpired(true);
+  //     setError('Your session has expired. Please log in again.');
+  //   }
+  // };
+  // Enhanced logout function with conversation memory control AND LOG
+  const logout = (reason = null, clearMemory = false) => {
+    const userEmail = currentUser?.email;
+    
+    console.log('=== LOGOUT DEBUG ===');
+    console.log('Reason:', reason);
+    console.log('Clear Memory:', clearMemory);
+    console.log('User Email:', userEmail);
+    console.log('Current localStorage keys:', Object.keys(localStorage));
+    
+    // Always clear auth data
     localStorage.removeItem('user');
     setCurrentUser(null);
     setIsTokenExpired(false);
     setError(null);
     
+    // Clear conversation memory only if explicitly requested
+    if (clearMemory && userEmail) {
+      console.log('🧹 CLEARING conversation memory for user:', userEmail);
+      
+      const aiCoachKey = `rlc-aicoach-state-${userEmail}`;
+      const reportWriterKey = `rlc-reportwriter-state-${userEmail}`;
+      
+      console.log('Removing keys:', aiCoachKey, reportWriterKey);
+      console.log('Keys before removal:', Object.keys(localStorage).filter(k => k.includes('rlc-')));
+      
+      localStorage.removeItem(aiCoachKey);
+      localStorage.removeItem(reportWriterKey);
+      localStorage.removeItem('rlc-aicoach-state-guest');
+      localStorage.removeItem('rlc-reportwriter-state-guest');
+      
+      console.log('Keys after removal:', Object.keys(localStorage).filter(k => k.includes('rlc-')));
+      console.log('✅ Memory cleared successfully');
+    } else {
+      console.log('💾 PRESERVING conversation memory (session expiration or no clearMemory flag)');
+    }
+    
     if (reason === 'token_expired') {
       setIsTokenExpired(true);
       setError('Your session has expired. Please log in again.');
     }
+    
+    console.log('=== END LOGOUT DEBUG ===');
   };
 
   // Handle authentication errors (401 responses)

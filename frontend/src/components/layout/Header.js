@@ -57,8 +57,13 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // const handleLogout = () => {
+  //   logout();
+  //   navigate('/login');
+  // };
   const handleLogout = () => {
-    logout();
+    console.log('🚪 USER CLICKED LOGOUT - should clear memory');
+    logout(null, true); // Voluntary logout - clear memory
     navigate('/login');
   };
 

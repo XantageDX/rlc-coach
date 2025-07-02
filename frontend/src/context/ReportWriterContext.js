@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 
+import { AuthContext } from './AuthContext'; // ← ADD THIS IMPORT
+
 // Create the context
 const ReportWriterContext = createContext();
 
@@ -201,26 +203,74 @@ const loadStateFromStorage = (userEmail) => {
 };
 
 // Provider component
+// export const ReportWriterProvider = ({ children }) => {
+//   const [state, dispatch] = useReducer(reportWriterReducer, initialState);
+
+//   // Load state from localStorage on initialization
+//   // useEffect(() => {
+//   //   const savedState = loadStateFromStorage();
+//   //   if (savedState) {
+//   //     dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
+//   //   }
+//   // }, []);
+
+//   // NEW ONE
+//   // useEffect(() => {
+//   //   // Get current user email for user-specific storage
+//   //   const user = JSON.parse(localStorage.getItem('user') || 'null');
+//   //   const userEmail = user?.email;
+    
+//   //   const savedState = loadStateFromStorage(userEmail);
+//   //   if (savedState) {
+//   //     dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
+//   //   }
+//   // }, []);
+//   //// THIRD VERSION WITH DEBUG
+//   useEffect(() => {
+//     // Get current user email for user-specific storage
+//     const user = JSON.parse(localStorage.getItem('user') || 'null');
+//     const userEmail = user?.email;
+    
+//     console.log('📝 ReportWriter: Loading state for user:', userEmail);
+//     console.log('📝 ReportWriter: User object from localStorage:', user);
+    
+//     const savedState = loadStateFromStorage(userEmail);
+//     console.log('📝 ReportWriter: Saved state from storage:', savedState);
+    
+//     if (savedState) {
+//       console.log('📝 ReportWriter: Found saved state, restoring...', savedState);
+//       dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
+//     } else {
+//       console.log('📝 ReportWriter: No saved state found, using initial state');
+//     }
+//   // }, []);
+//   }, [localStorage.getItem('user')]); // Instead of []
 export const ReportWriterProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reportWriterReducer, initialState);
+  const { currentUser } = useContext(AuthContext); // ← ADD THIS LINE
 
-  // Load state from localStorage on initialization
-  // useEffect(() => {
-  //   const savedState = loadStateFromStorage();
-  //   if (savedState) {
-  //     dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
-  //   }
-  // }, []);
+  // Load state when currentUser changes
   useEffect(() => {
-    // Get current user email for user-specific storage
-    const user = JSON.parse(localStorage.getItem('user') || 'null');
-    const userEmail = user?.email;
+    const userEmail = currentUser?.email;
+    
+    console.log('📝 ReportWriter: User changed, loading state for:', userEmail);
+    console.log('📝 ReportWriter: Current user object:', currentUser);
+    
+    if (!currentUser) {
+      console.log('📝 ReportWriter: No user logged in, skipping state load');
+      return;
+    }
     
     const savedState = loadStateFromStorage(userEmail);
+    console.log('📝 ReportWriter: Saved state from storage:', savedState);
+    
     if (savedState) {
+      console.log('📝 ReportWriter: Found saved state, restoring...', savedState);
       dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
+    } else {
+      console.log('📝 ReportWriter: No saved state found, using initial state');
     }
-  }, []);
+  }, [currentUser?.email]); // ← CHANGED: Watch for currentUser.email changes
 
   // Save state to localStorage whenever relevant state changes
   // useEffect(() => {
