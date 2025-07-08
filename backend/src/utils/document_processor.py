@@ -1,4 +1,3 @@
-# backend/src/utils/document_processor.py
 import os
 import tempfile
 from typing import List, Dict, Any

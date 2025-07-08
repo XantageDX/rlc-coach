@@ -1,6 +1,3 @@
-// Tenant Management Component for Super Admin
-// Location: frontend/src/components/admin/TenantManagement.js
-
 import React, { useState, useEffect, useCallback } from 'react';
 import tenantService from '../../services/tenantService';
 

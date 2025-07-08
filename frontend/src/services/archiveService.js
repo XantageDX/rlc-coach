@@ -55,51 +55,6 @@ const archiveService = {
   },
   
 
-  // BUCKET FIRST
-  // uploadDocument: async (type, projectId, file) => {
-  //   const formData = new FormData();
-  //   formData.append('document', file);
-  
-  //   try {
-  //     const response = await axios.post(
-  //       `${API_URL}/archive/projects/${projectId}/upload`, 
-  //       formData, 
-  //       {
-  //         headers: {
-  //           ...getAuthHeader(),
-  //           'Content-Type': 'multipart/form-data'
-  //         }
-  //       }
-  //     );
-  //     return response.data;
-  //   } catch (error) {
-  //     console.error('Error uploading document:', error);
-  //     throw error;
-  //   }
-  // },
-  // VERSION 1
-  // uploadDocument: async (type, projectId, file) => {
-  //   const formData = new FormData();
-  //   formData.append('file', file);  // Changed from 'document' to 'file'
-  
-  //   try {
-  //     const response = await axios.post(
-  //       `${API_URL}/archive/projects/${projectId}/upload`, 
-  //       formData, 
-  //       {
-  //         headers: {
-  //           ...getAuthHeader(),
-  //           'Content-Type': 'multipart/form-data'
-  //         }
-  //       }
-  //     );
-  //     return response.data;
-  //   } catch (error) {
-  //     console.error('Error uploading document:', error);
-  //     throw error;
-  //   }
-  // },
-  // VERSION 2
   uploadDocument: async (type, projectId, file) => {
     const formData = new FormData();
     formData.append('file', file);

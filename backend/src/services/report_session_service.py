@@ -1,81 +1,10 @@
-# # report_session_service.py
-# from typing import Dict, Any, Optional
-
-# # Store report sessions by session ID
-# _report_sessions = {}
-
-# def get_report_session(session_id: Optional[str] = None, report_id: Optional[str] = None, report_type: str = 'kg'):
-#     """
-#     Get or create a session for a specific report.
-    
-#     Args:
-#         session_id: Unique identifier for this report writing session
-#         report_id: ID of the report being edited
-#         report_type: Type of report ('kg' or 'kd')
-#     """
-#     global _report_sessions
-    
-#     # If no session ID provided, use a fallback based on report
-#     if not session_id:
-#         session_id = f"{report_type}_{report_id or 'default'}"
-    
-#     # If this session doesn't exist, create a new one
-#     if session_id not in _report_sessions:
-#         _report_sessions[session_id] = {
-#             "report_id": report_id,
-#             "report_type": report_type,
-#             "messages": [],
-#             "context": {}
-#         }
-#         print(f"Created new report session: {session_id}")
-    
-#     return _report_sessions[session_id]
-
-# def update_report_session(session_id: str, data: Dict[str, Any]):
-#     """Update an existing report session with new data."""
-#     global _report_sessions
-    
-#     if session_id in _report_sessions:
-#         _report_sessions[session_id].update(data)
-#         return True
-#     return False
-
-# def clear_report_session(session_id: Optional[str] = None, report_id: Optional[str] = None, report_type: str = 'kg'):
-#     """Clear the session for a specific report."""
-#     global _report_sessions
-    
-#     # If session ID is provided, clear that specific session
-#     if session_id and session_id in _report_sessions:
-#         del _report_sessions[session_id]
-#         print(f"Cleared report session by ID: {session_id}")
-#         return True
-    
-#     # Fallback: if no session ID but report_id is provided, try to find and clear by report details
-#     if not session_id and report_id:
-#         fallback_key = f"{report_type}_{report_id}"
-#         if fallback_key in _report_sessions:
-#             del _report_sessions[fallback_key]
-#             print(f"Cleared report session by fallback key: {fallback_key}")
-#             return True
-    
-#     return False
-
-# def get_all_sessions():
-#     """Return all active report sessions (for debugging)."""
-#     return _report_sessions
-
 #### PHASE 5.2 ####
-# report_session_service.py
 from typing import Dict, Any, Optional
 from datetime import datetime
 
 # Store report sessions by session ID
 _report_sessions = {}
 
-# def get_report_session(session_id: Optional[str] = None, report_id: Optional[str] = None, report_type: str = 'kg', tenant_id: Optional[str] = None):
-#     """
-#     Get or create a session for a specific report with ENFORCED tenant isolation.
-#     PHASE 5.2: Enhanced with mandatory tenant scoping for security.
 def get_report_session(session_id: Optional[str] = None, report_id: Optional[str] = None, report_type: str = 'kg', tenant_id: Optional[str] = None, user_email: Optional[str] = None):
     """
     Get or create a session for a specific report with ENFORCED tenant+user isolation.
@@ -89,13 +18,7 @@ def get_report_session(session_id: Optional[str] = None, report_id: Optional[str
     """
     global _report_sessions
     
-    # # PHASE 5.2 SECURITY: Create tenant-scoped session key
-    # if tenant_id:
-    #     # Tenant-scoped session: tenant_{tenant_id}_{session_id}
-    #     if not session_id:
-    #         session_id = f"{report_type}_{report_id or 'default'}"
-    #     scoped_session_id = f"tenant_{tenant_id}_{session_id}"
-    #     isolation_level = "tenant_scoped"
+    
     # PHASE 5.2 SECURITY: Create tenant+user-scoped session key for complete isolation
     if tenant_id and user_email:
         # Full isolation: tenant_{tenant_id}_user_{user_email}_{session_id}
@@ -146,11 +69,6 @@ def update_report_session(session_id: str, data: Dict[str, Any], tenant_id: Opti
     """
     global _report_sessions
     
-    # # PHASE 5.2 SECURITY: Create tenant-scoped session key
-    # if tenant_id:
-    #     scoped_session_id = f"tenant_{tenant_id}_{session_id}"
-    # else:
-    #     scoped_session_id = f"global_{session_id}"
     # PHASE 5.2 SECURITY: Create tenant+user-scoped session key for complete isolation
     if tenant_id and user_email:
         scoped_session_id = f"tenant_{tenant_id}_user_{user_email}_{session_id}"
@@ -185,11 +103,6 @@ def clear_report_session(session_id: Optional[str] = None, report_id: Optional[s
     
     # PHASE 5.2 SECURITY: Handle different clearing scenarios
     if session_id:
-        # # Clear specific session with tenant scoping
-        # if tenant_id:
-        #     scoped_session_id = f"tenant_{tenant_id}_{session_id}"
-        # else:
-        #     scoped_session_id = f"global_{session_id}"
         # Clear specific session with tenant+user scoping for complete isolation
         if tenant_id and user_email:
             scoped_session_id = f"tenant_{tenant_id}_user_{user_email}_{session_id}"
@@ -213,10 +126,6 @@ def clear_report_session(session_id: Optional[str] = None, report_id: Optional[s
     if not session_id and report_id:
         fallback_session_id = f"{report_type}_{report_id}"
         
-        # if tenant_id:
-        #     scoped_fallback_id = f"tenant_{tenant_id}_{fallback_session_id}"
-        # else:
-        #     scoped_fallback_id = f"global_{fallback_session_id}"
         if tenant_id and user_email:
             scoped_fallback_id = f"tenant_{tenant_id}_user_{user_email}_{fallback_session_id}"
         elif tenant_id:
@@ -236,54 +145,6 @@ def clear_report_session(session_id: Optional[str] = None, report_id: Optional[s
             return True
     
     return False
-
-# def clear_report_session(session_id: Optional[str] = None, report_id: Optional[str] = None, report_type: str = 'kg', tenant_id: Optional[str] = None):
-#     """
-#     Clear the session for a specific report with ENFORCED tenant isolation.
-#     PHASE 5.2: Enhanced with tenant validation and security logging.
-#     """
-#     global _report_sessions
-    
-#     # PHASE 5.2 SECURITY: Handle different clearing scenarios
-#     if session_id:
-#         # Clear specific session with tenant scoping
-#         if tenant_id:
-#             scoped_session_id = f"tenant_{tenant_id}_{session_id}"
-#         else:
-#             scoped_session_id = f"global_{session_id}"
-        
-#         if scoped_session_id in _report_sessions:
-#             # PHASE 5.2 SECURITY: Validate tenant access
-#             existing_session = _report_sessions[scoped_session_id]
-#             if existing_session.get("tenant_id") != tenant_id:
-#                 print(f"❌ Tenant {tenant_id} attempted to clear session owned by {existing_session.get('tenant_id')}")
-#                 return False
-            
-#             del _report_sessions[scoped_session_id]
-#             print(f"🗑️ Cleared report session by ID: {scoped_session_id}")
-#             return True
-    
-#     # Fallback: clear by report details with tenant scoping
-#     if not session_id and report_id:
-#         fallback_session_id = f"{report_type}_{report_id}"
-        
-#         if tenant_id:
-#             scoped_fallback_id = f"tenant_{tenant_id}_{fallback_session_id}"
-#         else:
-#             scoped_fallback_id = f"global_{fallback_session_id}"
-        
-#         if scoped_fallback_id in _report_sessions:
-#             # PHASE 5.2 SECURITY: Validate tenant access
-#             existing_session = _report_sessions[scoped_fallback_id]
-#             if existing_session.get("tenant_id") != tenant_id:
-#                 print(f"❌ Tenant {tenant_id} attempted to clear session owned by {existing_session.get('tenant_id')}")
-#                 return False
-            
-#             del _report_sessions[scoped_fallback_id]
-#             print(f"🗑️ Cleared report session by fallback: {scoped_fallback_id}")
-#             return True
-    
-#     return False
 
 def clear_all_tenant_sessions(tenant_id: Optional[str] = None):
     """

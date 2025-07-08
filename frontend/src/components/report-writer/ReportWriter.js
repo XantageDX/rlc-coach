@@ -353,15 +353,6 @@ const startVoiceInput = () => {
     resetRecordingState();
     
     // Only submit if we have a transcript
-    // if (finalTranscript.trim()) {
-    //   setChatInput(finalTranscript.trim());
-      
-    //   // Small delay to ensure the UI updates before submitting
-    //   setTimeout(() => {
-    //     handleChatSubmit();
-    //   }, 300);
-    // }
-    // Only submit if we have a transcript
     if (finalTranscript.trim()) {
       setChatInput(finalTranscript.trim());
       setIsTyping(true); // Show send button after voice input

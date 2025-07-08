@@ -51,6 +51,7 @@ const aiCoachReducer = (state, action) => {
       return {
         ...initialState,
         conversationId: `conversation-${Date.now()}`,
+        showSuggestions: true,  // ← EXPLICITLY set this to true
         messages: [{
           role: 'assistant',
           content: 'Hello! I\'m your AI Coach for Rapid Learning Cycles. What would you like to know about RLC? Ask me a question in the box at the bottom of the screen or click on one of the following options to get started.'
@@ -65,27 +66,11 @@ const aiCoachReducer = (state, action) => {
   }
 };
 
-// localStorage key
-// const STORAGE_KEY = 'rlc-aicoach-state';
 // Dynamic storage key based on current user
 const getStorageKey = (userEmail) => {
   return userEmail ? `rlc-aicoach-state-${userEmail}` : 'rlc-aicoach-state-guest';
 };
 
-// Helper function to save state to localStorage
-// const saveStateToStorage = (state) => {
-//   try {
-//     const stateToSave = {
-//       messages: state.messages,
-//       inputText: state.inputText,
-//       conversationId: state.conversationId,
-//       showSuggestions: state.showSuggestions
-//     };
-//     localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
-//   } catch (error) {
-//     console.warn('Failed to save AI Coach state to localStorage:', error);
-//   }
-// };
 const saveStateToStorage = (state, userEmail) => {
   try {
     const stateToSave = {
@@ -101,18 +86,6 @@ const saveStateToStorage = (state, userEmail) => {
   }
 };
 
-// Helper function to load state from localStorage
-// const loadStateFromStorage = () => {
-//   try {
-//     const savedState = localStorage.getItem(STORAGE_KEY);
-//     if (savedState) {
-//       return JSON.parse(savedState);
-//     }
-//   } catch (error) {
-//     console.warn('Failed to load AI Coach state from localStorage:', error);
-//   }
-//   return null;
-// };
 const loadStateFromStorage = (userEmail) => {
   try {
     const storageKey = getStorageKey(userEmail);
@@ -126,127 +99,36 @@ const loadStateFromStorage = (userEmail) => {
   return null;
 };
 
-// Provider component
-// export const AICoachProvider = ({ children }) => {
-//   const [state, dispatch] = useReducer(aiCoachReducer, initialState);
-
-//   // Load state from localStorage on initialization
-//   // useEffect(() => {
-//   //   const savedState = loadStateFromStorage();
-//   //   if (savedState) {
-//   //     // If we have saved state, restore it
-//   //     dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
-//   //   } else {
-//   //     // If no saved state, initialize with welcome message
-//   //     const welcomeMessage = {
-//   //       role: 'assistant',
-//   //       content: 'Hello! I\'m your AI Coach for Rapid Learning Cycles. What would you like to know about RLC? Ask me a question in the box at the bottom of the screen or click on one of the following options to get started.'
-//   //     };
-//   //     const conversationId = `conversation-${Date.now()}`;
-      
-//   //     dispatch({ type: actionTypes.SET_MESSAGES, payload: [welcomeMessage] });
-//   //     dispatch({ type: actionTypes.SET_CONVERSATION_ID, payload: conversationId });
-//   //   }
-//   // }, []);
-//   // useEffect(() => {
-//   //   // Get current user email for user-specific storage
-//   //   const user = JSON.parse(localStorage.getItem('user') || 'null');
-//   //   const userEmail = user?.email;
-    
-//   //   const savedState = loadStateFromStorage(userEmail);
-//   //   if (savedState) {
-//   //     dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
-//   //   } else {
-//   //     // Set welcome message if no saved state
-//   //     const welcomeMessage = {
-//   //       id: Date.now(),
-//   //       type: 'ai',
-//   //       content: 'Hello! I\'m your AI Coach for Rapid Learning Cycles. What would you like to know about RLC? Ask me a question in the box at the bottom of the screen or click on one of the following options to get started.'
-//   //     };
-//   //     const conversationId = `conversation-${Date.now()}`;
-      
-//   //     dispatch({ type: actionTypes.SET_MESSAGES, payload: [welcomeMessage] });
-//   //     dispatch({ type: actionTypes.SET_CONVERSATION_ID, payload: conversationId });
-//   //   }
-//   // }, []);
-//   useEffect(() => {
-//     // Get current user email for user-specific storage
-//     const user = JSON.parse(localStorage.getItem('user') || 'null');
-//     const userEmail = user?.email;
-    
-//     console.log('🤖 AICoach: Loading state for user:', userEmail);
-//     console.log('🤖 AICoach: User object from localStorage:', user);
-    
-//     const savedState = loadStateFromStorage(userEmail);
-//     console.log('🤖 AICoach: Saved state from storage:', savedState);
-    
-//     if (savedState) {
-//       console.log('🤖 AICoach: Found saved state, restoring...', savedState);
-//       dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
-//     } else {
-//       console.log('🤖 AICoach: No saved state found, setting welcome message');
-      
-//       // Set welcome message if no saved state (YOUR EXISTING LOGIC)
-//       const welcomeMessage = {
-//         id: Date.now(),
-//         type: 'ai',
-//         content: 'Hello! I\'m your AI Coach for Rapid Learning Cycles. What would you like to know about RLC? Ask me a question in the box at the bottom of the screen or click on one of the following options to get started.'
-//       };
-//       const conversationId = `conversation-${Date.now()}`;
-      
-//       console.log('🤖 AICoach: Setting welcome message and conversation ID:', conversationId);
-//       dispatch({ type: actionTypes.SET_MESSAGES, payload: [welcomeMessage] });
-//       dispatch({ type: actionTypes.SET_CONVERSATION_ID, payload: conversationId });
-//     }
-//   // }, []);
-//   }, [localStorage.getItem('user')]); // Instead of []
 export const AICoachProvider = ({ children }) => {
   const [state, dispatch] = useReducer(aiCoachReducer, initialState);
   const { currentUser } = useContext(AuthContext); // ← ADDED: Get currentUser from AuthContext
 
   useEffect(() => {
-    // Get current user email for user-specific storage
-    const userEmail = currentUser?.email; // ← CHANGED: Use currentUser instead of localStorage
+    const userEmail = currentUser?.email;
     
-    console.log('🤖 AICoach: Loading state for user:', userEmail);
-    console.log('🤖 AICoach: User object from AuthContext:', currentUser); // ← CHANGED: Log from AuthContext
-    
-    // Skip if no user is logged in
-    if (!currentUser) {
-      console.log('🤖 AICoach: No user logged in, skipping state load');
-      return;
-    }
-    
+    // Try to load saved state
     const savedState = loadStateFromStorage(userEmail);
-    console.log('🤖 AICoach: Saved state from storage:', savedState);
     
-    if (savedState) {
-      console.log('🤖 AICoach: Found saved state, restoring...', savedState);
+    if (savedState && savedState.messages && savedState.messages.length > 1) {
+      // Only restore if we have a real conversation (more than just welcome message)
+      console.log('🔄 AICoach: Restoring saved conversation for user:', userEmail);
       dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
     } else {
-      console.log('🤖 AICoach: No saved state found, setting welcome message');
-      
-      // Set welcome message if no saved state (YOUR EXISTING LOGIC)
+      // If no saved state or only welcome message, create fresh state
+      console.log('🆕 AICoach: Creating fresh state for user:', userEmail);
       const welcomeMessage = {
-        id: Date.now(),
-        type: 'ai',
+        role: 'assistant',
         content: 'Hello! I\'m your AI Coach for Rapid Learning Cycles. What would you like to know about RLC? Ask me a question in the box at the bottom of the screen or click on one of the following options to get started.'
       };
       const conversationId = `conversation-${Date.now()}`;
       
-      console.log('🤖 AICoach: Setting welcome message and conversation ID:', conversationId);
+      console.log('🤖 AICoach: Setting welcome message with suggestions enabled');
       dispatch({ type: actionTypes.SET_MESSAGES, payload: [welcomeMessage] });
       dispatch({ type: actionTypes.SET_CONVERSATION_ID, payload: conversationId });
+      dispatch({ type: actionTypes.SET_SHOW_SUGGESTIONS, payload: true }); // ← EXPLICITLY set suggestions
     }
-  }, [currentUser?.email]); // ← CHANGED: Watch for currentUser.email instead of localStorage
+  }, [currentUser?.email]);
 
-  // Save state to localStorage whenever relevant state changes
-  // useEffect(() => {
-  //   // Only save if we have messages (to avoid saving initial empty state)
-  //   if (state.messages.length > 0) {
-  //     saveStateToStorage(state);
-  //   }
-  // }, [state.messages, state.inputText, state.conversationId, state.showSuggestions]);
   useEffect(() => {
     // Only save if we have messages (to avoid saving initial empty state)
     if (state.messages.length > 0) {
@@ -285,41 +167,26 @@ export const AICoachProvider = ({ children }) => {
     dispatch({ type: actionTypes.SET_SHOW_SUGGESTIONS, payload: show });
   };
 
-//   const clearConversation = () => {
-//     // Clear both state and localStorage
-//     localStorage.removeItem(STORAGE_KEY);
-//     dispatch({ type: actionTypes.CLEAR_CONVERSATION });
-//   };
-// CLEAR MEMORY CONVERSATION
-    // const clearConversation = async () => {
-    //     // Store the old conversation ID before clearing
-    //     const oldConversationId = state.conversationId;
-        
-    //     // Clear frontend state and localStorage first
-    //     localStorage.removeItem(STORAGE_KEY);
-    //     dispatch({ type: actionTypes.CLEAR_CONVERSATION });
-        
-    //     // Clear backend memory if we had a conversation ID
-    //     if (oldConversationId) {
-    //     try {
-    //         // We'll add this function to the service next
-    //         await aiCoachService.clearConversation(oldConversationId);
-    //     } catch (error) {
-    //         console.warn('Failed to clear backend conversation memory:', error);
-    //         // Don't block the UI if backend clearing fails
-    //     }
-    //     }
-    // };
-    const clearConversation = async () => {
+const clearConversation = async () => {
       // Store the old conversation ID before clearing
       const oldConversationId = state.conversationId;
+      
+      console.log('🧹 AICoach: Clearing conversation, suggestions should show after this');
       
       // Clear frontend state and user-specific localStorage
       const user = JSON.parse(localStorage.getItem('user') || 'null');
       const userEmail = user?.email;
       const storageKey = getStorageKey(userEmail);
       localStorage.removeItem(storageKey);
+      
+      // Dispatch the clear action
       dispatch({ type: actionTypes.CLEAR_CONVERSATION });
+      
+      // Force suggestions to show after clearing
+      setTimeout(() => {
+        console.log('🔄 AICoach: Force-enabling suggestions after clear');
+        dispatch({ type: actionTypes.SET_SHOW_SUGGESTIONS, payload: true });
+      }, 100);
       
       // Clear backend memory if we had a conversation ID
       if (oldConversationId) {

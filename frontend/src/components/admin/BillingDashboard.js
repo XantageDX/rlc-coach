@@ -1,6 +1,3 @@
-// Billing Dashboard Component for Super Admin
-// Location: frontend/src/components/admin/BillingDashboard.js
-
 import React, { useState, useEffect, useCallback } from 'react';
 import billingService from '../../services/billingService';
 

@@ -1,6 +1,3 @@
-// Frontend service for billing and token usage analytics
-// Location: frontend/src/services/billingService.js
-
 const API_URL = 'https://api.spark.rapidlearningcycles.com';
 
 // Get auth header for requests (matching your existing pattern)

@@ -52,7 +52,6 @@ const initialState = {
   showActionsMenu: false
 };
 
-// Define action types
 const actionTypes = {
   SET_CURRENT_REPORT: 'SET_CURRENT_REPORT',
   SET_REPORT_TYPE: 'SET_REPORT_TYPE',
@@ -64,13 +63,15 @@ const actionTypes = {
   MARK_SAVED: 'MARK_SAVED',
   CLEAR_REPORT: 'CLEAR_REPORT',
   RESTORE_STATE: 'RESTORE_STATE',
-  // New action types for conversation memory
+  SET_SESSION_ID: 'SET_SESSION_ID', // ← ADD THIS
+  CLEAR_CONVERSATION_MEMORY: 'CLEAR_CONVERSATION_MEMORY', // ← ADD THIS
+  // Add new action types for conversation memory
+  SET_SELECTED_REPORT: 'SET_SELECTED_REPORT',
   SET_CHAT_MESSAGES: 'SET_CHAT_MESSAGES',
   ADD_CHAT_MESSAGE: 'ADD_CHAT_MESSAGE',
   SET_CHAT_INPUT: 'SET_CHAT_INPUT',
-  SET_SELECTED_REPORT: 'SET_SELECTED_REPORT',
-  SET_SOURCES: 'SET_SOURCES',
   SET_AI_LOADING: 'SET_AI_LOADING',
+  SET_SOURCES: 'SET_SOURCES',
   SET_SHOW_ACTIONS_MENU: 'SET_SHOW_ACTIONS_MENU'
 };
 
@@ -123,39 +124,24 @@ const reportWriterReducer = (state, action) => {
       return { ...state, isAiLoading: action.payload };
     case actionTypes.SET_SHOW_ACTIONS_MENU:
       return { ...state, showActionsMenu: action.payload };
+    case actionTypes.CLEAR_CONVERSATION_MEMORY:
+      return {
+        ...initialState,
+        sessionId: `report-session-${Date.now()}` // Generate new session ID
+      };
+    case actionTypes.SET_SESSION_ID:
+      return { ...state, sessionId: action.payload };
     default:
       return state;
   }
 };
 
-// localStorage key
-// const STORAGE_KEY = 'rlc-reportwriter-state';
 
 // Dynamic storage key based on current user
   const getStorageKey = (userEmail) => {
     return userEmail ? `rlc-reportwriter-state-${userEmail}` : 'rlc-reportwriter-state-guest';
   };
 
-// Helper function to save state to localStorage
-// const saveStateToStorage = (state) => {
-//   try {
-//     const stateToSave = {
-//       currentReport: state.currentReport,
-//       reportType: state.reportType,
-//       formData: state.formData,
-//       aiSuggestions: state.aiSuggestions,
-//       // Save conversation memory state
-//       selectedReport: state.selectedReport,
-//       chatMessages: state.chatMessages,
-//       chatInput: state.chatInput,
-//       sources: state.sources
-//       // Note: We don't save loading states or UI states like showActionsMenu
-//     };
-//     localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
-//   } catch (error) {
-//     console.warn('Failed to save Report Writer state to localStorage:', error);
-//   }
-// };
 const saveStateToStorage = (state, userEmail) => {
   try {
     const stateToSave = {
@@ -177,18 +163,6 @@ const saveStateToStorage = (state, userEmail) => {
   }
 };
 
-// Helper function to load state from localStorage
-// const loadStateFromStorage = () => {
-//   try {
-//     const savedState = localStorage.getItem(STORAGE_KEY);
-//     if (savedState) {
-//       return JSON.parse(savedState);
-//     }
-//   } catch (error) {
-//     console.warn('Failed to load Report Writer state from localStorage:', error);
-//   }
-//   return null;
-// };
 const loadStateFromStorage = (userEmail) => {
   try {
     const storageKey = getStorageKey(userEmail);
@@ -202,54 +176,10 @@ const loadStateFromStorage = (userEmail) => {
   return null;
 };
 
-// Provider component
-// export const ReportWriterProvider = ({ children }) => {
-//   const [state, dispatch] = useReducer(reportWriterReducer, initialState);
-
-//   // Load state from localStorage on initialization
-//   // useEffect(() => {
-//   //   const savedState = loadStateFromStorage();
-//   //   if (savedState) {
-//   //     dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
-//   //   }
-//   // }, []);
-
-//   // NEW ONE
-//   // useEffect(() => {
-//   //   // Get current user email for user-specific storage
-//   //   const user = JSON.parse(localStorage.getItem('user') || 'null');
-//   //   const userEmail = user?.email;
-    
-//   //   const savedState = loadStateFromStorage(userEmail);
-//   //   if (savedState) {
-//   //     dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
-//   //   }
-//   // }, []);
-//   //// THIRD VERSION WITH DEBUG
-//   useEffect(() => {
-//     // Get current user email for user-specific storage
-//     const user = JSON.parse(localStorage.getItem('user') || 'null');
-//     const userEmail = user?.email;
-    
-//     console.log('📝 ReportWriter: Loading state for user:', userEmail);
-//     console.log('📝 ReportWriter: User object from localStorage:', user);
-    
-//     const savedState = loadStateFromStorage(userEmail);
-//     console.log('📝 ReportWriter: Saved state from storage:', savedState);
-    
-//     if (savedState) {
-//       console.log('📝 ReportWriter: Found saved state, restoring...', savedState);
-//       dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
-//     } else {
-//       console.log('📝 ReportWriter: No saved state found, using initial state');
-//     }
-//   // }, []);
-//   }, [localStorage.getItem('user')]); // Instead of []
 export const ReportWriterProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reportWriterReducer, initialState);
   const { currentUser } = useContext(AuthContext); // ← ADD THIS LINE
 
-  // Load state when currentUser changes
   useEffect(() => {
     const userEmail = currentUser?.email;
     
@@ -268,37 +198,24 @@ export const ReportWriterProvider = ({ children }) => {
       console.log('📝 ReportWriter: Found saved state, restoring...', savedState);
       dispatch({ type: actionTypes.RESTORE_STATE, payload: savedState });
     } else {
-      console.log('📝 ReportWriter: No saved state found, using initial state');
+      console.log('📝 ReportWriter: No saved state - resetting to fresh initial state');
+      // When no saved state (voluntary logout cleared localStorage), reset to original initial state
+      dispatch({ type: actionTypes.RESTORE_STATE, payload: initialState });
     }
-  }, [currentUser?.email]); // ← CHANGED: Watch for currentUser.email changes
+  }, [currentUser?.email]);
 
-  // Save state to localStorage whenever relevant state changes
-  // useEffect(() => {
-  //   saveStateToStorage(state);
-  // }, [
-  //   state.currentReport,
-  //   state.reportType,
-  //   state.formData,
-  //   state.aiSuggestions,
-  //   // Add conversation memory dependencies
-  //   state.selectedReport,
-  //   state.chatMessages,
-  //   state.chatInput,
-  //   state.sources
-  // ]);
   useEffect(() => {
-    // Only save if we have actual content (avoid saving initial empty state)
-    if (state.currentReport || state.formData.title || state.chatMessages.length > 1) {
-      const user = JSON.parse(localStorage.getItem('user') || 'null');
-      const userEmail = user?.email;
-      saveStateToStorage(state, userEmail);
+    // Only save if we have a user AND actual content beyond the initial welcome message
+    if (currentUser?.email && (state.currentReport || state.formData.title || state.chatMessages.length > 1)) {
+      console.log('📝 ReportWriter: Saving state to localStorage');
+      saveStateToStorage(state, currentUser.email);
     }
   }, [
+    currentUser?.email, // Add this dependency
     state.currentReport,
     state.reportType,
     state.formData,
     state.aiSuggestions,
-    // Add conversation memory dependencies
     state.selectedReport,
     state.chatMessages,
     state.chatInput,
@@ -338,17 +255,6 @@ export const ReportWriterProvider = ({ children }) => {
     dispatch({ type: actionTypes.MARK_SAVED });
   };
 
-  // const clearReport = () => {
-  //   // Generate a new session ID
-  //   const newSessionId = `report-session-${Date.now()}`;
-    
-  //   // Clear both state and localStorage
-  //   localStorage.removeItem(STORAGE_KEY);
-  //   dispatch({ 
-  //     type: actionTypes.CLEAR_REPORT,
-  //     payload: { sessionId: newSessionId }
-  //   });
-  // };
   const clearReport = () => {
     // Generate a new session ID
     const newSessionId = `report-session-${Date.now()}`;
@@ -363,6 +269,21 @@ export const ReportWriterProvider = ({ children }) => {
       type: actionTypes.CLEAR_REPORT,
       payload: { sessionId: newSessionId }
     });
+  };
+
+  const clearConversationMemory = () => {
+    console.log('🧹 ReportWriter: Clearing conversation memory');
+    
+    // Clear user-specific localStorage
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    const userEmail = user?.email;
+    const storageKey = getStorageKey(userEmail);
+    localStorage.removeItem(storageKey);
+    
+    // Dispatch the clear action
+    dispatch({ type: actionTypes.CLEAR_CONVERSATION_MEMORY });
+    
+    console.log('✅ ReportWriter: Conversation memory cleared');
   };
 
   // New action creators for conversation memory
@@ -392,6 +313,10 @@ export const ReportWriterProvider = ({ children }) => {
 
   const setShowActionsMenu = (show) => {
     dispatch({ type: actionTypes.SET_SHOW_ACTIONS_MENU, payload: show });
+  };
+
+  const setSessionId = (sessionId) => {
+    dispatch({ type: actionTypes.SET_SESSION_ID, payload: sessionId });
   };
 
   // Context value
@@ -432,7 +357,9 @@ export const ReportWriterProvider = ({ children }) => {
     setChatInput,
     setAiLoading,
     setSources,
-    setShowActionsMenu
+    setShowActionsMenu,
+    setSessionId, // ← ADD THIS
+    clearConversationMemory // ← ADD THIS
   };
 
   return (

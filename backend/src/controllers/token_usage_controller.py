@@ -16,9 +16,6 @@ from datetime import datetime, timezone
 
 router = APIRouter()
 
-# Add these new endpoints to your existing token_usage_controller.py
-# Keep all your existing endpoints and add these new ones
-
 @router.get("/monthly-report")
 async def get_monthly_token_report(
     month: Optional[str] = None,
@@ -430,44 +427,6 @@ async def get_tenant_usage(
             detail=f"Error retrieving usage data: {str(e)}"
         )
 
-# @router.get("/usage-all")
-# async def get_all_tenants_usage(current_user = Depends(get_current_user)):
-#     """Get token usage for all tenants (super_admin only)"""
-#     if current_user.role != "super_admin":
-#         raise HTTPException(
-#             status_code=status.HTTP_403_FORBIDDEN,
-#             detail="Only super admins can view all tenant usage"
-#         )
-    
-#     try:
-#         current_month = datetime.utcnow().strftime("%Y-%m")
-#         tenants_collection = db["tenants"]
-#         token_usage_collection = db["tenant_token_usage"]
-        
-#         # Get all tenants
-#         tenants = list(tenants_collection.find({}, {"_id": 1, "name": 1, "token_limit_millions": 1}))
-        
-#         usage_data = []
-#         for tenant in tenants:
-#             tenant_id = str(tenant["_id"])
-#             usage = await token_logger.get_tenant_usage_summary(tenant_id, current_month)
-            
-#             usage_data.append({
-#                 "tenant_id": tenant_id,
-#                 "tenant_name": tenant["name"],
-#                 "usage": usage
-#             })
-        
-#         return {
-#             "month": current_month,
-#             "tenants": usage_data,
-#             "total_tenants": len(usage_data)
-#         }
-#     except Exception as e:
-#         raise HTTPException(
-#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             detail=f"Error retrieving usage data: {str(e)}"
-#         )
 @router.get("/usage-all")
 async def get_all_tenants_usage(current_user = Depends(get_current_user)):
     if current_user.role != "super_admin":

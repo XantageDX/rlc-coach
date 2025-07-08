@@ -8,14 +8,6 @@ from src.utils.auth import get_current_user
 
 router = APIRouter()
 
-# @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-# async def register(user_data: UserCreate):
-#     """
-#     Register a new user.
-#     """
-#     return await create_user(user_data)
-
-
 @router.post("/token", response_model=TokenResponse)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     """
